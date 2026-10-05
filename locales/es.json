@@ -1,0 +1,532 @@
+{
+  "nav": {
+    "title": "Secciones",
+    "chat": "Chat",
+    "tasks": "Tareas",
+    "memory": "Memoria",
+    "space": "Espacio",
+    "connections": "Conexiones"
+  },
+  "common": {
+    "loading": "Cargando…",
+    "cancel": "Cancelar",
+    "create": "Crear",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "remove": "Quitar",
+    "back": "Atrás",
+    "done": "Listo",
+    "more": "Mostrar más"
+  },
+  "login": {
+    "logoAlt": "Logotipo de Nabu",
+    "signIn": "Iniciar sesión con {provider}",
+    "corporate": "Cuenta corporativa",
+    "orgOnly": "Solo miembros de {org}",
+    "errors": {
+      "state": "El enlace de inicio de sesión caducó. Inténtelo de nuevo.",
+      "denied": "Se canceló el inicio de sesión.",
+      "failed": "No se pudo iniciar sesión. Inténtelo de nuevo.",
+      "not_org_member": "Su cuenta no pertenece a la organización.",
+      "no_verified_email": "Su cuenta no tiene un correo principal verificado.",
+      "email_not_verified": "El proveedor no ha verificado su correo.",
+      "blocked": "El acceso de su cuenta está cerrado.",
+      "provider": "El proveedor de inicio de sesión no está disponible."
+    }
+  },
+  "profile": {
+    "title": "Perfil",
+    "language": "Idioma",
+    "theme": "Tema",
+    "themes": {
+      "light": "Claro",
+      "dark": "Oscuro"
+    },
+    "timezone": "Zona horaria",
+    "admin": "Administración",
+    "logout": "Cerrar sesión"
+  },
+  "tones": {
+    "business": "Formal",
+    "friendly": "Cercano",
+    "brief": "Conciso",
+    "mentor": "Mentor"
+  },
+  "agent": {
+    "menu": "Agente",
+    "name": "Nombre del agente",
+    "tone": "Tono",
+    "everywhere": "El cambio se aplica en todos los canales y servicios conectados."
+  },
+  "channels": {
+    "web": "Sitio web",
+    "telegram": "Telegram",
+    "vkws": "VK WorkSpace"
+  },
+  "days": {
+    "0": "domingo",
+    "1": "lunes",
+    "2": "martes",
+    "3": "miércoles",
+    "4": "jueves",
+    "5": "viernes",
+    "6": "sábado"
+  },
+  "chat": {
+    "title": "Chat",
+    "conversations": "Conversaciones",
+    "conversation": "Conversación",
+    "main": "Principal",
+    "topics": "Temas",
+    "archive": "Archivo",
+    "noTopics": "Aún no hay temas",
+    "newTopic": "Nuevo tema",
+    "topicTitle": "Tema",
+    "topicHint": "Un tema tiene su propio historial y la misma memoria y espacio.",
+    "mainHint": "Una conversación en todos los canales",
+    "noModel": "sin modelo",
+    "loadOlder": "Mensajes anteriores",
+    "emptyTitle": "Hola, soy {name}",
+    "emptyHint": "Pídame ordenar el correo, buscar algo en sus herramientas o recordarle algo más tarde.",
+    "placeholder": "Mensaje para {name}…",
+    "send": "Enviar",
+    "attach": "Adjuntar archivos",
+    "typing": "El agente está escribiendo",
+    "archivedHint": "El tema está archivado y es de solo lectura.",
+    "unarchive": "Desarchivar",
+    "taskMark": "Tarea",
+    "moreSteps": "{count, plural, one {# paso más} other {# pasos más}}",
+    "hideSteps": "Ocultar pasos",
+    "tools": {
+      "memory": "Memoria",
+      "task": "Tareas",
+      "space": "Espacio"
+    },
+    "voice": {
+      "hold": "Mantenga pulsado para grabar",
+      "stop": "Detener la grabación",
+      "recording": "Grabando… {seconds} s",
+      "review": "Revise la transcripción antes de enviar",
+      "notRecognized": "No se reconoció la voz",
+      "micDenied": "Sin acceso al micrófono",
+      "unsupported": "Este navegador no admite la entrada de voz"
+    }
+  },
+  "llm": {
+    "retry": "Reintentar",
+    "errors": {
+      "insufficient_balance": "El proveedor de modelos se quedó sin saldo. Un administrador debe recargarlo.",
+      "auth": "La conexión con el modelo fue rechazada. Un administrador debe revisar la clave.",
+      "rate_limit": "El modelo está saturado. Reintente en un minuto.",
+      "unavailable": "El modelo no está disponible temporalmente. Reintente más tarde.",
+      "bad_request": "El modelo rechazó la solicitud.",
+      "context_overflow": "La conversación es demasiado larga para el modelo. Empiece un tema nuevo.",
+      "agent_crashed": "El agente se detuvo inesperadamente. Reintente.",
+      "agent_busy": "El agente está ocupado. Reintente en un minuto.",
+      "agent_not_configured": "El agente no está configurado: un administrador debe añadir una conexión de modelos.",
+      "user_blocked": "El acceso al agente está cerrado para su cuenta.",
+      "workspace_not_connected": "El espacio de trabajo no se conectó.",
+      "limit_exceeded": "La ejecución superó sus límites."
+    }
+  },
+  "tasks": {
+    "title": "Tareas",
+    "hint": "Las tareas se crean en la conversación con el agente: pídale que le recuerde algo una vez o que haga algo con regularidad.",
+    "example": "«Cada lunes a las 10:00 envíame por Telegram un resumen de métricas»",
+    "filters": {
+      "active": "Activas",
+      "done": "Terminadas",
+      "cancelled": "Canceladas"
+    },
+    "cols": {
+      "task": "Tarea",
+      "schedule": "Programación",
+      "next": "Próxima ejecución",
+      "last": "Última ejecución",
+      "channel": "Canal"
+    },
+    "empty": "No hay tareas",
+    "emptyHint": "Pida a su agente en el chat que cree una.",
+    "paused": "En pausa",
+    "run": {
+      "running": "En curso",
+      "succeeded": "Hecho",
+      "failed": "Error"
+    },
+    "cancel": "Cancelar",
+    "resume": "Reanudar",
+    "cancelTitle": "¿Cancelar la tarea?",
+    "cancelText": "La tarea «{title}» ya no se ejecutará.",
+    "noRuns": "Aún no hay ejecuciones",
+    "openInChat": "Abrir en la conversación",
+    "once": "Una vez, {at}",
+    "daily": "Cada día a las {time}",
+    "weekdays": "Los días laborables a las {time}",
+    "weekly": "Cada {day} a las {time}",
+    "everyMinutes": "{count, plural, one {Cada minuto} other {Cada # minutos}}"
+  },
+  "memory": {
+    "title": "Memoria",
+    "lead": "Lo que su agente recuerda de usted. Guarda datos en las conversaciones; puede editar, eliminar o añadir registros.",
+    "search": "Buscar en la memoria",
+    "add": "Añadir registro",
+    "clear": "Borrar todo",
+    "clearTitle": "¿Borrar la memoria?",
+    "clearText": "Se eliminarán todos los registros. El agente dejará de usarlos desde el próximo mensaje.",
+    "clearConfirm": "Borrar todo",
+    "empty": "La memoria está vacía",
+    "emptyHint": "Diga al agente qué recordar o añada un registro.",
+    "notFound": "No se encontró nada",
+    "fromChat": "de una conversación",
+    "manual": "añadido a mano",
+    "editTitle": "Editar registro",
+    "text": "Texto",
+    "pinned": "Tener siempre en cuenta"
+  },
+  "space": {
+    "title": "Espacio",
+    "lead": "El espacio de trabajo personal de su agente: los archivos se conservan entre conversaciones y están aislados de otros usuarios.",
+    "upload": "Subir",
+    "download": "Descargar",
+    "used": "{used} de {quota}",
+    "disabled": "Los espacios personales no están activados",
+    "state": {
+      "running": "Activo",
+      "sleeping": "En reposo",
+      "starting": "Iniciando",
+      "stopping": "Entrando en reposo"
+    },
+    "cols": {
+      "path": "Ruta",
+      "size": "Tamaño",
+      "changed": "Modificado"
+    },
+    "byAgent": "por el agente",
+    "byUser": "por usted",
+    "empty": "Aún no hay archivos",
+    "emptyHint": "Aquí aparecen los archivos que crea el agente y los que usted sube."
+  },
+  "connections": {
+    "title": "Conexiones",
+    "lead": "Mensajeros para hablar con su agente y herramientas de la empresa que puede usar.",
+    "channels": "Canales",
+    "catalog": "Catálogo",
+    "filters": {
+      "all": "Todo",
+      "connected": "Conectado",
+      "mcp": "MCP",
+      "skill": "Skills"
+    },
+    "personal": "personal",
+    "platform": "plataforma",
+    "platformRead": "plataforma · lectura",
+    "skill": "skill",
+    "inDevelopment": "en desarrollo",
+    "connected": "Conectado",
+    "connect": "Conectar",
+    "revoke": "Revocar acceso",
+    "disable": "Desactivar",
+    "status": {
+      "available": "Disponible",
+      "in_development": "Próximamente",
+      "unavailable": "No disponible"
+    },
+    "empty": "El catálogo está vacío",
+    "tokenTitle": "Acceso a {name}",
+    "token": "Token personal",
+    "tokenHint": "El token se guarda cifrado en Nabu, nunca en el espacio del agente.",
+    "linked": "Vinculado",
+    "linkedAs": "{account}, desde {when}",
+    "unlink": "Desvincular",
+    "getCode": "Obtener código de vinculación",
+    "linkHint": "Vincule su cuenta para hablar aquí con el agente.",
+    "codeTitle": "Vincular {channel}",
+    "codeText": "Envíe este mensaje al bot de Nabu:",
+    "codeTextBot": "Envíe este mensaje a {bot}:",
+    "openBot": "Abrir el bot",
+    "codeExpires": "El código sirve una vez hasta las {time}.",
+    "oauth": {
+      "connected": "Acceso concedido",
+      "denied": "No se concedió el acceso",
+      "failed": "La conexión falló",
+      "invalid_state": "El enlace caducó; conecte de nuevo"
+    }
+  },
+  "admin": {
+    "title": "Administración",
+    "noAccess": "Se requiere el rol de administrador de la plataforma",
+    "users": {
+      "title": "Usuarios",
+      "invite": "Añadir por correo",
+      "add": "Añadir",
+      "search": "Buscar por nombre o correo",
+      "user": "Usuario",
+      "channels": "Canales",
+      "role": "Rol",
+      "admin": "Administrador",
+      "lastSeen": "Última actividad",
+      "status": "Estado",
+      "statuses": {
+        "active": "Activo",
+        "invited": "Invitado",
+        "blocked": "Bloqueado"
+      },
+      "block": "Bloquear",
+      "unblock": "Desbloquear",
+      "audit": "Auditoría",
+      "makeAdmin": "Administrador de la plataforma",
+      "inviteHint": "El usuario recibe el rol en su primer inicio de sesión."
+    },
+    "models": {
+      "title": "Conexiones de modelos",
+      "lead": "Conexiones directas a proveedores o a una pasarela compatible con OpenAI, como LiteLLM.",
+      "add": "Añadir conexión",
+      "type": "Tipo",
+      "types": {
+        "deepseek": "DeepSeek",
+        "openai_compatible": "Compatible con OpenAI"
+      },
+      "name": "Nombre",
+      "baseUrl": "URL base",
+      "key": "Clave",
+      "models": "Modelos",
+      "modelsHint": "Identificadores de modelos separados por comas.",
+      "enabled": "Activada",
+      "check": "Comprobar",
+      "replaceKey": "Sustituir clave",
+      "status": {
+        "ok": "OK",
+        "unchecked": "Sin comprobar",
+        "disabled": "Desactivada",
+        "error": "Error"
+      },
+      "personal": "Agentes personales",
+      "personalHint": "El modelo por defecto de los agentes personales y los modelos que los usuarios pueden elegir.",
+      "default": "Modelo por defecto",
+      "thinking": "Razonamiento",
+      "available": "Disponibles para usuarios",
+      "levels": {
+        "off": "Desactivado",
+        "minimal": "Mínimo",
+        "low": "Bajo",
+        "medium": "Medio",
+        "high": "Alto",
+        "xhigh": "Muy alto",
+        "max": "Máximo"
+      }
+    },
+    "harness": {
+      "title": "Harness",
+      "lead": "Entornos en los que se ejecutan los agentes. Esta versión incluye Pi.",
+      "name": "Harness",
+      "version": "Versión",
+      "state": "Estado",
+      "states": {
+        "ok": "Funciona",
+        "error": "Error"
+      }
+    },
+    "catalog": {
+      "title": "Catálogo",
+      "addMcp": "Añadir MCP",
+      "addSkill": "Añadir skills",
+      "item": "Elemento",
+      "source": "Origen",
+      "mode": "Acceso",
+      "state": "Estado",
+      "published": "Publicado",
+      "check": "Comprobar",
+      "sync": "Sincronizar",
+      "upload": "Subida",
+      "skills": "{count, plural, one {# skill} other {# skills}}",
+      "tools": "{count, plural, one {# herramienta} other {# herramientas}}",
+      "states": {
+        "ok": "OK",
+        "error": "Error",
+        "unchecked": "Sin comprobar",
+        "unconfigured": "Sin configurar"
+      },
+      "name": "Nombre",
+      "titleField": "Título",
+      "description": "Descripción",
+      "sources": {
+        "git": "Git",
+        "upload": "Subida"
+      },
+      "repo": "Repositorio",
+      "path": "Directorio",
+      "ref": "Rama",
+      "bundle": "Archivo de directorios de skills (tar.gz)",
+      "hook": "Webhook de push",
+      "modeHint": {
+        "personal": "Los usuarios conceden acceso en su propio nombre; el agente actúa con sus permisos.",
+        "platform": "Una credencial de servicio de la plataforma; de solo lectura salvo que se desactive."
+      },
+      "authKind": "Acceso personal",
+      "auth": {
+        "oauth": "OAuth",
+        "token": "Token personal",
+        "delegation": "Delegación"
+      },
+      "audience": "Audiencia",
+      "delegationHint": "Nabu firma un token para esta audiencia y pasa el correo del usuario; el producto verifica la firma con las claves de Nabu.",
+      "callback": "Dirección de retorno de OAuth",
+      "headers": "Cabeceras",
+      "addHeader": "Añadir cabecera",
+      "readOnly": "Solo lectura",
+      "exposure": "Herramientas",
+      "exposures": {
+        "deferred": "Bajo demanda",
+        "direct": "Siempre"
+      }
+    },
+    "service-agents": {
+      "title": "Agentes de servicio",
+      "add": "Añadir agente",
+      "lead": "Ejecutores preconfigurados de tareas en segundo plano que los servicios llaman por la API.",
+      "name": "Nombre",
+      "purpose": "Propósito",
+      "model": "Modelo",
+      "workspace": "Espacio",
+      "clients": "Clientes",
+      "week": "Ejecuciones en 7 días",
+      "failed": "{count, plural, one {# con error} other {# con error}}",
+      "runs": "Ejecuciones",
+      "instructions": "Instrucciones",
+      "skills": "Skills",
+      "mcpHint": "Solo servidores MCP de la plataforma; quien llama puede pasar sus propios servidores para una ejecución.",
+      "callerMcp": "Aceptar servidores MCP de quien llama",
+      "workspaces": {
+        "none": "Ninguno",
+        "nabu": "Sandbox de Nabu",
+        "external": "De quien llama"
+      },
+      "timeout": "Límite de tiempo, segundos",
+      "maxTokens": "Límite de tokens (0 — ninguno)",
+      "runsOf": "Ejecuciones de {name}",
+      "noRuns": "Aún no hay ejecuciones",
+      "status": {
+        "queued": "En cola",
+        "running": "En curso",
+        "succeeded": "Hecho",
+        "failed": "Error",
+        "cancelled": "Cancelado"
+      }
+    },
+    "clients": {
+      "title": "Clientes de servicio",
+      "add": "Añadir cliente",
+      "auditHint": "Las acciones en nombre de usuarios se registran en la auditoría con el cliente.",
+      "enabled": "Activado",
+      "agents": "Agentes de servicio",
+      "rights": "Permisos",
+      "delegate": "Delegación",
+      "import": "Importación de ajustes",
+      "secret": "Secreto",
+      "reissue": "Reemitir secreto",
+      "oldValid": "El secreto anterior vale hasta {until}",
+      "secretTitle": "Credenciales de {name}",
+      "secretOnce": "Copie el secreto ahora: se muestra una sola vez.",
+      "name": "Nombre",
+      "url": "Dirección"
+    },
+    "usage": {
+      "title": "Uso",
+      "by": {
+        "user": "Usuario",
+        "agent": "Agente",
+        "client": "Cliente",
+        "model": "Modelo",
+        "connection": "Conexión",
+        "day": "Día"
+      },
+      "days": "{count, plural, one {# día} other {# días}}",
+      "cost": "Coste",
+      "tokens": "Tokens",
+      "requests": "Solicitudes",
+      "in": "Entrada",
+      "out": "Salida",
+      "cache": "Caché",
+      "empty": "Sin uso en el periodo"
+    },
+    "audit": {
+      "title": "Auditoría",
+      "export": "Exportar CSV",
+      "kinds": {
+        "all": "Todos los agentes",
+        "personal": "Personales",
+        "service": "De servicio"
+      },
+      "results": {
+        "all": "Cualquier resultado",
+        "ok": "Éxito",
+        "error": "Error"
+      },
+      "oneUser": "Un usuario",
+      "time": "Hora",
+      "agent": "Agente",
+      "onBehalf": "En nombre de",
+      "channel": "Canal",
+      "tool": "Herramienta",
+      "result": "Resultado",
+      "via": "a través de {client}",
+      "empty": "Sin registros"
+    }
+  },
+  "errors": {
+    "generic": "Algo salió mal ({code}).",
+    "network": "Sin conexión con el servidor.",
+    "unauthenticated": "Inicie sesión de nuevo.",
+    "csrf_invalid": "La página está desactualizada. Recárguela.",
+    "forbidden": "No permitido.",
+    "not_found": "No encontrado.",
+    "internal": "Error del servidor.",
+    "too_large": "El archivo es demasiado grande.",
+    "user_blocked": "El acceso de su cuenta está cerrado.",
+    "agent_not_configured": "El agente aún no está configurado.",
+    "agent_unavailable": "El agente no está disponible temporalmente.",
+    "model_not_available": "El modelo no está disponible.",
+    "conversation_archived": "El tema está archivado.",
+    "empty_message": "El mensaje está vacío.",
+    "message_too_long": "El mensaje es demasiado largo.",
+    "link_code_invalid": "El código de vinculación no es válido o caducó.",
+    "channel_disabled": "El canal no está activado.",
+    "catalog_item_unavailable": "El elemento no está disponible.",
+    "token_required": "Se requiere un token personal.",
+    "space_quota_exceeded": "El espacio está lleno.",
+    "invalid_path": "Ruta no válida.",
+    "name_taken": "El nombre está ocupado.",
+    "connection_in_use": "Hay agentes de servicio que usan esta conexión.",
+    "user_exists": "Ya existe un usuario con este correo.",
+    "invalid_email": "Correo no válido.",
+    "cannot_demote_self": "No puede cambiar su propio rol ni bloquearse.",
+    "task_not_active": "La tarea no está activa.",
+    "task_not_paused": "Solo se puede reanudar una tarea en pausa.",
+    "confirmation_required": "Se requiere confirmación.",
+    "transcription_unavailable": "La entrada de voz no está configurada.",
+    "transcription_failed": "No se reconoció el mensaje de voz.",
+    "invalid_json": "Solicitud no válida.",
+    "sync_failed": "La sincronización falló.",
+    "invalid_source": "Origen no válido.",
+    "invalid_model": "Modelo no válido.",
+    "invalid_key": "Se requiere la clave.",
+    "invalid_url": "URL no válida.",
+    "invalid_type": "Tipo no válido.",
+    "invalid_name": "Nombre no válido.",
+    "invalid_title": "Título no válido.",
+    "invalid_text": "Texto no válido.",
+    "invalid_mode": "Modo de acceso no válido.",
+    "invalid_auth": "Ajustes de acceso no válidos.",
+    "invalid_timezone": "Zona horaria desconocida.",
+    "invalid_tone": "Tono desconocido.",
+    "not_retryable": "Solo se puede reintentar una respuesta con error.",
+    "main_not_archivable": "La conversación principal no se puede archivar.",
+    "agent_not_allowed": "El agente de servicio no está permitido.",
+    "invalid_harness": "Harness desconocido.",
+    "invalid_workspace": "Espacio no válido.",
+    "invalid_limits": "Límites no válidos.",
+    "invalid_bundle": "Archivo no válido.",
+    "invalid_thinking": "El modelo no admite este nivel."
+  }
+}

@@ -1,0 +1,532 @@
+{
+  "nav": {
+    "title": "Sections",
+    "chat": "Chat",
+    "tasks": "Tasks",
+    "memory": "Memory",
+    "space": "Space",
+    "connections": "Connections"
+  },
+  "common": {
+    "loading": "Loading…",
+    "cancel": "Cancel",
+    "create": "Create",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "remove": "Remove",
+    "back": "Back",
+    "done": "Done",
+    "more": "Show more"
+  },
+  "login": {
+    "logoAlt": "Nabu logo",
+    "signIn": "Sign in with {provider}",
+    "corporate": "Corporate account",
+    "orgOnly": "Members of {org} only",
+    "errors": {
+      "state": "The sign-in link expired. Try again.",
+      "denied": "Sign-in was cancelled.",
+      "failed": "Sign-in failed. Try again.",
+      "not_org_member": "Your account is not a member of the organization.",
+      "no_verified_email": "Your account has no verified primary email.",
+      "email_not_verified": "The provider has not verified your email.",
+      "blocked": "Access is closed for your account.",
+      "provider": "The sign-in provider is unavailable."
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "language": "Language",
+    "theme": "Theme",
+    "themes": {
+      "light": "Light",
+      "dark": "Dark"
+    },
+    "timezone": "Time zone",
+    "admin": "Administration",
+    "logout": "Sign out"
+  },
+  "tones": {
+    "business": "Business",
+    "friendly": "Friendly",
+    "brief": "Brief",
+    "mentor": "Mentor"
+  },
+  "agent": {
+    "menu": "Agent",
+    "name": "Agent name",
+    "tone": "Tone",
+    "everywhere": "The change applies in every channel and connected service."
+  },
+  "channels": {
+    "web": "Website",
+    "telegram": "Telegram",
+    "vkws": "VK WorkSpace"
+  },
+  "days": {
+    "0": "Sunday",
+    "1": "Monday",
+    "2": "Tuesday",
+    "3": "Wednesday",
+    "4": "Thursday",
+    "5": "Friday",
+    "6": "Saturday"
+  },
+  "chat": {
+    "title": "Chat",
+    "conversations": "Conversations",
+    "conversation": "Conversation",
+    "main": "Main",
+    "topics": "Topics",
+    "archive": "Archive",
+    "noTopics": "No topics yet",
+    "newTopic": "New topic",
+    "topicTitle": "Topic",
+    "topicHint": "A topic has its own history and the same memory and space.",
+    "mainHint": "One conversation in every channel",
+    "noModel": "no model",
+    "loadOlder": "Earlier messages",
+    "emptyTitle": "Hi, I am {name}",
+    "emptyHint": "Ask me to sort mail, find something in your tools or remind you later.",
+    "placeholder": "Message {name}…",
+    "send": "Send",
+    "attach": "Attach files",
+    "typing": "The agent is typing",
+    "archivedHint": "The topic is archived and read-only.",
+    "unarchive": "Unarchive",
+    "taskMark": "Task",
+    "moreSteps": "{count, plural, one {# more step} other {# more steps}}",
+    "hideSteps": "Hide steps",
+    "tools": {
+      "memory": "Memory",
+      "task": "Tasks",
+      "space": "Space"
+    },
+    "voice": {
+      "hold": "Hold to record",
+      "stop": "Stop recording",
+      "recording": "Recording… {seconds} s",
+      "review": "Check the transcript before sending",
+      "notRecognized": "The speech was not recognized",
+      "micDenied": "No access to the microphone",
+      "unsupported": "Voice input is not supported in this browser"
+    }
+  },
+  "llm": {
+    "retry": "Retry",
+    "errors": {
+      "insufficient_balance": "The model provider has no balance left. An administrator needs to top it up.",
+      "auth": "The model connection was rejected. An administrator needs to check its key.",
+      "rate_limit": "The model is overloaded. Retry in a minute.",
+      "unavailable": "The model is temporarily unavailable. Retry later.",
+      "bad_request": "The model rejected the request.",
+      "context_overflow": "The conversation became too long for the model. Start a new topic.",
+      "agent_crashed": "The agent stopped unexpectedly. Retry.",
+      "agent_busy": "The agent is busy. Retry in a minute.",
+      "agent_not_configured": "The agent is not configured: an administrator has to add a model connection.",
+      "user_blocked": "Access to the agent is closed for your account.",
+      "workspace_not_connected": "The workspace did not connect.",
+      "limit_exceeded": "The run exceeded its limits."
+    }
+  },
+  "tasks": {
+    "title": "Tasks",
+    "hint": "Tasks are created in the conversation with the agent: ask it to remind you once or to do something regularly.",
+    "example": "“Every Monday at 10:00 send me a metrics summary in Telegram”",
+    "filters": {
+      "active": "Active",
+      "done": "Finished",
+      "cancelled": "Cancelled"
+    },
+    "cols": {
+      "task": "Task",
+      "schedule": "Schedule",
+      "next": "Next run",
+      "last": "Last run",
+      "channel": "Channel"
+    },
+    "empty": "No tasks here",
+    "emptyHint": "Ask your agent in the chat to create one.",
+    "paused": "Paused",
+    "run": {
+      "running": "Running",
+      "succeeded": "Done",
+      "failed": "Failed"
+    },
+    "cancel": "Cancel",
+    "resume": "Resume",
+    "cancelTitle": "Cancel the task?",
+    "cancelText": "The task «{title}» will not run any more.",
+    "noRuns": "No runs yet",
+    "openInChat": "Open in the conversation",
+    "once": "Once, {at}",
+    "daily": "Every day at {time}",
+    "weekdays": "Every weekday at {time}",
+    "weekly": "Every {day} at {time}",
+    "everyMinutes": "{count, plural, one {Every minute} other {Every # minutes}}"
+  },
+  "memory": {
+    "title": "Memory",
+    "lead": "What your agent remembers about you. It saves facts in conversations; you can edit, delete or add records.",
+    "search": "Search memory",
+    "add": "Add record",
+    "clear": "Clear all",
+    "clearTitle": "Clear the memory?",
+    "clearText": "All records will be deleted. The agent will stop using them from the next message.",
+    "clearConfirm": "Clear all",
+    "empty": "The memory is empty",
+    "emptyHint": "Tell the agent what to remember, or add a record.",
+    "notFound": "Nothing found",
+    "fromChat": "from a conversation",
+    "manual": "added manually",
+    "editTitle": "Edit record",
+    "text": "Text",
+    "pinned": "Always keep in mind"
+  },
+  "space": {
+    "title": "Space",
+    "lead": "The personal workspace of your agent: files persist between conversations and are isolated from other users.",
+    "upload": "Upload",
+    "download": "Download",
+    "used": "{used} of {quota}",
+    "disabled": "Personal spaces are not enabled",
+    "state": {
+      "running": "Active",
+      "sleeping": "Sleeping",
+      "starting": "Starting",
+      "stopping": "Going to sleep"
+    },
+    "cols": {
+      "path": "Path",
+      "size": "Size",
+      "changed": "Changed"
+    },
+    "byAgent": "by the agent",
+    "byUser": "by you",
+    "empty": "No files yet",
+    "emptyHint": "Files the agent creates and files you upload appear here."
+  },
+  "connections": {
+    "title": "Connections",
+    "lead": "Messengers for talking to your agent and the tools of the company it may use.",
+    "channels": "Channels",
+    "catalog": "Catalog",
+    "filters": {
+      "all": "All",
+      "connected": "Connected",
+      "mcp": "MCP",
+      "skill": "Skills"
+    },
+    "personal": "personal",
+    "platform": "platform",
+    "platformRead": "platform · read",
+    "skill": "skill",
+    "inDevelopment": "in development",
+    "connected": "Connected",
+    "connect": "Connect",
+    "revoke": "Revoke access",
+    "disable": "Disable",
+    "status": {
+      "available": "Available",
+      "in_development": "Coming soon",
+      "unavailable": "Unavailable"
+    },
+    "empty": "The catalog is empty",
+    "tokenTitle": "Access to {name}",
+    "token": "Personal token",
+    "tokenHint": "The token is stored encrypted in Nabu, never in the agent's space.",
+    "linked": "Linked",
+    "linkedAs": "{account}, since {when}",
+    "unlink": "Unlink",
+    "getCode": "Get link code",
+    "linkHint": "Link your account to talk to the agent here.",
+    "codeTitle": "Link {channel}",
+    "codeText": "Send this message to the Nabu bot:",
+    "codeTextBot": "Send this message to {bot}:",
+    "openBot": "Open the bot",
+    "codeExpires": "The code works once until {time}.",
+    "oauth": {
+      "connected": "Access granted",
+      "denied": "Access was not granted",
+      "failed": "The connection failed",
+      "invalid_state": "The link expired; connect again"
+    }
+  },
+  "admin": {
+    "title": "Administration",
+    "noAccess": "The platform administrator role is required",
+    "users": {
+      "title": "Users",
+      "invite": "Add by email",
+      "add": "Add",
+      "search": "Search by name or email",
+      "user": "User",
+      "channels": "Channels",
+      "role": "Role",
+      "admin": "Administrator",
+      "lastSeen": "Last activity",
+      "status": "Status",
+      "statuses": {
+        "active": "Active",
+        "invited": "Invited",
+        "blocked": "Blocked"
+      },
+      "block": "Block",
+      "unblock": "Unblock",
+      "audit": "Audit",
+      "makeAdmin": "Platform administrator",
+      "inviteHint": "The user gets the role at the first sign-in."
+    },
+    "models": {
+      "title": "Model connections",
+      "lead": "Direct connections to providers or to an OpenAI-compatible gateway such as LiteLLM.",
+      "add": "Add connection",
+      "type": "Type",
+      "types": {
+        "deepseek": "DeepSeek",
+        "openai_compatible": "OpenAI-compatible"
+      },
+      "name": "Name",
+      "baseUrl": "Base URL",
+      "key": "Key",
+      "models": "Models",
+      "modelsHint": "Model ids separated by commas.",
+      "enabled": "Enabled",
+      "check": "Check",
+      "replaceKey": "Replace key",
+      "status": {
+        "ok": "OK",
+        "unchecked": "Not checked",
+        "disabled": "Disabled",
+        "error": "Error"
+      },
+      "personal": "Personal agents",
+      "personalHint": "The default model of personal agents and the models users may choose.",
+      "default": "Default model",
+      "thinking": "Reasoning",
+      "available": "Available to users",
+      "levels": {
+        "off": "Off",
+        "minimal": "Minimal",
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "xhigh": "Extra high",
+        "max": "Max"
+      }
+    },
+    "harness": {
+      "title": "Harness",
+      "lead": "Environments agents run in. This release has Pi.",
+      "name": "Harness",
+      "version": "Version",
+      "state": "State",
+      "states": {
+        "ok": "Working",
+        "error": "Error"
+      }
+    },
+    "catalog": {
+      "title": "Catalog",
+      "addMcp": "Add MCP",
+      "addSkill": "Add skills",
+      "item": "Item",
+      "source": "Source",
+      "mode": "Access",
+      "state": "State",
+      "published": "Published",
+      "check": "Check",
+      "sync": "Synchronize",
+      "upload": "Upload",
+      "skills": "{count, plural, one {# skill} other {# skills}}",
+      "tools": "{count, plural, one {# tool} other {# tools}}",
+      "states": {
+        "ok": "OK",
+        "error": "Error",
+        "unchecked": "Not checked",
+        "unconfigured": "Not configured"
+      },
+      "name": "Name",
+      "titleField": "Title",
+      "description": "Description",
+      "sources": {
+        "git": "Git",
+        "upload": "Upload"
+      },
+      "repo": "Repository",
+      "path": "Directory",
+      "ref": "Branch",
+      "bundle": "Archive of skill directories (tar.gz)",
+      "hook": "Push webhook",
+      "modeHint": {
+        "personal": "Users grant access on their own behalf; the agent acts with their rights.",
+        "platform": "A service credential of the platform; read-only unless switched off."
+      },
+      "authKind": "Personal access",
+      "auth": {
+        "oauth": "OAuth",
+        "token": "Personal token",
+        "delegation": "Delegation"
+      },
+      "audience": "Audience",
+      "delegationHint": "Nabu signs a token for this audience and passes the user's email; the product checks the signature by Nabu's keys.",
+      "callback": "OAuth callback",
+      "headers": "Headers",
+      "addHeader": "Add header",
+      "readOnly": "Read-only",
+      "exposure": "Tools",
+      "exposures": {
+        "deferred": "On demand",
+        "direct": "Always"
+      }
+    },
+    "service-agents": {
+      "title": "Service agents",
+      "add": "Add agent",
+      "lead": "Preconfigured executors of background tasks that services call through the API.",
+      "name": "Name",
+      "purpose": "Purpose",
+      "model": "Model",
+      "workspace": "Workspace",
+      "clients": "Clients",
+      "week": "Runs in 7 days",
+      "failed": "{count, plural, one {# failed} other {# failed}}",
+      "runs": "Runs",
+      "instructions": "Instructions",
+      "skills": "Skills",
+      "mcpHint": "Platform MCP servers only; callers can pass their own servers for one run.",
+      "callerMcp": "Accept MCP servers of the caller",
+      "workspaces": {
+        "none": "None",
+        "nabu": "Nabu sandbox",
+        "external": "Of the caller"
+      },
+      "timeout": "Time limit, seconds",
+      "maxTokens": "Token limit (0 — none)",
+      "runsOf": "Runs of {name}",
+      "noRuns": "No runs yet",
+      "status": {
+        "queued": "Queued",
+        "running": "Running",
+        "succeeded": "Done",
+        "failed": "Failed",
+        "cancelled": "Cancelled"
+      }
+    },
+    "clients": {
+      "title": "Service clients",
+      "add": "Add client",
+      "auditHint": "Actions on behalf of users are written to the audit with the client.",
+      "enabled": "Enabled",
+      "agents": "Service agents",
+      "rights": "Rights",
+      "delegate": "Delegation",
+      "import": "Settings import",
+      "secret": "Secret",
+      "reissue": "Reissue secret",
+      "oldValid": "The old secret works until {until}",
+      "secretTitle": "Credentials of {name}",
+      "secretOnce": "Copy the secret now: it is shown only once.",
+      "name": "Name",
+      "url": "Address"
+    },
+    "usage": {
+      "title": "Usage",
+      "by": {
+        "user": "User",
+        "agent": "Agent",
+        "client": "Client",
+        "model": "Model",
+        "connection": "Connection",
+        "day": "Day"
+      },
+      "days": "{count, plural, one {# day} other {# days}}",
+      "cost": "Cost",
+      "tokens": "Tokens",
+      "requests": "Requests",
+      "in": "Input",
+      "out": "Output",
+      "cache": "Cache",
+      "empty": "No usage in the period"
+    },
+    "audit": {
+      "title": "Audit",
+      "export": "Export CSV",
+      "kinds": {
+        "all": "All agents",
+        "personal": "Personal",
+        "service": "Service"
+      },
+      "results": {
+        "all": "Any result",
+        "ok": "Success",
+        "error": "Error"
+      },
+      "oneUser": "One user",
+      "time": "Time",
+      "agent": "Agent",
+      "onBehalf": "On behalf of",
+      "channel": "Channel",
+      "tool": "Tool",
+      "result": "Result",
+      "via": "via {client}",
+      "empty": "No records"
+    }
+  },
+  "errors": {
+    "generic": "Something went wrong ({code}).",
+    "network": "No connection to the server.",
+    "unauthenticated": "Sign in again.",
+    "csrf_invalid": "The page is outdated. Reload it.",
+    "forbidden": "Not allowed.",
+    "not_found": "Not found.",
+    "internal": "Server error.",
+    "too_large": "The file is too large.",
+    "user_blocked": "Access is closed for your account.",
+    "agent_not_configured": "The agent is not configured yet.",
+    "agent_unavailable": "The agent is temporarily unavailable.",
+    "model_not_available": "The model is not available.",
+    "conversation_archived": "The topic is archived.",
+    "empty_message": "The message is empty.",
+    "message_too_long": "The message is too long.",
+    "link_code_invalid": "The link code is invalid or expired.",
+    "channel_disabled": "The channel is not enabled.",
+    "catalog_item_unavailable": "The item is not available.",
+    "token_required": "A personal token is required.",
+    "space_quota_exceeded": "The space is full.",
+    "invalid_path": "Invalid path.",
+    "name_taken": "The name is taken.",
+    "connection_in_use": "Service agents use this connection.",
+    "user_exists": "A user with this email exists.",
+    "invalid_email": "Invalid email.",
+    "cannot_demote_self": "You cannot change your own role or block yourself.",
+    "task_not_active": "The task is not active.",
+    "task_not_paused": "Only a paused task can be resumed.",
+    "confirmation_required": "Confirmation is required.",
+    "transcription_unavailable": "Voice input is not configured.",
+    "transcription_failed": "The voice message was not recognized.",
+    "invalid_json": "Invalid request.",
+    "sync_failed": "Synchronization failed.",
+    "invalid_source": "Invalid source.",
+    "invalid_model": "Invalid model.",
+    "invalid_key": "The key is required.",
+    "invalid_url": "Invalid URL.",
+    "invalid_type": "Invalid type.",
+    "invalid_name": "Invalid name.",
+    "invalid_title": "Invalid title.",
+    "invalid_text": "Invalid text.",
+    "invalid_mode": "Invalid access mode.",
+    "invalid_auth": "Invalid access settings.",
+    "invalid_timezone": "Unknown time zone.",
+    "invalid_tone": "Unknown tone.",
+    "not_retryable": "Only a failed answer can be retried.",
+    "main_not_archivable": "The main conversation cannot be archived.",
+    "agent_not_allowed": "The service agent is not allowed.",
+    "invalid_harness": "Unknown harness.",
+    "invalid_workspace": "Invalid workspace.",
+    "invalid_limits": "Invalid limits.",
+    "invalid_bundle": "Invalid archive.",
+    "invalid_thinking": "The model does not support this level."
+  }
+}

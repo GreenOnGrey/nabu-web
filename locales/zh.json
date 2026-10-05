@@ -1,0 +1,532 @@
+{
+  "nav": {
+    "title": "栏目",
+    "chat": "聊天",
+    "tasks": "任务",
+    "memory": "记忆",
+    "space": "空间",
+    "connections": "连接"
+  },
+  "common": {
+    "loading": "加载中…",
+    "cancel": "取消",
+    "create": "创建",
+    "save": "保存",
+    "delete": "删除",
+    "edit": "编辑",
+    "remove": "移除",
+    "back": "返回",
+    "done": "完成",
+    "more": "显示更多"
+  },
+  "login": {
+    "logoAlt": "Nabu 标志",
+    "signIn": "使用 {provider} 登录",
+    "corporate": "企业账号",
+    "orgOnly": "仅限 {org} 的成员",
+    "errors": {
+      "state": "登录链接已过期，请重试。",
+      "denied": "登录已取消。",
+      "failed": "登录失败，请重试。",
+      "not_org_member": "您的账号不是该组织的成员。",
+      "no_verified_email": "您的账号没有已验证的主邮箱。",
+      "email_not_verified": "身份提供方未验证您的邮箱。",
+      "blocked": "您的账号已被禁止访问。",
+      "provider": "登录提供方不可用。"
+    }
+  },
+  "profile": {
+    "title": "个人资料",
+    "language": "语言",
+    "theme": "主题",
+    "themes": {
+      "light": "浅色",
+      "dark": "深色"
+    },
+    "timezone": "时区",
+    "admin": "管理",
+    "logout": "退出登录"
+  },
+  "tones": {
+    "business": "商务",
+    "friendly": "友好",
+    "brief": "简洁",
+    "mentor": "导师"
+  },
+  "agent": {
+    "menu": "智能体",
+    "name": "智能体名称",
+    "tone": "语气",
+    "everywhere": "更改在所有渠道和已连接的服务中生效。"
+  },
+  "channels": {
+    "web": "网站",
+    "telegram": "Telegram",
+    "vkws": "VK WorkSpace"
+  },
+  "days": {
+    "0": "星期日",
+    "1": "星期一",
+    "2": "星期二",
+    "3": "星期三",
+    "4": "星期四",
+    "5": "星期五",
+    "6": "星期六"
+  },
+  "chat": {
+    "title": "聊天",
+    "conversations": "对话",
+    "conversation": "对话",
+    "main": "主对话",
+    "topics": "话题",
+    "archive": "归档",
+    "noTopics": "暂无话题",
+    "newTopic": "新话题",
+    "topicTitle": "话题",
+    "topicHint": "话题有独立的历史记录，记忆和空间与主对话相同。",
+    "mainHint": "所有渠道共用一个对话",
+    "noModel": "未选择模型",
+    "loadOlder": "更早的消息",
+    "emptyTitle": "你好，我是 {name}",
+    "emptyHint": "可以让我整理邮件、在工具中查找信息或稍后提醒你。",
+    "placeholder": "给 {name} 发消息…",
+    "send": "发送",
+    "attach": "附加文件",
+    "typing": "智能体正在输入",
+    "archivedHint": "该话题已归档，只能查看。",
+    "unarchive": "取消归档",
+    "taskMark": "任务",
+    "moreSteps": "{count, plural, other {另外 # 个步骤}}",
+    "hideSteps": "隐藏步骤",
+    "tools": {
+      "memory": "记忆",
+      "task": "任务",
+      "space": "空间"
+    },
+    "voice": {
+      "hold": "按住录音",
+      "stop": "停止录音",
+      "recording": "录音中… {seconds} 秒",
+      "review": "发送前请检查转写文本",
+      "notRecognized": "未能识别语音",
+      "micDenied": "无法访问麦克风",
+      "unsupported": "此浏览器不支持语音输入"
+    }
+  },
+  "llm": {
+    "retry": "重试",
+    "errors": {
+      "insufficient_balance": "模型提供方余额不足，需要管理员充值。",
+      "auth": "模型连接被拒绝，需要管理员检查密钥。",
+      "rate_limit": "模型繁忙，请一分钟后重试。",
+      "unavailable": "模型暂时不可用，请稍后重试。",
+      "bad_request": "模型拒绝了该请求。",
+      "context_overflow": "对话对模型来说太长了，请新建一个话题。",
+      "agent_crashed": "智能体意外停止，请重试。",
+      "agent_busy": "智能体繁忙，请一分钟后重试。",
+      "agent_not_configured": "智能体尚未配置：需要管理员添加模型连接。",
+      "user_blocked": "您的账号已被禁止访问智能体。",
+      "workspace_not_connected": "工作空间未连接。",
+      "limit_exceeded": "运行超出了限制。"
+    }
+  },
+  "tasks": {
+    "title": "任务",
+    "hint": "任务在与智能体的对话中创建：让它提醒你一次，或定期做某件事。",
+    "example": "“每周一 10:00 在 Telegram 给我发送指标摘要”",
+    "filters": {
+      "active": "进行中",
+      "done": "已完成",
+      "cancelled": "已取消"
+    },
+    "cols": {
+      "task": "任务",
+      "schedule": "计划",
+      "next": "下次运行",
+      "last": "上次运行",
+      "channel": "渠道"
+    },
+    "empty": "暂无任务",
+    "emptyHint": "在聊天中让智能体创建一个任务。",
+    "paused": "已暂停",
+    "run": {
+      "running": "运行中",
+      "succeeded": "已完成",
+      "failed": "失败"
+    },
+    "cancel": "取消",
+    "resume": "恢复",
+    "cancelTitle": "取消任务？",
+    "cancelText": "任务“{title}”将不再运行。",
+    "noRuns": "暂无运行记录",
+    "openInChat": "在对话中打开",
+    "once": "一次，{at}",
+    "daily": "每天 {time}",
+    "weekdays": "工作日 {time}",
+    "weekly": "每{day} {time}",
+    "everyMinutes": "{count, plural, other {每 # 分钟}}"
+  },
+  "memory": {
+    "title": "记忆",
+    "lead": "智能体记住的关于你的信息。它在对话中保存事实；你可以编辑、删除或添加记录。",
+    "search": "搜索记忆",
+    "add": "添加记录",
+    "clear": "全部清除",
+    "clearTitle": "清除记忆？",
+    "clearText": "所有记录都将被删除，智能体从下一条消息起不再使用它们。",
+    "clearConfirm": "全部清除",
+    "empty": "记忆为空",
+    "emptyHint": "告诉智能体要记住什么，或添加一条记录。",
+    "notFound": "未找到任何内容",
+    "fromChat": "来自对话",
+    "manual": "手动添加",
+    "editTitle": "编辑记录",
+    "text": "内容",
+    "pinned": "始终考虑"
+  },
+  "space": {
+    "title": "空间",
+    "lead": "智能体的个人工作空间：文件在对话之间保留，并与其他用户隔离。",
+    "upload": "上传",
+    "download": "下载",
+    "used": "已用 {used}，共 {quota}",
+    "disabled": "个人空间未启用",
+    "state": {
+      "running": "运行中",
+      "sleeping": "休眠",
+      "starting": "启动中",
+      "stopping": "正在休眠"
+    },
+    "cols": {
+      "path": "路径",
+      "size": "大小",
+      "changed": "修改时间"
+    },
+    "byAgent": "由智能体",
+    "byUser": "由你",
+    "empty": "暂无文件",
+    "emptyHint": "智能体创建的文件和你上传的文件会显示在这里。"
+  },
+  "connections": {
+    "title": "连接",
+    "lead": "与智能体交流的即时通讯工具，以及它可以使用的公司工具。",
+    "channels": "渠道",
+    "catalog": "目录",
+    "filters": {
+      "all": "全部",
+      "connected": "已连接",
+      "mcp": "MCP",
+      "skill": "技能"
+    },
+    "personal": "个人",
+    "platform": "平台",
+    "platformRead": "平台 · 只读",
+    "skill": "技能",
+    "inDevelopment": "开发中",
+    "connected": "已连接",
+    "connect": "连接",
+    "revoke": "撤销访问",
+    "disable": "停用",
+    "status": {
+      "available": "可用",
+      "in_development": "即将推出",
+      "unavailable": "不可用"
+    },
+    "empty": "目录为空",
+    "tokenTitle": "访问 {name}",
+    "token": "个人令牌",
+    "tokenHint": "令牌加密保存在 Nabu 中，不会进入智能体的空间。",
+    "linked": "已绑定",
+    "linkedAs": "{account}，自 {when}",
+    "unlink": "解除绑定",
+    "getCode": "获取绑定码",
+    "linkHint": "绑定账号后即可在这里与智能体交流。",
+    "codeTitle": "绑定 {channel}",
+    "codeText": "向 Nabu 机器人发送以下消息：",
+    "codeTextBot": "向 {bot} 发送以下消息：",
+    "openBot": "打开机器人",
+    "codeExpires": "绑定码仅可使用一次，有效期至 {time}。",
+    "oauth": {
+      "connected": "已授予访问权限",
+      "denied": "未授予访问权限",
+      "failed": "连接失败",
+      "invalid_state": "链接已过期，请重新连接"
+    }
+  },
+  "admin": {
+    "title": "管理",
+    "noAccess": "需要平台管理员角色",
+    "users": {
+      "title": "用户",
+      "invite": "通过邮箱添加",
+      "add": "添加",
+      "search": "按姓名或邮箱搜索",
+      "user": "用户",
+      "channels": "渠道",
+      "role": "角色",
+      "admin": "管理员",
+      "lastSeen": "最近活动",
+      "status": "状态",
+      "statuses": {
+        "active": "活跃",
+        "invited": "已邀请",
+        "blocked": "已封禁"
+      },
+      "block": "封禁",
+      "unblock": "解除封禁",
+      "audit": "审计",
+      "makeAdmin": "平台管理员",
+      "inviteHint": "用户首次登录时获得该角色。"
+    },
+    "models": {
+      "title": "模型连接",
+      "lead": "直接连接模型提供方，或连接 LiteLLM 等兼容 OpenAI 的网关。",
+      "add": "添加连接",
+      "type": "类型",
+      "types": {
+        "deepseek": "DeepSeek",
+        "openai_compatible": "兼容 OpenAI"
+      },
+      "name": "名称",
+      "baseUrl": "基础 URL",
+      "key": "密钥",
+      "models": "模型",
+      "modelsHint": "模型 ID，用逗号分隔。",
+      "enabled": "已启用",
+      "check": "检查",
+      "replaceKey": "更换密钥",
+      "status": {
+        "ok": "正常",
+        "unchecked": "未检查",
+        "disabled": "已停用",
+        "error": "错误"
+      },
+      "personal": "个人智能体",
+      "personalHint": "个人智能体的默认模型，以及用户可以选择的模型。",
+      "default": "默认模型",
+      "thinking": "推理",
+      "available": "用户可用",
+      "levels": {
+        "off": "关闭",
+        "minimal": "最低",
+        "low": "低",
+        "medium": "中",
+        "high": "高",
+        "xhigh": "很高",
+        "max": "最高"
+      }
+    },
+    "harness": {
+      "title": "Harness",
+      "lead": "智能体的运行环境。此版本包含 Pi。",
+      "name": "Harness",
+      "version": "版本",
+      "state": "状态",
+      "states": {
+        "ok": "运行中",
+        "error": "错误"
+      }
+    },
+    "catalog": {
+      "title": "目录",
+      "addMcp": "添加 MCP",
+      "addSkill": "添加技能",
+      "item": "条目",
+      "source": "来源",
+      "mode": "访问方式",
+      "state": "状态",
+      "published": "已发布",
+      "check": "检查",
+      "sync": "同步",
+      "upload": "上传",
+      "skills": "{count, plural, other {# 个技能}}",
+      "tools": "{count, plural, other {# 个工具}}",
+      "states": {
+        "ok": "正常",
+        "error": "错误",
+        "unchecked": "未检查",
+        "unconfigured": "未配置"
+      },
+      "name": "名称",
+      "titleField": "标题",
+      "description": "描述",
+      "sources": {
+        "git": "Git",
+        "upload": "上传"
+      },
+      "repo": "仓库",
+      "path": "目录",
+      "ref": "分支",
+      "bundle": "技能目录归档（tar.gz）",
+      "hook": "推送 Webhook",
+      "modeHint": {
+        "personal": "用户以自己的名义授予访问权限；智能体以用户的权限操作。",
+        "platform": "平台的服务凭据；默认只读。"
+      },
+      "authKind": "个人访问",
+      "auth": {
+        "oauth": "OAuth",
+        "token": "个人令牌",
+        "delegation": "委托"
+      },
+      "audience": "受众",
+      "delegationHint": "Nabu 为该受众签发令牌并传递用户邮箱；产品使用 Nabu 的公钥验证签名。",
+      "callback": "OAuth 回调地址",
+      "headers": "请求头",
+      "addHeader": "添加请求头",
+      "readOnly": "只读",
+      "exposure": "工具",
+      "exposures": {
+        "deferred": "按需",
+        "direct": "始终"
+      }
+    },
+    "service-agents": {
+      "title": "服务智能体",
+      "add": "添加智能体",
+      "lead": "预先配置的后台任务执行者，由服务通过 API 调用。",
+      "name": "名称",
+      "purpose": "用途",
+      "model": "模型",
+      "workspace": "工作空间",
+      "clients": "客户端",
+      "week": "7 天内运行次数",
+      "failed": "{count, plural, other {# 次失败}}",
+      "runs": "运行记录",
+      "instructions": "指令",
+      "skills": "技能",
+      "mcpHint": "仅限平台 MCP 服务器；调用方可以为单次运行传入自己的服务器。",
+      "callerMcp": "接受调用方的 MCP 服务器",
+      "workspaces": {
+        "none": "无",
+        "nabu": "Nabu 沙箱",
+        "external": "调用方的"
+      },
+      "timeout": "时间限制（秒）",
+      "maxTokens": "令牌限制（0 表示不限）",
+      "runsOf": "{name} 的运行记录",
+      "noRuns": "暂无运行记录",
+      "status": {
+        "queued": "排队中",
+        "running": "运行中",
+        "succeeded": "已完成",
+        "failed": "失败",
+        "cancelled": "已取消"
+      }
+    },
+    "clients": {
+      "title": "服务客户端",
+      "add": "添加客户端",
+      "auditHint": "代表用户执行的操作会连同客户端一起记入审计。",
+      "enabled": "已启用",
+      "agents": "服务智能体",
+      "rights": "权限",
+      "delegate": "委托",
+      "import": "导入设置",
+      "secret": "密钥",
+      "reissue": "重新签发密钥",
+      "oldValid": "旧密钥在 {until} 前有效",
+      "secretTitle": "{name} 的凭据",
+      "secretOnce": "请立即复制密钥：它只显示一次。",
+      "name": "名称",
+      "url": "地址"
+    },
+    "usage": {
+      "title": "用量",
+      "by": {
+        "user": "用户",
+        "agent": "智能体",
+        "client": "客户端",
+        "model": "模型",
+        "connection": "连接",
+        "day": "日期"
+      },
+      "days": "{count, plural, other {# 天}}",
+      "cost": "费用",
+      "tokens": "令牌",
+      "requests": "请求",
+      "in": "输入",
+      "out": "输出",
+      "cache": "缓存",
+      "empty": "该时段内没有用量"
+    },
+    "audit": {
+      "title": "审计",
+      "export": "导出 CSV",
+      "kinds": {
+        "all": "全部智能体",
+        "personal": "个人",
+        "service": "服务"
+      },
+      "results": {
+        "all": "任意结果",
+        "ok": "成功",
+        "error": "错误"
+      },
+      "oneUser": "单个用户",
+      "time": "时间",
+      "agent": "智能体",
+      "onBehalf": "代表",
+      "channel": "渠道",
+      "tool": "工具",
+      "result": "结果",
+      "via": "通过 {client}",
+      "empty": "没有记录"
+    }
+  },
+  "errors": {
+    "generic": "出现问题（{code}）。",
+    "network": "无法连接服务器。",
+    "unauthenticated": "请重新登录。",
+    "csrf_invalid": "页面已过期，请刷新。",
+    "forbidden": "无权操作。",
+    "not_found": "未找到。",
+    "internal": "服务器错误。",
+    "too_large": "文件太大。",
+    "user_blocked": "您的账号已被禁止访问。",
+    "agent_not_configured": "智能体尚未配置。",
+    "agent_unavailable": "智能体暂时不可用。",
+    "model_not_available": "该模型不可用。",
+    "conversation_archived": "该话题已归档。",
+    "empty_message": "消息为空。",
+    "message_too_long": "消息太长。",
+    "link_code_invalid": "绑定码无效或已过期。",
+    "channel_disabled": "该渠道未启用。",
+    "catalog_item_unavailable": "该条目不可用。",
+    "token_required": "需要个人令牌。",
+    "space_quota_exceeded": "空间已满。",
+    "invalid_path": "路径无效。",
+    "name_taken": "名称已被占用。",
+    "connection_in_use": "有服务智能体正在使用此连接。",
+    "user_exists": "该邮箱的用户已存在。",
+    "invalid_email": "邮箱无效。",
+    "cannot_demote_self": "不能更改自己的角色或封禁自己。",
+    "task_not_active": "任务不在进行中。",
+    "task_not_paused": "只有已暂停的任务可以恢复。",
+    "confirmation_required": "需要确认。",
+    "transcription_unavailable": "语音输入未配置。",
+    "transcription_failed": "未能识别语音消息。",
+    "invalid_json": "请求无效。",
+    "sync_failed": "同步失败。",
+    "invalid_source": "来源无效。",
+    "invalid_model": "模型无效。",
+    "invalid_key": "需要密钥。",
+    "invalid_url": "URL 无效。",
+    "invalid_type": "类型无效。",
+    "invalid_name": "名称无效。",
+    "invalid_title": "标题无效。",
+    "invalid_text": "内容无效。",
+    "invalid_mode": "访问方式无效。",
+    "invalid_auth": "访问设置无效。",
+    "invalid_timezone": "未知时区。",
+    "invalid_tone": "未知语气。",
+    "not_retryable": "只有失败的回答可以重试。",
+    "main_not_archivable": "主对话不能归档。",
+    "agent_not_allowed": "不允许使用该服务智能体。",
+    "invalid_harness": "未知 harness。",
+    "invalid_workspace": "工作空间无效。",
+    "invalid_limits": "限制无效。",
+    "invalid_bundle": "归档无效。",
+    "invalid_thinking": "该模型不支持此推理级别。"
+  }
+}
