@@ -17,7 +17,9 @@
     "remove": "Quitar",
     "back": "Atrás",
     "done": "Listo",
-    "more": "Mostrar más"
+    "more": "Mostrar más",
+    "saved": "Guardado",
+    "close": "Cerrar"
   },
   "login": {
     "logoAlt": "Logotipo de Nabu",
@@ -32,7 +34,8 @@
       "no_verified_email": "Su cuenta no tiene un correo principal verificado.",
       "email_not_verified": "El proveedor no ha verificado su correo.",
       "blocked": "El acceso de su cuenta está cerrado.",
-      "provider": "El proveedor de inicio de sesión no está disponible."
+      "provider": "El proveedor de inicio de sesión no está disponible.",
+      "restore_pending": "La cuenta espera ser restaurada. Los administradores han recibido la solicitud."
     }
   },
   "profile": {
@@ -62,7 +65,9 @@
   "channels": {
     "web": "Sitio web",
     "telegram": "Telegram",
-    "vkws": "VK WorkSpace"
+    "vkws": "VK WorkSpace",
+    "vkteams": "VK Teams",
+    "email": "Correo"
   },
   "days": {
     "0": "domingo",
@@ -111,6 +116,22 @@
       "notRecognized": "No se reconoció la voz",
       "micDenied": "Sin acceso al micrófono",
       "unsupported": "Este navegador no admite la entrada de voz"
+    },
+    "unread": "{count, plural, one {# respuesta sin leer} other {# respuestas sin leer}}",
+    "confirm": {
+      "title": "Confirme la acción",
+      "text": "El agente quiere ejecutar: {action}",
+      "approve": "Ejecutar",
+      "reject": "Rechazar",
+      "approved": "Usted confirmó: {action}",
+      "rejected": "Usted rechazó: {action}"
+    },
+    "mail": {
+      "from": "De",
+      "to": "Para",
+      "cc": "Copia",
+      "webOnly": "El bot no era el único destinatario: la respuesta está solo aquí, no por correo.",
+      "quoted": "Texto citado"
     }
   },
   "llm": {
@@ -164,7 +185,8 @@
     "daily": "Cada día a las {time}",
     "weekdays": "Los días laborables a las {time}",
     "weekly": "Cada {day} a las {time}",
-    "everyMinutes": "{count, plural, one {Cada minuto} other {Cada # minutos}}"
+    "everyMinutes": "{count, plural, one {Cada minuto} other {Cada # minutos}}",
+    "channelUnavailable": "canal no disponible, entregado en la web"
   },
   "memory": {
     "title": "Memoria",
@@ -205,7 +227,8 @@
     "byAgent": "por el agente",
     "byUser": "por usted",
     "empty": "Aún no hay archivos",
-    "emptyHint": "Aquí aparecen los archivos que crea el agente y los que usted sube."
+    "emptyHint": "Aquí aparecen los archivos que crea el agente y los que usted sube.",
+    "linked": "El archivo del correo:"
   },
   "connections": {
     "title": "Conexiones",
@@ -239,19 +262,26 @@
     "linked": "Vinculado",
     "linkedAs": "{account}, desde {when}",
     "unlink": "Desvincular",
-    "getCode": "Obtener código de vinculación",
-    "linkHint": "Vincule su cuenta para hablar aquí con el agente.",
-    "codeTitle": "Vincular {channel}",
-    "codeText": "Envíe este mensaje al bot de Nabu:",
-    "codeTextBot": "Envíe este mensaje a {bot}:",
     "openBot": "Abrir el bot",
-    "codeExpires": "El código sirve una vez hasta las {time}.",
     "oauth": {
       "connected": "Acceso concedido",
       "denied": "No se concedió el acceso",
       "failed": "La conexión falló",
       "invalid_state": "El enlace caducó; conecte de nuevo"
-    }
+    },
+    "channelUnavailable": "El canal no está disponible para su cuenta.",
+    "getKey": "Obtener clave",
+    "reissueKey": "Reemitir clave",
+    "keyHint": "Obtenga una clave personal y envíela una vez al bot {bot}.",
+    "keyIssued": "Clave emitida {when}",
+    "keyTitle": "Su clave de Telegram",
+    "keyText": "Envíe esta clave a {bot} como primer mensaje.",
+    "keyOnce": "Copie la clave ahora: se muestra una sola vez. Para verla de nuevo, reemítala.",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "noLinking": "No requiere vinculación",
+    "emailHint": "Escriba al bot desde su dirección corporativa. El bot responde por correo solo si es el único destinatario; si no, la respuesta espera en Nabu.",
+    "vkteamsHint": "Añada el bot a sus contactos o escríbale primero: le reconoce por el correo de su cuenta."
   },
   "admin": {
     "title": "Administración",
@@ -270,13 +300,60 @@
       "statuses": {
         "active": "Activo",
         "invited": "Invitado",
-        "blocked": "Bloqueado"
+        "blocked": "Bloqueado",
+        "archived": "Archivado"
       },
       "block": "Bloquear",
       "unblock": "Desbloquear",
       "audit": "Auditoría",
       "makeAdmin": "Administrador de la plataforma",
-      "inviteHint": "El usuario recibe el rol en su primer inicio de sesión."
+      "inviteHint": "El usuario recibe el rol en su primer inicio de sesión.",
+      "archiveList": "Archivar por lista",
+      "archive": "Archivar",
+      "card": "Ficha",
+      "filters": {
+        "active": "Activos",
+        "archived": "Archivados",
+        "purge": "Eliminación en 7 días"
+      },
+      "requestTitle": "{name} pide restaurar la cuenta",
+      "requestAt": "inicio de sesión {when}",
+      "archivedSince": "archivada desde {when}",
+      "newIdentity": "Nuevo ID en el proveedor de acceso: {subject}. Al restaurar se vincula con la cuenta archivada.",
+      "sameIdentity": "El mismo ID en el proveedor de acceso.",
+      "restore": "Restaurar",
+      "restoreAndLink": "Restaurar y vincular",
+      "reject": "Rechazar",
+      "restored": "La cuenta está restaurada",
+      "archivedAt": "Archivada",
+      "purgeAfter": "Eliminación",
+      "archivedBy": "Archivada por",
+      "purgeIn": "{count, plural, =0 {hoy} one {en # día} other {en # días}}",
+      "byApi": "API · {client}",
+      "archiveEmpty": "No hay cuentas archivadas",
+      "archiveTitle": "Archivar cuentas",
+      "archiveEmails": "Correos, uno por línea",
+      "archiveDo": "{count, plural, one {Archivar # cuenta} other {Archivar # cuentas}}",
+      "groupAgents": "Agentes de grupo del propietario",
+      "groups": {
+        "transfer": "Transferir a un administrador",
+        "disable": "Desactivar"
+      },
+      "archiveHint": "Se cierran el acceso y todos los canales, las tareas se pausan y se eliminan el sandbox, los accesos personales y el vínculo de Telegram. Conversaciones, memoria y archivos se conservan hasta el fin de la retención.",
+      "results": {
+        "archived": "archivada",
+        "restored": "restaurada",
+        "already_archived": "ya archivada",
+        "already_active": "ya activa",
+        "not_found": "no encontrada",
+        "purged": "eliminada"
+      },
+      "reasons": {
+        "always": "siempre",
+        "all_users": "para todos",
+        "user": "activado para el usuario",
+        "disabled": "no disponible"
+      }
     },
     "models": {
       "title": "Conexiones de modelos",
@@ -472,6 +549,85 @@
       "result": "Resultado",
       "via": "a través de {client}",
       "empty": "Sin registros"
+    },
+    "channels": {
+      "title": "Canales",
+      "lead": "Dónde hablan los usuarios con sus agentes y quién tiene acceso a cada canal.",
+      "channel": "Canal",
+      "state": "Conexión",
+      "enabled": "Activado",
+      "allUsers": "Para todos",
+      "groups": "Grupos",
+      "users": "Usuarios",
+      "always": "siempre",
+      "client": "cliente de servicio",
+      "statuses": {
+        "ok": "Conectado",
+        "error": "Error",
+        "unknown": "Sin comprobar"
+      },
+      "everybody": "todos",
+      "configure": "Configurar",
+      "cardTitle": "Canal {channel}",
+      "check": "Comprobar conexión",
+      "checkOk": "La conexión funciona",
+      "checkFailed": "La conexión falló",
+      "provider": "Proveedor",
+      "providers": {
+        "google": "Google Workspace",
+        "yandex360": "Yandex 360",
+        "vkworkmail": "VK WorkMail"
+      },
+      "mailbox": "Buzón del bot",
+      "aliases": "Alias",
+      "domains": "Dominios corporativos",
+      "domainsHint": "Solo se aceptan correos de estos dominios.",
+      "authservHint": "El nombre del servidor en la cabecera Authentication-Results del proveedor; se rellena según el proveedor.",
+      "apiUrl": "Dirección de la API del bot",
+      "secrets": {
+        "botToken": "Token del bot",
+        "token": "Token del bot",
+        "appPassword": "Contraseña de aplicación",
+        "serviceAccountJson": "Clave de la cuenta de servicio (JSON)"
+      },
+      "secretSet": "Definido. Introduzca un valor nuevo para reemplazarlo",
+      "secretHint": "El secreto se guarda cifrado y no se vuelve a mostrar.",
+      "rules": "El bot responde por correo solo si es el único destinatario: una dirección en Para y Cc vacío. Los demás correos se responden en el tema de la aplicación web. Las acciones que modifican datos esperan la confirmación del usuario.",
+      "rejected": "Rechazados recientemente"
+    },
+    "group-agents": {
+      "title": "Agentes de grupo",
+      "lead": "Agentes de chats grupales con memoria y espacio propios y solo accesos de plataforma.",
+      "empty": "Aún no hay agentes de grupo",
+      "group": "Grupo",
+      "members": "Miembros",
+      "owner": "Propietario",
+      "model": "Modelo",
+      "cost": "Coste del mes",
+      "state": "Estado",
+      "removed": "eliminado del grupo",
+      "defaultModel": "por defecto",
+      "statuses": {
+        "active": "Activo",
+        "disabled": "Desactivado",
+        "removed": "Eliminado"
+      },
+      "dataUntil": "datos conservados hasta {when}",
+      "transfer": "Transferir",
+      "disable": "Desactivar",
+      "enable": "Activar",
+      "transferTitle": "Transferir el agente de {group}",
+      "transferHint": "El nuevo propietario es un administrador o un miembro del grupo con acceso al canal."
+    },
+    "settings": {
+      "title": "Ajustes",
+      "lead": "Ajustes de la instancia.",
+      "retention": "Retención de cuentas archivadas",
+      "days": "días",
+      "retentionHint": "Pasado este plazo, la cuenta archivada y sus datos se eliminan definitivamente. El mismo plazo se aplica a los datos de un agente de grupo eliminado de su grupo.",
+      "confirmTitle": "Retención del archivo",
+      "confirmText": "La nueva retención de {days} días se aplica a todas las cuentas archivadas.",
+      "willPurge": "{count, plural, =0 {La próxima limpieza no elimina ninguna cuenta.} one {La próxima limpieza elimina # cuenta.} other {La próxima limpieza elimina # cuentas.}}"
     }
   },
   "errors": {
@@ -490,8 +646,6 @@
     "conversation_archived": "El tema está archivado.",
     "empty_message": "El mensaje está vacío.",
     "message_too_long": "El mensaje es demasiado largo.",
-    "link_code_invalid": "El código de vinculación no es válido o caducó.",
-    "channel_disabled": "El canal no está activado.",
     "catalog_item_unavailable": "El elemento no está disponible.",
     "token_required": "Se requiere un token personal.",
     "space_quota_exceeded": "El espacio está lleno.",
@@ -527,6 +681,24 @@
     "invalid_workspace": "Espacio no válido.",
     "invalid_limits": "Límites no válidos.",
     "invalid_bundle": "Archivo no válido.",
-    "invalid_thinking": "El modelo no admite este nivel."
+    "invalid_thinking": "El modelo no admite este nivel.",
+    "channel_unavailable": "El canal no está disponible para esta cuenta.",
+    "channel_locked": "La aplicación web no se puede desactivar.",
+    "user_archived": "La cuenta está archivada.",
+    "restore_pending": "La cuenta espera ser restaurada.",
+    "confirmation_expired": "La confirmación caducó. Pídalo de nuevo al agente.",
+    "confirmation_resolved": "La acción ya está resuelta.",
+    "group_agent_forbidden": "Solo el propietario y los administradores gestionan el agente de grupo.",
+    "group_agent_removed": "El bot fue eliminado del grupo.",
+    "cannot_archive_self": "No puede archivar su propia cuenta.",
+    "invalid_settings": "Los ajustes del canal no son válidos.",
+    "invalid_owner": "El nuevo propietario debe ser miembro del grupo con acceso al canal.",
+    "invalid_transfer": "Los agentes de grupo se transfieren a un administrador activo.",
+    "invalid_retention": "La retención es de 1 a 3650 días.",
+    "identity_conflict": "Otra identidad del proveedor de acceso está vinculada a esta cuenta.",
+    "emails_required": "Indique al menos un correo.",
+    "too_many_emails": "Como máximo 500 correos por llamada.",
+    "not_checkable": "Este canal no tiene conexión que comprobar.",
+    "key_collision": "Inténtelo de nuevo."
   }
 }

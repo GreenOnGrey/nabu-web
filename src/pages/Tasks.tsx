@@ -138,7 +138,8 @@ function Runs({ task, lng }: { task: Task; lng: string }) {
         <div className="r" key={r.id}>
           <span>{dateTime(r.startedAt, lng)}</span>
           <span className={r.status === "succeeded" ? "ok-t" : r.status === "failed" ? "err-t" : "muted"}>{t(`tasks.run.${r.status}`)}</span>
-          <span className="t2">{r.errorText ?? r.summary ?? ""}</span>
+          <span className="t2">{r.errorText ?? r.summary ?? ""}
+            {r.deliveryNote === "channel_unavailable" && <span className="small warn-t"> · {t("tasks.channelUnavailable")}</span>}</span>
           {r.messageId ? <Link to="/" className="small">{t("tasks.openInChat")}</Link> : <span />}
         </div>
       ))}

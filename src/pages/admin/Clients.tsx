@@ -61,6 +61,8 @@ export function ClientsAdmin() {
             <dd className="row" style={{ gap: 16 }}>
               <Switch on={c.canDelegate} onChange={(v) => patch.mutate({ id: c.id, canDelegate: v })} label={t("admin.clients.delegate")} />
               <Switch on={c.canImport} onChange={(v) => patch.mutate({ id: c.id, canImport: v })} label={t("admin.clients.import")} />
+              <Switch on={c.canArchive} onChange={(v) => patch.mutate({ id: c.id, canArchive: v })} label={<span className="mono">users:archive</span>} />
+              <Switch on={c.canRestore} onChange={(v) => patch.mutate({ id: c.id, canRestore: v })} label={<span className="mono">users:restore</span>} />
             </dd>
             <dt>{t("admin.clients.secret")}</dt>
             <dd className="row" style={{ gap: 8 }}>

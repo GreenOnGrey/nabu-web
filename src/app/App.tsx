@@ -30,10 +30,10 @@ export function App() {
     if (!unauthenticated && me.data) return <Navigate to="/" replace />;
     return config.data ? <LoginPage config={config.data} /> : <Loading />;
   }
-  if (me.error instanceof ApiError && me.error.code === "user_blocked") {
+  if (me.error instanceof ApiError && (me.error.code === "user_blocked" || me.error.code === "user_archived")) {
     return (
       <main className="main">
-        <Empty icon="lock" title={t("errors.user_blocked")} />
+        <Empty icon="lock" title={t(`errors.${me.error.code}`)} />
       </main>
     );
   }
@@ -89,6 +89,8 @@ function Authenticated() {
         qc.invalidateQueries({ queryKey: keys.space });
         qc.invalidateQueries({ queryKey: keys.files });
       }),
+      onEvent("conversation.unread", inv(["conversations"])),
+      onEvent("access.changed", inv(keys.channels)),
       onEvent("connections.changed", () => {
         qc.invalidateQueries({ queryKey: keys.catalog });
         qc.invalidateQueries({ queryKey: keys.channels });

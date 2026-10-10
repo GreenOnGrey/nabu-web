@@ -17,7 +17,9 @@
     "remove": "移除",
     "back": "返回",
     "done": "完成",
-    "more": "显示更多"
+    "more": "显示更多",
+    "saved": "已保存",
+    "close": "关闭"
   },
   "login": {
     "logoAlt": "Nabu 标志",
@@ -32,7 +34,8 @@
       "no_verified_email": "您的账号没有已验证的主邮箱。",
       "email_not_verified": "身份提供方未验证您的邮箱。",
       "blocked": "您的账号已被禁止访问。",
-      "provider": "登录提供方不可用。"
+      "provider": "登录提供方不可用。",
+      "restore_pending": "账户正在等待恢复。管理员已收到请求。"
     }
   },
   "profile": {
@@ -62,7 +65,9 @@
   "channels": {
     "web": "网站",
     "telegram": "Telegram",
-    "vkws": "VK WorkSpace"
+    "vkws": "VK WorkSpace",
+    "vkteams": "VK Teams",
+    "email": "邮件"
   },
   "days": {
     "0": "星期日",
@@ -111,6 +116,22 @@
       "notRecognized": "未能识别语音",
       "micDenied": "无法访问麦克风",
       "unsupported": "此浏览器不支持语音输入"
+    },
+    "unread": "{count} 条未读回复",
+    "confirm": {
+      "title": "确认操作",
+      "text": "代理想要执行：{action}",
+      "approve": "执行",
+      "reject": "拒绝",
+      "approved": "您已确认：{action}",
+      "rejected": "您已拒绝：{action}"
+    },
+    "mail": {
+      "from": "发件人",
+      "to": "收件人",
+      "cc": "抄送",
+      "webOnly": "机器人不是唯一收件人：回复仅在此处，不通过邮件发送。",
+      "quoted": "引用内容"
     }
   },
   "llm": {
@@ -164,7 +185,8 @@
     "daily": "每天 {time}",
     "weekdays": "工作日 {time}",
     "weekly": "每{day} {time}",
-    "everyMinutes": "{count, plural, other {每 # 分钟}}"
+    "everyMinutes": "{count, plural, other {每 # 分钟}}",
+    "channelUnavailable": "渠道不可用，已送达网页端"
   },
   "memory": {
     "title": "记忆",
@@ -205,7 +227,8 @@
     "byAgent": "由智能体",
     "byUser": "由你",
     "empty": "暂无文件",
-    "emptyHint": "智能体创建的文件和你上传的文件会显示在这里。"
+    "emptyHint": "智能体创建的文件和你上传的文件会显示在这里。",
+    "linked": "邮件中的文件："
   },
   "connections": {
     "title": "连接",
@@ -239,19 +262,26 @@
     "linked": "已绑定",
     "linkedAs": "{account}，自 {when}",
     "unlink": "解除绑定",
-    "getCode": "获取绑定码",
-    "linkHint": "绑定账号后即可在这里与智能体交流。",
-    "codeTitle": "绑定 {channel}",
-    "codeText": "向 Nabu 机器人发送以下消息：",
-    "codeTextBot": "向 {bot} 发送以下消息：",
     "openBot": "打开机器人",
-    "codeExpires": "绑定码仅可使用一次，有效期至 {time}。",
     "oauth": {
       "connected": "已授予访问权限",
       "denied": "未授予访问权限",
       "failed": "连接失败",
       "invalid_state": "链接已过期，请重新连接"
-    }
+    },
+    "channelUnavailable": "此渠道对您的账户不可用。",
+    "getKey": "获取密钥",
+    "reissueKey": "重新签发密钥",
+    "keyHint": "获取个人密钥并向机器人 {bot} 发送一次。",
+    "keyIssued": "密钥签发于 {when}",
+    "keyTitle": "您的 Telegram 密钥",
+    "keyText": "将此密钥作为第一条消息发送给 {bot}。",
+    "keyOnce": "请立即复制密钥：它只显示一次。如需再次查看，请重新签发。",
+    "copy": "复制",
+    "copied": "已复制",
+    "noLinking": "无需绑定",
+    "emailHint": "请使用公司邮箱给机器人写信。仅当机器人是唯一收件人时才会邮件回复，否则回复保留在 Nabu 中。",
+    "vkteamsHint": "将机器人添加到联系人或先给它发消息：它通过账户邮箱识别您。"
   },
   "admin": {
     "title": "管理",
@@ -270,13 +300,60 @@
       "statuses": {
         "active": "活跃",
         "invited": "已邀请",
-        "blocked": "已封禁"
+        "blocked": "已封禁",
+        "archived": "已归档"
       },
       "block": "封禁",
       "unblock": "解除封禁",
       "audit": "审计",
       "makeAdmin": "平台管理员",
-      "inviteHint": "用户首次登录时获得该角色。"
+      "inviteHint": "用户首次登录时获得该角色。",
+      "archiveList": "按列表归档",
+      "archive": "归档",
+      "card": "详情",
+      "filters": {
+        "active": "活跃",
+        "archived": "已归档",
+        "purge": "7 天内删除"
+      },
+      "requestTitle": "{name} 请求恢复账户",
+      "requestAt": "登录于 {when}",
+      "archivedSince": "自 {when} 起归档",
+      "newIdentity": "登录提供商处的新 ID：{subject}。恢复后将其关联到归档账户。",
+      "sameIdentity": "登录提供商处的 ID 未变。",
+      "restore": "恢复",
+      "restoreAndLink": "恢复并关联",
+      "reject": "拒绝",
+      "restored": "账户已恢复",
+      "archivedAt": "归档时间",
+      "purgeAfter": "删除",
+      "archivedBy": "归档人",
+      "purgeIn": "{count, plural, =0 {今天} other {# 天后}}",
+      "byApi": "API · {client}",
+      "archiveEmpty": "没有归档账户",
+      "archiveTitle": "归档账户",
+      "archiveEmails": "邮箱，每行一个",
+      "archiveDo": "归档 {count} 个账户",
+      "groupAgents": "所有者的群组代理",
+      "groups": {
+        "transfer": "移交给管理员",
+        "disable": "停用"
+      },
+      "archiveHint": "登录和所有渠道将关闭，任务暂停，沙箱、个人访问权限和 Telegram 绑定将被删除。对话、记忆和文件保留至保留期结束。",
+      "results": {
+        "archived": "已归档",
+        "restored": "已恢复",
+        "already_archived": "已在归档中",
+        "already_active": "已处于活跃状态",
+        "not_found": "未找到",
+        "purged": "已删除"
+      },
+      "reasons": {
+        "always": "始终",
+        "all_users": "对所有人",
+        "user": "已为该用户启用",
+        "disabled": "不可用"
+      }
     },
     "models": {
       "title": "模型连接",
@@ -472,6 +549,85 @@
       "result": "结果",
       "via": "通过 {client}",
       "empty": "没有记录"
+    },
+    "channels": {
+      "title": "渠道",
+      "lead": "用户在何处与代理交流，以及谁可以使用各个渠道。",
+      "channel": "渠道",
+      "state": "连接",
+      "enabled": "已启用",
+      "allUsers": "对所有人开放",
+      "groups": "群组",
+      "users": "用户",
+      "always": "始终",
+      "client": "服务客户端",
+      "statuses": {
+        "ok": "已连接",
+        "error": "错误",
+        "unknown": "未检查"
+      },
+      "everybody": "所有人",
+      "configure": "配置",
+      "cardTitle": "渠道 {channel}",
+      "check": "检查连接",
+      "checkOk": "连接正常",
+      "checkFailed": "连接失败",
+      "provider": "提供商",
+      "providers": {
+        "google": "Google Workspace",
+        "yandex360": "Yandex 360",
+        "vkworkmail": "VK WorkMail"
+      },
+      "mailbox": "机器人邮箱",
+      "aliases": "别名",
+      "domains": "公司域名",
+      "domainsHint": "仅接受来自这些域名的邮件。",
+      "authservHint": "提供商 Authentication-Results 头中的服务器名称；按提供商预填。",
+      "apiUrl": "机器人 API 地址",
+      "secrets": {
+        "botToken": "机器人令牌",
+        "token": "机器人令牌",
+        "appPassword": "应用专用密码",
+        "serviceAccountJson": "服务账号密钥 (JSON)"
+      },
+      "secretSet": "已设置。输入新值以替换",
+      "secretHint": "密钥加密存储，不会再次显示。",
+      "rules": "仅当机器人是唯一收件人（收件人只有一个地址且抄送为空）时才邮件回复。其他邮件在网页应用的主题中回复。修改数据的操作需等待用户确认。",
+      "rejected": "最近被拒绝"
+    },
+    "group-agents": {
+      "title": "群组代理",
+      "lead": "群聊代理，拥有独立的记忆和空间，仅使用平台访问权限。",
+      "empty": "暂无群组代理",
+      "group": "群组",
+      "members": "成员",
+      "owner": "所有者",
+      "model": "模型",
+      "cost": "本月费用",
+      "state": "状态",
+      "removed": "已被移出群组",
+      "defaultModel": "默认",
+      "statuses": {
+        "active": "活跃",
+        "disabled": "已停用",
+        "removed": "已移除"
+      },
+      "dataUntil": "数据保留至 {when}",
+      "transfer": "移交",
+      "disable": "停用",
+      "enable": "启用",
+      "transferTitle": "移交 {group} 的代理",
+      "transferHint": "新所有者须为管理员或拥有该渠道访问权限的群组成员。"
+    },
+    "settings": {
+      "title": "设置",
+      "lead": "实例设置。",
+      "retention": "归档账户保留期",
+      "days": "天",
+      "retentionHint": "超过此期限后，归档账户及其数据将被永久删除。被移出群组的群组代理数据也保留同样的时间。",
+      "confirmTitle": "归档保留期",
+      "confirmText": "新的保留期 {days} 天适用于所有归档账户。",
+      "willPurge": "{count, plural, =0 {下次清理不会删除任何账户。} other {下次清理将删除 # 个账户。}}"
     }
   },
   "errors": {
@@ -490,8 +646,6 @@
     "conversation_archived": "该话题已归档。",
     "empty_message": "消息为空。",
     "message_too_long": "消息太长。",
-    "link_code_invalid": "绑定码无效或已过期。",
-    "channel_disabled": "该渠道未启用。",
     "catalog_item_unavailable": "该条目不可用。",
     "token_required": "需要个人令牌。",
     "space_quota_exceeded": "空间已满。",
@@ -527,6 +681,24 @@
     "invalid_workspace": "工作空间无效。",
     "invalid_limits": "限制无效。",
     "invalid_bundle": "归档无效。",
-    "invalid_thinking": "该模型不支持此推理级别。"
+    "invalid_thinking": "该模型不支持此推理级别。",
+    "channel_unavailable": "此渠道对该账户不可用。",
+    "channel_locked": "网页应用无法关闭。",
+    "user_archived": "账户已归档。",
+    "restore_pending": "账户正在等待恢复。",
+    "confirmation_expired": "确认已过期。请再次向代理提出请求。",
+    "confirmation_resolved": "该操作已处理。",
+    "group_agent_forbidden": "只有所有者和管理员可以管理群组代理。",
+    "group_agent_removed": "机器人已被移出群组。",
+    "cannot_archive_self": "不能归档自己的账户。",
+    "invalid_settings": "渠道设置无效。",
+    "invalid_owner": "新所有者必须是拥有该渠道访问权限的群组成员。",
+    "invalid_transfer": "群组代理只能移交给活跃的管理员。",
+    "invalid_retention": "保留期为 1 到 3650 天。",
+    "identity_conflict": "该账户已关联登录提供商的另一个身份。",
+    "emails_required": "请至少输入一个邮箱。",
+    "too_many_emails": "每次最多 500 个邮箱。",
+    "not_checkable": "此渠道没有可检查的连接。",
+    "key_collision": "请重试。"
   }
 }

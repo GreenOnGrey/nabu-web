@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { apiUrl } from "../api/base";
 import { api, ApiError } from "../api/client";
 import { keys, useAgent } from "../api/queries";
-import type { Conversation, List, Message, ToolStep } from "../api/types";
+import type { Confirmation, Conversation, List, Message, ToolStep } from "../api/types";
 import { useSession } from "../app/session";
 import { errorText } from "../lib/errors";
 import { intlLocale } from "../lib/i18n";
@@ -65,8 +65,9 @@ function Sidebar({ open, main, topics, archived, currentId, onNew, onPick }: {
   const when = (c: Conversation) => relativeTime(c.lastMessageAt ?? c.createdAt, intlLocale(i18n.language));
   const item = (c: Conversation, cls = "") => (
     <button key={c.id} className={`it${c.id === currentId ? " on" : ""}${cls}`} onClick={() => onPick(c)} aria-current={c.id === currentId}>
-      <Icon name="msg2" size={16} />
+      <Icon name={c.source === "email" ? "mail" : "msg2"} size={16} />
       <span className="nm">{c.kind === "main" ? t("chat.main") : c.title}</span>
+      {c.unreadCount > 0 && <span className="unread" aria-label={t("chat.unread", { count: c.unreadCount })}>{c.unreadCount}</span>}
       <span className="sub">{when(c)}</span>
     </button>
   );
@@ -131,6 +132,30 @@ function Conversation({ conv, onMenu }: { conv: Conversation; onMenu: () => void
   const fileRef = useRef<HTMLInputElement>(null);
   const recorder = useRecorder();
   const readOnly = conv.archivedAt !== null;
+
+  // UI-04: opening a mail topic resets its unread counter.
+  useEffect(() => {
+    if (conv.unreadCount > 0) {
+      void api.post(`/api/v1/conversations/${conv.id}/read`).then(() => qc.invalidateQueries({ queryKey: ["conversations"] })).catch(() => undefined);
+    }
+  }, [conv.id, conv.unreadCount, qc]);
+
+  // R9: calls of tools that change data wait for the user in mail topics.
+  const confirmKey = ["confirmations", conv.id];
+  const confirmations = useQuery({
+    queryKey: confirmKey, enabled: conv.writesRequireConfirmation,
+    queryFn: () => api.get<{ items: Confirmation[] }>(`/api/v1/confirmations?conversationId=${conv.id}`),
+  });
+  const refreshConfirmations = (d: { conversationId: string }) => {
+    if (d.conversationId === conv.id) qc.invalidateQueries({ queryKey: confirmKey });
+  };
+  useEvent("confirmation.created", refreshConfirmations);
+  useEvent("confirmation.resolved", refreshConfirmations);
+  const resolve = useMutation({
+    mutationFn: ({ id, action }: { id: string; action: "approve" | "reject" }) => api.post(`/api/v1/confirmations/${id}:${action}`),
+    onSettled: () => qc.invalidateQueries({ queryKey: confirmKey }),
+    onError: (e) => toast({ kind: "error", title: errorText(t, e) }),
+  });
 
   const history = useInfiniteQuery({
     queryKey: keys.messages(conv.id),
@@ -277,7 +302,7 @@ function Conversation({ conv, onMenu }: { conv: Conversation; onMenu: () => void
           </div>
         </div>
         <span className="spacer" />
-        <span className="small muted hide-m">{conv.kind === "main" ? t("chat.mainHint") : conv.title}</span>
+        <span className="small muted hide-m">{conv.kind === "main" ? t("chat.mainHint") : <>{conv.source === "email" && <Icon name="mail" size={13} />} {conv.title}</>}</span>
       </div>
       {agentMenu && a && <AgentMenu agent={a} onClose={() => setAgentMenu(false)} />}
 
@@ -291,6 +316,17 @@ function Conversation({ conv, onMenu }: { conv: Conversation; onMenu: () => void
           <div className="empty"><div className="ic"><Icon name="spark" /></div><b>{t("chat.emptyTitle", { name: a?.name ?? "Nabu" })}</b>{t("chat.emptyHint")}</div>
         )}
         {messages.map((m) => <MessageView key={m.id} m={m} busy={busy} onRetry={() => retry(m)} />)}
+        {(confirmations.data?.items ?? []).map((c) => (
+          <div className="confirm" key={c.id} role="group" aria-label={t("chat.confirm.title")}>
+            <div className="h"><Icon name="alert" size={16} />{t("chat.confirm.title")}</div>
+            <div>{t("chat.confirm.text", { action: c.summary })}</div>
+            <pre>{c.argsPreview}</pre>
+            <div className="acts">
+              <button className="btn sm primary" disabled={resolve.isPending} onClick={() => resolve.mutate({ id: c.id, action: "approve" })}>{t("chat.confirm.approve")}</button>
+              <button className="btn sm" disabled={resolve.isPending} onClick={() => resolve.mutate({ id: c.id, action: "reject" })}>{t("chat.confirm.reject")}</button>
+            </div>
+          </div>
+        ))}
       </div>
 
       {readOnly ? (
@@ -365,7 +401,8 @@ function ChannelMark({ m }: { m: Message }) {
   let icon: Parameters<typeof Icon>[0]["name"] = "msg";
   let label = ch;
   if (ch === "telegram") [icon, label] = ["tg", "Telegram"];
-  else if (ch === "vkws") [icon, label] = ["msg", "VK WorkSpace"];
+  else if (ch === "vkteams" || ch === "vkws") [icon, label] = ["msg", "VK Teams"];
+  else if (ch === "email") [icon, label] = ["mail", t("channels.email")];
   else if (ch.startsWith("task:")) [icon, label] = ["repeat", t("chat.taskMark")];
   else if (ch.startsWith("client:")) [icon, label] = ["plug", ch.slice(7).replace(/^./, (c) => c.toUpperCase())];
   return <div className="chan"><Icon name={icon} size={12} /> {label} · {time}</div>;
@@ -384,9 +421,26 @@ function MessageView({ m, busy, onRetry }: { m: Message; busy: boolean; onRetry:
   const steps = m.toolSteps ?? [];
   const shown = open || steps.length <= 3 ? steps : steps.slice(-2);
   if (m.role === "user") {
+    const mail = m.context?.email;
+    if (m.context?.confirmation) {
+      // the outcome of a confirmation is a note, not words of the user
+      return <div className="sysnote">{t(`chat.confirm.${m.context.confirmation.status}`, { action: m.context.confirmation.summary })}</div>;
+    }
     return (
       <div className="m u">
         <ChannelMark m={m} />
+        {mail && (
+          <div className="mailcard">
+            <div className="subj"><Icon name="mail" size={14} />{mail.subject || "—"}</div>
+            <dl>
+              <dt>{t("chat.mail.from")}</dt><dd>{mail.fromName ? `${mail.fromName} <${mail.from}>` : mail.from}</dd>
+              <dt>{t("chat.mail.to")}</dt><dd>{mail.to.join(", ") || "—"}</dd>
+              {mail.cc.length > 0 && <><dt>{t("chat.mail.cc")}</dt><dd>{mail.cc.join(", ")}</dd></>}
+            </dl>
+            {mail.mode === "web_only" && <div className="small muted" style={{ marginTop: 6 }}>{t("chat.mail.webOnly")}</div>}
+            {mail.quoted && <details><summary>{t("chat.mail.quoted")}</summary><pre>{mail.quoted}</pre></details>}
+          </div>
+        )}
         {m.text && <div className="bub">{m.text}</div>}
         {m.attachments.length > 0 && (
           <div className="atts">

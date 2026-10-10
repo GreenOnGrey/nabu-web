@@ -17,7 +17,9 @@
     "remove": "Remove",
     "back": "Back",
     "done": "Done",
-    "more": "Show more"
+    "more": "Show more",
+    "saved": "Saved",
+    "close": "Close"
   },
   "login": {
     "logoAlt": "Nabu logo",
@@ -32,7 +34,8 @@
       "no_verified_email": "Your account has no verified primary email.",
       "email_not_verified": "The provider has not verified your email.",
       "blocked": "Access is closed for your account.",
-      "provider": "The sign-in provider is unavailable."
+      "provider": "The sign-in provider is unavailable.",
+      "restore_pending": "The account is waiting to be restored. Administrators have received the request."
     }
   },
   "profile": {
@@ -62,7 +65,9 @@
   "channels": {
     "web": "Website",
     "telegram": "Telegram",
-    "vkws": "VK WorkSpace"
+    "vkws": "VK WorkSpace",
+    "vkteams": "VK Teams",
+    "email": "Mail"
   },
   "days": {
     "0": "Sunday",
@@ -111,6 +116,22 @@
       "notRecognized": "The speech was not recognized",
       "micDenied": "No access to the microphone",
       "unsupported": "Voice input is not supported in this browser"
+    },
+    "unread": "{count, plural, one {# unread answer} other {# unread answers}}",
+    "confirm": {
+      "title": "Confirm the action",
+      "text": "The agent wants to perform: {action}",
+      "approve": "Execute",
+      "reject": "Reject",
+      "approved": "You confirmed: {action}",
+      "rejected": "You rejected: {action}"
+    },
+    "mail": {
+      "from": "From",
+      "to": "To",
+      "cc": "Cc",
+      "webOnly": "The bot was not the only recipient: the answer is only here, not by mail.",
+      "quoted": "Quoted text"
     }
   },
   "llm": {
@@ -164,7 +185,8 @@
     "daily": "Every day at {time}",
     "weekdays": "Every weekday at {time}",
     "weekly": "Every {day} at {time}",
-    "everyMinutes": "{count, plural, one {Every minute} other {Every # minutes}}"
+    "everyMinutes": "{count, plural, one {Every minute} other {Every # minutes}}",
+    "channelUnavailable": "channel unavailable, delivered to the web"
   },
   "memory": {
     "title": "Memory",
@@ -205,7 +227,8 @@
     "byAgent": "by the agent",
     "byUser": "by you",
     "empty": "No files yet",
-    "emptyHint": "Files the agent creates and files you upload appear here."
+    "emptyHint": "Files the agent creates and files you upload appear here.",
+    "linked": "The file from the letter:"
   },
   "connections": {
     "title": "Connections",
@@ -239,19 +262,26 @@
     "linked": "Linked",
     "linkedAs": "{account}, since {when}",
     "unlink": "Unlink",
-    "getCode": "Get link code",
-    "linkHint": "Link your account to talk to the agent here.",
-    "codeTitle": "Link {channel}",
-    "codeText": "Send this message to the Nabu bot:",
-    "codeTextBot": "Send this message to {bot}:",
     "openBot": "Open the bot",
-    "codeExpires": "The code works once until {time}.",
     "oauth": {
       "connected": "Access granted",
       "denied": "Access was not granted",
       "failed": "The connection failed",
       "invalid_state": "The link expired; connect again"
-    }
+    },
+    "channelUnavailable": "The channel is not available for your account.",
+    "getKey": "Get key",
+    "reissueKey": "Reissue key",
+    "keyHint": "Get a personal key and send it to the bot {bot} once.",
+    "keyIssued": "Key issued {when}",
+    "keyTitle": "Your Telegram key",
+    "keyText": "Send this key to {bot} as the first message.",
+    "keyOnce": "Copy the key now: it is shown only once. To see a key again, reissue it.",
+    "copy": "Copy",
+    "copied": "Copied",
+    "noLinking": "No linking needed",
+    "emailHint": "Write to the bot from your corporate address. The bot answers by mail only when it is the only recipient; otherwise the answer waits in Nabu.",
+    "vkteamsHint": "Add the bot to your contacts or write to it first: it finds you by the email of your account."
   },
   "admin": {
     "title": "Administration",
@@ -270,13 +300,60 @@
       "statuses": {
         "active": "Active",
         "invited": "Invited",
-        "blocked": "Blocked"
+        "blocked": "Blocked",
+        "archived": "Archived"
       },
       "block": "Block",
       "unblock": "Unblock",
       "audit": "Audit",
       "makeAdmin": "Platform administrator",
-      "inviteHint": "The user gets the role at the first sign-in."
+      "inviteHint": "The user gets the role at the first sign-in.",
+      "archiveList": "Archive by list",
+      "archive": "Archive",
+      "card": "Card",
+      "filters": {
+        "active": "Active",
+        "archived": "Archived",
+        "purge": "Deleted within 7 days"
+      },
+      "requestTitle": "{name} asks to restore the account",
+      "requestAt": "signed in {when}",
+      "archivedSince": "archived since {when}",
+      "newIdentity": "A new ID at the sign-in provider: {subject}. Restoring links it to the archived account.",
+      "sameIdentity": "The same ID at the sign-in provider.",
+      "restore": "Restore",
+      "restoreAndLink": "Restore and link",
+      "reject": "Reject",
+      "restored": "The account is restored",
+      "archivedAt": "Archived",
+      "purgeAfter": "Deletion",
+      "archivedBy": "Archived by",
+      "purgeIn": "{count, plural, =0 {today} one {in # day} other {in # days}}",
+      "byApi": "API · {client}",
+      "archiveEmpty": "No archived accounts",
+      "archiveTitle": "Archive accounts",
+      "archiveEmails": "Emails, one per line",
+      "archiveDo": "{count, plural, one {Archive # account} other {Archive # accounts}}",
+      "groupAgents": "Group agents of the owner",
+      "groups": {
+        "transfer": "Transfer to an administrator",
+        "disable": "Disable"
+      },
+      "archiveHint": "Sign-in and all channels are closed, tasks are paused, the sandbox, personal accesses and the Telegram link are removed. Conversations, memory and files are kept until the retention ends.",
+      "results": {
+        "archived": "archived",
+        "restored": "restored",
+        "already_archived": "already archived",
+        "already_active": "already active",
+        "not_found": "not found",
+        "purged": "deleted"
+      },
+      "reasons": {
+        "always": "always",
+        "all_users": "for all users",
+        "user": "enabled for the user",
+        "disabled": "not available"
+      }
     },
     "models": {
       "title": "Model connections",
@@ -472,6 +549,85 @@
       "result": "Result",
       "via": "via {client}",
       "empty": "No records"
+    },
+    "channels": {
+      "title": "Channels",
+      "lead": "Where users talk to their agents and who has access to each channel.",
+      "channel": "Channel",
+      "state": "Connection",
+      "enabled": "Enabled",
+      "allUsers": "For all users",
+      "groups": "Groups",
+      "users": "Users",
+      "always": "always",
+      "client": "service client",
+      "statuses": {
+        "ok": "Connected",
+        "error": "Error",
+        "unknown": "Not checked"
+      },
+      "everybody": "everybody",
+      "configure": "Configure",
+      "cardTitle": "Channel {channel}",
+      "check": "Check connection",
+      "checkOk": "The connection works",
+      "checkFailed": "The connection failed",
+      "provider": "Provider",
+      "providers": {
+        "google": "Google Workspace",
+        "yandex360": "Yandex 360",
+        "vkworkmail": "VK WorkMail"
+      },
+      "mailbox": "Mailbox of the bot",
+      "aliases": "Aliases",
+      "domains": "Corporate domains",
+      "domainsHint": "Letters are accepted only from these domains.",
+      "authservHint": "The server name in the Authentication-Results header of the provider; filled by the provider.",
+      "apiUrl": "Bot API address",
+      "secrets": {
+        "botToken": "Bot token",
+        "token": "Bot token",
+        "appPassword": "App password",
+        "serviceAccountJson": "Service account key (JSON)"
+      },
+      "secretSet": "Set. Enter a new value to replace it",
+      "secretHint": "The secret is stored encrypted and never shown again.",
+      "rules": "The bot answers by mail only when it is the only recipient: one address in To and an empty Cc. Other letters are answered in the topic of the web application. Actions that change data wait for the confirmation of the user.",
+      "rejected": "Rejected recently"
+    },
+    "group-agents": {
+      "title": "Group agents",
+      "lead": "Agents of group chats with their own memory and space and platform access only.",
+      "empty": "No group agents yet",
+      "group": "Group",
+      "members": "Members",
+      "owner": "Owner",
+      "model": "Model",
+      "cost": "Cost this month",
+      "state": "State",
+      "removed": "removed from the group",
+      "defaultModel": "default",
+      "statuses": {
+        "active": "Active",
+        "disabled": "Disabled",
+        "removed": "Removed"
+      },
+      "dataUntil": "data kept until {when}",
+      "transfer": "Transfer",
+      "disable": "Disable",
+      "enable": "Enable",
+      "transferTitle": "Transfer the agent of {group}",
+      "transferHint": "The new owner is an administrator or a member of the group with access to the channel."
+    },
+    "settings": {
+      "title": "Settings",
+      "lead": "Settings of the instance.",
+      "retention": "Retention of archived accounts",
+      "days": "days",
+      "retentionHint": "After this time an archived account and its data are deleted for good. The same time is kept for the data of a group agent removed from its group.",
+      "confirmTitle": "Retention of the archive",
+      "confirmText": "The new retention of {days} days applies to all archived accounts.",
+      "willPurge": "{count, plural, =0 {No account is deleted by the next purge.} one {The next purge deletes # account.} other {The next purge deletes # accounts.}}"
     }
   },
   "errors": {
@@ -490,8 +646,6 @@
     "conversation_archived": "The topic is archived.",
     "empty_message": "The message is empty.",
     "message_too_long": "The message is too long.",
-    "link_code_invalid": "The link code is invalid or expired.",
-    "channel_disabled": "The channel is not enabled.",
     "catalog_item_unavailable": "The item is not available.",
     "token_required": "A personal token is required.",
     "space_quota_exceeded": "The space is full.",
@@ -527,6 +681,24 @@
     "invalid_workspace": "Invalid workspace.",
     "invalid_limits": "Invalid limits.",
     "invalid_bundle": "Invalid archive.",
-    "invalid_thinking": "The model does not support this level."
+    "invalid_thinking": "The model does not support this level.",
+    "channel_unavailable": "The channel is not available for this account.",
+    "channel_locked": "The web application cannot be switched off.",
+    "user_archived": "The account is archived.",
+    "restore_pending": "The account is waiting to be restored.",
+    "confirmation_expired": "The confirmation expired. Ask the agent again.",
+    "confirmation_resolved": "The action is already resolved.",
+    "group_agent_forbidden": "Only the owner and administrators manage the group agent.",
+    "group_agent_removed": "The bot was removed from the group.",
+    "cannot_archive_self": "You cannot archive your own account.",
+    "invalid_settings": "The settings of the channel are not valid.",
+    "invalid_owner": "The new owner must be a member of the group with access to the channel.",
+    "invalid_transfer": "Group agents are transferred to an active administrator.",
+    "invalid_retention": "The retention is from 1 to 3650 days.",
+    "identity_conflict": "Another identity of the sign-in provider is linked to this account.",
+    "emails_required": "Enter at least one email.",
+    "too_many_emails": "At most 500 emails per call.",
+    "not_checkable": "This channel has no connection to check.",
+    "key_collision": "Try again."
   }
 }

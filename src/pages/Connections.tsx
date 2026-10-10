@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { api } from "../api/client";
 import { keys } from "../api/queries";
-import type { CatalogItem, Channels } from "../api/types";
+import type { CatalogItem, MyChannel } from "../api/types";
 import { errorText } from "../lib/errors";
 import { intlLocale } from "../lib/i18n";
 import { dateTime } from "../lib/format";
@@ -13,8 +13,8 @@ import { Empty, Modal, useToast } from "../components/ui";
 
 const FILTERS = ["all", "connected", "mcp", "skill"] as const;
 
-/** Connections (R31, design §3.5): messengers linked by a one-time code; the
- * catalog of skills and MCP with the access mode and the action. */
+/** Connections (R31, design §3.5): the channels of the user and the catalog
+ * of skills and MCP with the access mode and the action. */
 export function ConnectionsPage() {
   const { t } = useTranslation();
   const toast = useToast();
@@ -108,54 +108,74 @@ function TokenModal({ item, onClose, onSave }: { item: CatalogItem; onClose: () 
   );
 }
 
+/** Channels of the user (FTR.NAB.CMN-0002 R12–R13, design §3.6): Telegram is
+ * linked with a personal key shown once; VK Teams and mail need no linking. */
 function ChannelsBlock() {
   const { t, i18n } = useTranslation();
   const qc = useQueryClient();
-  const [code, setCode] = useState<{ type: string; code: string; expiresAt: string; bot: string } | null>(null);
-  const channels = useQuery({ queryKey: keys.channels, queryFn: () => api.get<Channels>("/api/v1/channels") });
+  const toast = useToast();
+  const [key, setKey] = useState<{ key: string; bot: string } | null>(null);
+  const channels = useQuery({ queryKey: keys.channels, queryFn: () => api.get<{ items: MyChannel[] }>("/api/v1/channels") });
+  const refresh = () => { qc.invalidateQueries({ queryKey: keys.channels }); qc.invalidateQueries({ queryKey: keys.me }); };
   const issue = useMutation({
-    mutationFn: (type: string) => api.post<{ code: string; expiresAt: string; bot: string }>(`/api/v1/channels/${type}/link-code`),
-    onSuccess: (r, type) => setCode({ type, ...r }),
+    mutationFn: () => api.post<{ key: string; bot: string }>("/api/v1/channels/telegram/key"),
+    onSuccess: (r) => { setKey(r); refresh(); },
+    onError: (e) => toast({ kind: "error", title: errorText(t, e) }),
   });
-  const unlink = useMutation({
-    mutationFn: (type: string) => api.del(`/api/v1/channels/${type}`),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: keys.channels }); qc.invalidateQueries({ queryKey: keys.me }); },
-  });
-  const all = [...new Set([...(channels.data?.available.map((a) => a.type) ?? []), ...(channels.data?.linked.map((l) => l.type) ?? [])])];
-  if (channels.data && all.length === 0) return null;
+  const unlink = useMutation({ mutationFn: () => api.del("/api/v1/channels/telegram/binding"), onSuccess: refresh });
+  const items = channels.data?.items ?? [];
+  if (items.length === 0) return null;
+  const locale = intlLocale(i18n.language);
   return (
     <>
       <h3 className="sec">{t("connections.channels")}</h3>
       <div className="channels">
-        {all.map((type) => {
-          const linked = channels.data?.linked.find((l) => l.type === type);
-          return (
-            <div className="ccard" key={type}>
-              <div className="t"><Icon name={type === "telegram" ? "tg" : "msg"} size={16} />{t(`channels.${type}`)}</div>
-              {linked ? (
+        {items.map((c) => (
+          <div className="ccard" key={c.kind}>
+            <div className="t"><Icon name={c.kind === "telegram" ? "tg" : c.kind === "email" ? "mail" : "msg"} size={16} />{t(`channels.${c.kind}`)}
+              {c.address && <span className="small muted mono">{c.address}</span>}</div>
+            {!c.available ? (
+              <div className="d"><Icon name="lock" size={14} /> {t("connections.channelUnavailable")}</div>
+            ) : c.kind === "telegram" ? (
+              c.binding ? (
                 <>
-                  <div className="d">{t("connections.linkedAs", { account: linked.account || "—", when: dateTime(linked.linkedAt, intlLocale(i18n.language)) })}</div>
+                  <div className="d">{t("connections.linkedAs", { account: c.binding.account || "—", when: dateTime(c.binding.boundAt, locale) })}</div>
                   <div className="acts"><span className="small ok-t">{t("connections.linked")}</span>
-                    <button className="btn sm" onClick={() => unlink.mutate(type)}>{t("connections.unlink")}</button></div>
+                    <span className="row" style={{ gap: 6 }}>
+                      <button className="btn sm" onClick={() => issue.mutate()}>{t("connections.reissueKey")}</button>
+                      <button className="btn sm" onClick={() => unlink.mutate()}>{t("connections.unlink")}</button>
+                    </span></div>
                 </>
               ) : (
                 <>
-                  <div className="d">{t("connections.linkHint")}</div>
-                  <div className="acts"><span />
-                    <button className="btn sm primary" onClick={() => issue.mutate(type)}>{t("connections.getCode")}</button></div>
+                  <div className="d">{t("connections.keyHint", { bot: c.address ?? "" })}</div>
+                  <div className="acts"><span className="small muted">{c.keyIssuedAt ? t("connections.keyIssued", { when: dateTime(c.keyIssuedAt, locale) }) : ""}</span>
+                    <button className="btn sm primary" disabled={issue.isPending} onClick={() => issue.mutate()}>
+                      <Icon name="key" size={14} />{c.keyIssuedAt ? t("connections.reissueKey") : t("connections.getKey")}
+                    </button></div>
                 </>
-              )}
-            </div>
-          );
-        })}
+              )
+            ) : (
+              <>
+                <div className="d">{c.kind === "email" ? t("connections.emailHint") : t("connections.vkteamsHint")}</div>
+                <div className="acts"><span className="small ok-t">{t("connections.noLinking")}</span><span /></div>
+              </>
+            )}
+          </div>
+        ))}
       </div>
-      {code && (
-        <Modal title={t("connections.codeTitle", { channel: t(`channels.${code.type}`) })} onClose={() => { setCode(null); qc.invalidateQueries({ queryKey: keys.channels }); }}
-          footer={<button className="btn primary" onClick={() => { setCode(null); qc.invalidateQueries({ queryKey: keys.channels }); }}>{t("common.done")}</button>}>
-          <p style={{ marginTop: 0 }}>{code.bot ? t("connections.codeTextBot", { bot: "@" + code.bot }) : t("connections.codeText")}</p>
-          <div className="code-box">/start {code.code}</div>
-          {code.bot && <p><a href={`https://t.me/${code.bot}?start=${code.code}`} target="_blank" rel="noreferrer">{t("connections.openBot")}</a></p>}
-          <div className="hint">{t("connections.codeExpires", { time: new Date(code.expiresAt).toLocaleTimeString() })}</div>
+      {key && (
+        <Modal title={t("connections.keyTitle")} onClose={() => setKey(null)}
+          footer={<button className="btn primary" onClick={() => setKey(null)}>{t("common.done")}</button>}>
+          <p style={{ marginTop: 0 }}>{t("connections.keyText", { bot: key.bot || "Telegram" })}</p>
+          <div className="keybox" data-testid="tg-key">{key.key}</div>
+          <div className="row" style={{ gap: 8, marginTop: 10 }}>
+            <button className="btn sm" onClick={() => { void navigator.clipboard?.writeText(key.key); toast({ kind: "ok", title: t("connections.copied") }); }}>
+              <Icon name="copy" size={14} />{t("connections.copy")}
+            </button>
+            {key.bot && <a className="btn sm ghost" href={`https://t.me/${key.bot.replace(/^@/, "")}`} target="_blank" rel="noreferrer">{t("connections.openBot")}</a>}
+          </div>
+          <div className="hintbox warn" style={{ marginTop: 12 }}><Icon name="alert" /><span>{t("connections.keyOnce")}</span></div>
         </Modal>
       )}
     </>

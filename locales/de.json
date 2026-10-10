@@ -17,7 +17,9 @@
     "remove": "Entfernen",
     "back": "Zurück",
     "done": "Fertig",
-    "more": "Mehr anzeigen"
+    "more": "Mehr anzeigen",
+    "saved": "Gespeichert",
+    "close": "Schließen"
   },
   "login": {
     "logoAlt": "Nabu-Logo",
@@ -32,7 +34,8 @@
       "no_verified_email": "Ihr Konto hat keine bestätigte primäre E-Mail.",
       "email_not_verified": "Der Anbieter hat Ihre E-Mail nicht bestätigt.",
       "blocked": "Der Zugang für Ihr Konto ist gesperrt.",
-      "provider": "Der Anmeldeanbieter ist nicht erreichbar."
+      "provider": "Der Anmeldeanbieter ist nicht erreichbar.",
+      "restore_pending": "Das Konto wartet auf Wiederherstellung. Die Administratoren haben die Anfrage erhalten."
     }
   },
   "profile": {
@@ -62,7 +65,9 @@
   "channels": {
     "web": "Website",
     "telegram": "Telegram",
-    "vkws": "VK WorkSpace"
+    "vkws": "VK WorkSpace",
+    "vkteams": "VK Teams",
+    "email": "E-Mail"
   },
   "days": {
     "0": "Sonntag",
@@ -111,6 +116,22 @@
       "notRecognized": "Die Sprache wurde nicht erkannt",
       "micDenied": "Kein Zugriff auf das Mikrofon",
       "unsupported": "Spracheingabe wird von diesem Browser nicht unterstützt"
+    },
+    "unread": "{count, plural, one {# ungelesene Antwort} other {# ungelesene Antworten}}",
+    "confirm": {
+      "title": "Aktion bestätigen",
+      "text": "Der Agent möchte ausführen: {action}",
+      "approve": "Ausführen",
+      "reject": "Ablehnen",
+      "approved": "Sie haben bestätigt: {action}",
+      "rejected": "Sie haben abgelehnt: {action}"
+    },
+    "mail": {
+      "from": "Von",
+      "to": "An",
+      "cc": "Kopie",
+      "webOnly": "Der Bot war nicht der einzige Empfänger: Die Antwort steht nur hier, nicht per E-Mail.",
+      "quoted": "Zitierter Text"
     }
   },
   "llm": {
@@ -164,7 +185,8 @@
     "daily": "Täglich um {time}",
     "weekdays": "Werktags um {time}",
     "weekly": "Jeden {day} um {time}",
-    "everyMinutes": "{count, plural, one {Jede Minute} other {Alle # Minuten}}"
+    "everyMinutes": "{count, plural, one {Jede Minute} other {Alle # Minuten}}",
+    "channelUnavailable": "Kanal nicht verfügbar, im Web zugestellt"
   },
   "memory": {
     "title": "Gedächtnis",
@@ -205,7 +227,8 @@
     "byAgent": "vom Agenten",
     "byUser": "von Ihnen",
     "empty": "Noch keine Dateien",
-    "emptyHint": "Hier erscheinen Dateien, die der Agent erstellt oder die Sie hochladen."
+    "emptyHint": "Hier erscheinen Dateien, die der Agent erstellt oder die Sie hochladen.",
+    "linked": "Die Datei aus der E-Mail:"
   },
   "connections": {
     "title": "Verbindungen",
@@ -239,19 +262,26 @@
     "linked": "Verknüpft",
     "linkedAs": "{account}, seit {when}",
     "unlink": "Trennen",
-    "getCode": "Verknüpfungscode erhalten",
-    "linkHint": "Verknüpfen Sie Ihr Konto, um hier mit dem Agenten zu sprechen.",
-    "codeTitle": "{channel} verknüpfen",
-    "codeText": "Senden Sie diese Nachricht an den Nabu-Bot:",
-    "codeTextBot": "Senden Sie diese Nachricht an {bot}:",
     "openBot": "Bot öffnen",
-    "codeExpires": "Der Code gilt einmalig bis {time}.",
     "oauth": {
       "connected": "Zugriff erteilt",
       "denied": "Zugriff nicht erteilt",
       "failed": "Verbindung fehlgeschlagen",
       "invalid_state": "Der Link ist abgelaufen; erneut verbinden"
-    }
+    },
+    "channelUnavailable": "Der Kanal ist für Ihr Konto nicht verfügbar.",
+    "getKey": "Schlüssel erhalten",
+    "reissueKey": "Schlüssel neu ausstellen",
+    "keyHint": "Holen Sie einen persönlichen Schlüssel und senden Sie ihn einmal an den Bot {bot}.",
+    "keyIssued": "Schlüssel ausgestellt {when}",
+    "keyTitle": "Ihr Telegram-Schlüssel",
+    "keyText": "Senden Sie diesen Schlüssel als erste Nachricht an {bot}.",
+    "keyOnce": "Kopieren Sie den Schlüssel jetzt: Er wird nur einmal angezeigt. Für eine erneute Anzeige neu ausstellen.",
+    "copy": "Kopieren",
+    "copied": "Kopiert",
+    "noLinking": "Keine Verknüpfung nötig",
+    "emailHint": "Schreiben Sie dem Bot von Ihrer Firmenadresse. Der Bot antwortet per E-Mail nur als einziger Empfänger; sonst wartet die Antwort in Nabu.",
+    "vkteamsHint": "Fügen Sie den Bot zu Ihren Kontakten hinzu oder schreiben Sie ihm zuerst: Er erkennt Sie an der E-Mail Ihres Kontos."
   },
   "admin": {
     "title": "Administration",
@@ -270,13 +300,60 @@
       "statuses": {
         "active": "Aktiv",
         "invited": "Eingeladen",
-        "blocked": "Gesperrt"
+        "blocked": "Gesperrt",
+        "archived": "Archiviert"
       },
       "block": "Sperren",
       "unblock": "Entsperren",
       "audit": "Audit",
       "makeAdmin": "Plattformadministrator",
-      "inviteHint": "Der Benutzer erhält die Rolle bei der ersten Anmeldung."
+      "inviteHint": "Der Benutzer erhält die Rolle bei der ersten Anmeldung.",
+      "archiveList": "Per Liste archivieren",
+      "archive": "Archivieren",
+      "card": "Karte",
+      "filters": {
+        "active": "Aktive",
+        "archived": "Archiviert",
+        "purge": "Löschung in 7 Tagen"
+      },
+      "requestTitle": "{name} bittet um Wiederherstellung des Kontos",
+      "requestAt": "Anmeldung {when}",
+      "archivedSince": "archiviert seit {when}",
+      "newIdentity": "Neue ID beim Anmeldeanbieter: {subject}. Die Wiederherstellung verknüpft sie mit dem archivierten Konto.",
+      "sameIdentity": "Dieselbe ID beim Anmeldeanbieter.",
+      "restore": "Wiederherstellen",
+      "restoreAndLink": "Wiederherstellen und verknüpfen",
+      "reject": "Ablehnen",
+      "restored": "Das Konto ist wiederhergestellt",
+      "archivedAt": "Archiviert am",
+      "purgeAfter": "Löschung",
+      "archivedBy": "Archiviert von",
+      "purgeIn": "{count, plural, =0 {heute} one {in # Tag} other {in # Tagen}}",
+      "byApi": "API · {client}",
+      "archiveEmpty": "Keine archivierten Konten",
+      "archiveTitle": "Konten archivieren",
+      "archiveEmails": "E-Mails, eine pro Zeile",
+      "archiveDo": "{count, plural, one {# Konto archivieren} other {# Konten archivieren}}",
+      "groupAgents": "Gruppenagenten des Besitzers",
+      "groups": {
+        "transfer": "An einen Administrator übergeben",
+        "disable": "Deaktivieren"
+      },
+      "archiveHint": "Anmeldung und alle Kanäle werden geschlossen, Aufgaben pausiert, Sandbox, persönliche Zugänge und Telegram-Verknüpfung entfernt. Gespräche, Gedächtnis und Dateien bleiben bis zum Ende der Aufbewahrung.",
+      "results": {
+        "archived": "archiviert",
+        "restored": "wiederhergestellt",
+        "already_archived": "bereits archiviert",
+        "already_active": "bereits aktiv",
+        "not_found": "nicht gefunden",
+        "purged": "gelöscht"
+      },
+      "reasons": {
+        "always": "immer",
+        "all_users": "für alle",
+        "user": "für den Nutzer aktiviert",
+        "disabled": "nicht verfügbar"
+      }
     },
     "models": {
       "title": "Modellverbindungen",
@@ -472,6 +549,85 @@
       "result": "Ergebnis",
       "via": "über {client}",
       "empty": "Keine Einträge"
+    },
+    "channels": {
+      "title": "Kanäle",
+      "lead": "Wo Nutzer mit ihren Agenten sprechen und wer Zugriff auf jeden Kanal hat.",
+      "channel": "Kanal",
+      "state": "Verbindung",
+      "enabled": "Aktiv",
+      "allUsers": "Für alle Nutzer",
+      "groups": "Gruppen",
+      "users": "Nutzer",
+      "always": "immer",
+      "client": "Service-Client",
+      "statuses": {
+        "ok": "Verbunden",
+        "error": "Fehler",
+        "unknown": "Nicht geprüft"
+      },
+      "everybody": "alle",
+      "configure": "Einrichten",
+      "cardTitle": "Kanal {channel}",
+      "check": "Verbindung prüfen",
+      "checkOk": "Die Verbindung funktioniert",
+      "checkFailed": "Verbindung fehlgeschlagen",
+      "provider": "Anbieter",
+      "providers": {
+        "google": "Google Workspace",
+        "yandex360": "Yandex 360",
+        "vkworkmail": "VK WorkMail"
+      },
+      "mailbox": "Postfach des Bots",
+      "aliases": "Aliasse",
+      "domains": "Firmendomains",
+      "domainsHint": "E-Mails werden nur von diesen Domains angenommen.",
+      "authservHint": "Der Servername im Header Authentication-Results des Anbieters; vom Anbieter vorgegeben.",
+      "apiUrl": "Bot-API-Adresse",
+      "secrets": {
+        "botToken": "Bot-Token",
+        "token": "Bot-Token",
+        "appPassword": "App-Passwort",
+        "serviceAccountJson": "Schlüssel des Dienstkontos (JSON)"
+      },
+      "secretSet": "Gesetzt. Neuen Wert eingeben, um ihn zu ersetzen",
+      "secretHint": "Das Geheimnis wird verschlüsselt gespeichert und nicht wieder angezeigt.",
+      "rules": "Der Bot antwortet per E-Mail nur als einziger Empfänger: eine Adresse in An und leeres Cc. Andere E-Mails werden im Thema der Web-App beantwortet. Ändernde Aktionen warten auf die Bestätigung des Nutzers.",
+      "rejected": "Kürzlich abgelehnt"
+    },
+    "group-agents": {
+      "title": "Gruppenagenten",
+      "lead": "Agenten von Gruppenchats mit eigenem Gedächtnis und Bereich und nur Plattformzugängen.",
+      "empty": "Noch keine Gruppenagenten",
+      "group": "Gruppe",
+      "members": "Mitglieder",
+      "owner": "Besitzer",
+      "model": "Modell",
+      "cost": "Kosten im Monat",
+      "state": "Zustand",
+      "removed": "aus der Gruppe entfernt",
+      "defaultModel": "Standard",
+      "statuses": {
+        "active": "Aktiv",
+        "disabled": "Deaktiviert",
+        "removed": "Entfernt"
+      },
+      "dataUntil": "Daten bis {when} aufbewahrt",
+      "transfer": "Übergeben",
+      "disable": "Deaktivieren",
+      "enable": "Aktivieren",
+      "transferTitle": "Agent von {group} übergeben",
+      "transferHint": "Der neue Besitzer ist ein Administrator oder ein Gruppenmitglied mit Kanalzugriff."
+    },
+    "settings": {
+      "title": "Einstellungen",
+      "lead": "Einstellungen der Instanz.",
+      "retention": "Aufbewahrung archivierter Konten",
+      "days": "Tage",
+      "retentionHint": "Nach dieser Zeit werden ein archiviertes Konto und seine Daten endgültig gelöscht. Ebenso lange bleiben Daten eines aus der Gruppe entfernten Gruppenagenten.",
+      "confirmTitle": "Aufbewahrung des Archivs",
+      "confirmText": "Die neue Aufbewahrung von {days} Tagen gilt für alle archivierten Konten.",
+      "willPurge": "{count, plural, =0 {Die nächste Bereinigung löscht kein Konto.} one {Die nächste Bereinigung löscht # Konto.} other {Die nächste Bereinigung löscht # Konten.}}"
     }
   },
   "errors": {
@@ -490,8 +646,6 @@
     "conversation_archived": "Das Thema ist archiviert.",
     "empty_message": "Die Nachricht ist leer.",
     "message_too_long": "Die Nachricht ist zu lang.",
-    "link_code_invalid": "Der Verknüpfungscode ist ungültig oder abgelaufen.",
-    "channel_disabled": "Der Kanal ist nicht aktiviert.",
     "catalog_item_unavailable": "Das Element ist nicht verfügbar.",
     "token_required": "Ein persönliches Token ist erforderlich.",
     "space_quota_exceeded": "Der Arbeitsbereich ist voll.",
@@ -527,6 +681,24 @@
     "invalid_workspace": "Ungültiger Arbeitsbereich.",
     "invalid_limits": "Ungültige Limits.",
     "invalid_bundle": "Ungültiges Archiv.",
-    "invalid_thinking": "Das Modell unterstützt diese Stufe nicht."
+    "invalid_thinking": "Das Modell unterstützt diese Stufe nicht.",
+    "channel_unavailable": "Der Kanal ist für dieses Konto nicht verfügbar.",
+    "channel_locked": "Die Web-App kann nicht abgeschaltet werden.",
+    "user_archived": "Das Konto ist archiviert.",
+    "restore_pending": "Das Konto wartet auf Wiederherstellung.",
+    "confirmation_expired": "Die Bestätigung ist abgelaufen. Bitten Sie den Agenten erneut.",
+    "confirmation_resolved": "Über die Aktion wurde bereits entschieden.",
+    "group_agent_forbidden": "Nur Besitzer und Administratoren verwalten den Gruppenagenten.",
+    "group_agent_removed": "Der Bot wurde aus der Gruppe entfernt.",
+    "cannot_archive_self": "Sie können Ihr eigenes Konto nicht archivieren.",
+    "invalid_settings": "Die Kanaleinstellungen sind ungültig.",
+    "invalid_owner": "Der neue Besitzer muss Gruppenmitglied mit Kanalzugriff sein.",
+    "invalid_transfer": "Gruppenagenten werden an einen aktiven Administrator übergeben.",
+    "invalid_retention": "Die Aufbewahrung beträgt 1 bis 3650 Tage.",
+    "identity_conflict": "Mit dem Konto ist eine andere Identität des Anmeldeanbieters verknüpft.",
+    "emails_required": "Geben Sie mindestens eine E-Mail an.",
+    "too_many_emails": "Höchstens 500 E-Mails pro Aufruf.",
+    "not_checkable": "Dieser Kanal hat keine prüfbare Verbindung.",
+    "key_collision": "Versuchen Sie es erneut."
   }
 }

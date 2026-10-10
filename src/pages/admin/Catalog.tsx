@@ -150,7 +150,7 @@ function EditItem({ item, type, onClose }: { item: AdminCatalogItem | null; type
             <>
               <div className="field"><label>{t("admin.catalog.authKind")}</label>
                 <div className="mini-seg" style={{ display: "inline-flex" }}>
-                  {["oauth", "token", "delegation"].map((k) => <button key={k} className={authKind === k ? "on" : ""} onClick={() => setAuthKind(k)}>{t(`admin.catalog.auth.${k}`)}</button>)}
+                  {["oauth", "token", "delegation"].map((k) => <button key={k} className={authKind === k ? "on" : ""} onClick={() => { setAuthKind(k); if (!item && k === "delegation") setReadOnly(false); }}>{t(`admin.catalog.auth.${k}`)}</button>)}
                 </div>
               </div>
               {authKind === "oauth" && (

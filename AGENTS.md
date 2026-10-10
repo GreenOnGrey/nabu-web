@@ -5,8 +5,8 @@ Guide for coding agents and developers working in this repository.
 ## Workspace
 
 Nabu is `nabu-core` (Go backend), `nabu-web` (this SPA) and `nabu` (docs, charts, deploy), checked
-out next to Hammurapi; the specification is `hammurapi-specs/specs/NAB/CMN/FTR.NAB.CMN-0001/`
-(`design/mockups.html` defines the screens).
+out next to Hammurapi; the specifications are `hammurapi-specs/specs/NAB/CMN/FTR.NAB.CMN-0001/` and
+`FTR.NAB.CMN-0002/` (channels and accounts); `design/mockups.html` of each defines the screens.
 
 - Every change implements the feature specification; refer to it in comments as
   `FTR.NAB.CMN-0001 R12`, `design §3`.
@@ -34,7 +34,8 @@ CI runs lint, tests, `deploy/sync-ref.sh --check` and actionlint.
 src/api/          client (fetch, nabu_csrf cookie, ApiError), types.ts (mirrors core JSON), queries.ts
 src/app/          App (routes), Shell (navigation), ProfileMenu, session
 src/chat/         chat page: conversations, agent menu, voice
-src/pages/        Tasks, Memory, Space, Connections, Login; admin/ — Administration (paths.ts)
+src/pages/        Tasks, Memory, Space, Connections, Login; admin/ — Administration (paths.ts):
+                  Users (archive), Channels, GroupAgents, Settings, …
 src/components/   ui, icons (tone icons of the agent), Markdown
 src/lib/          sse, i18n, format, errors, llm
 locales/*.json    en (default and fallback), ru, de, es, zh — shown as EN RU DE ES ZH

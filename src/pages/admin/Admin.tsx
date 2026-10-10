@@ -12,9 +12,14 @@ import { ServiceAgentsAdmin } from "./ServiceAgents";
 import { ClientsAdmin } from "./Clients";
 import { UsageAdmin } from "./Usage";
 import { AuditAdmin } from "./Audit";
+import { ChannelsAdmin } from "./Channels";
+import { GroupAgentsAdmin } from "./GroupAgents";
+import { SettingsAdmin } from "./Settings";
 
 const SECTIONS = [
   { path: "users", icon: "users" },
+  { path: "channels", icon: "msg" },
+  { path: "group-agents", icon: "grid" },
   { path: "models", icon: "cpu" },
   { path: "harness", icon: "box" },
   { path: "catalog", icon: "plug" },
@@ -22,6 +27,7 @@ const SECTIONS = [
   { path: "clients", icon: "server" },
   { path: "usage", icon: "chart" },
   { path: "audit", icon: "shield" },
+  { path: "settings", icon: "gear" },
 ] as const;
 
 /** The administration panel (R33–R34, design §2): for platform administrators only. */
@@ -50,6 +56,9 @@ export function AdminPage() {
           <Route path="clients" element={<ClientsAdmin />} />
           <Route path="usage" element={<UsageAdmin />} />
           <Route path="audit" element={<AuditAdmin />} />
+          <Route path="channels" element={<ChannelsAdmin />} />
+          <Route path="group-agents" element={<GroupAgentsAdmin />} />
+          <Route path="settings" element={<SettingsAdmin />} />
           <Route path="*" element={<Navigate to={adminPath("users")} replace />} />
         </Routes>
       </main>

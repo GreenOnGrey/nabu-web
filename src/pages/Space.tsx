@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { apiUrl } from "../api/base";
@@ -20,6 +21,9 @@ export function SpacePage() {
   const toast = useToast();
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  // FTR.NAB.CMN-0002 R8: letters link to files of the space that were too big to attach
+  const [params] = useSearchParams();
+  const linked = params.get("path");
   const info = useQuery({ queryKey: keys.space, queryFn: () => api.get<SpaceInfo>("/api/v1/space") });
   const files = useInfiniteQuery({
     queryKey: keys.files,
@@ -59,6 +63,12 @@ export function SpacePage() {
         <button className="btn primary sm" disabled={uploading} onClick={() => fileRef.current?.click()}><Icon name="upload" size={15} />{t("space.upload")}</button>
         <input ref={fileRef} type="file" multiple hidden onChange={(e) => upload(e.target.files)} />
       </div>
+      {linked && (
+        <div className="hintbox"><Icon name="files" />
+          <span>{t("space.linked")} <span className="mono">{linked}</span>{" "}
+            <a className="btn sm" href={apiUrl(`/api/v1/space/files/content?path=${encodeURIComponent(linked)}`)}><Icon name="download" size={14} />{t("space.download")}</a></span>
+        </div>
+      )}
       {s && (
         <div className="row" style={{ gap: 24, marginBottom: 18, alignItems: "center" }}>
           {s.enabled ? <span className={`statebadge ${s.state}`}>{t(`space.state.${s.state}`)}</span> : <span className="small muted">{t("space.disabled")}</span>}

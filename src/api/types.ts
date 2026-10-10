@@ -16,10 +16,14 @@ export interface PublicConfig {
   version: string;
 }
 
-export interface ChannelLink {
-  type: string;
-  account: string;
-  linkedAt: string;
+/** A channel in the Connections of a user (FTR.NAB.CMN-0002 tech §3). */
+export interface MyChannel {
+  kind: "telegram" | "vkteams" | "email";
+  available: boolean;
+  reason: "always" | "all_users" | "user" | "disabled";
+  binding?: { account: string; boundAt: string };
+  keyIssuedAt?: string;
+  address?: string;
 }
 
 export interface Me {
@@ -31,7 +35,7 @@ export interface Me {
   language: string;
   theme: string;
   timezone: string;
-  channels: ChannelLink[];
+  channels: MyChannel[];
 }
 
 export interface AvailableModel {
@@ -60,6 +64,40 @@ export interface Conversation {
   lastMessageAt: string | null;
   archivedAt: string | null;
   createdAt: string;
+  /** FTR.NAB.CMN-0002: mail topics. */
+  source: "chat" | "email" | "group";
+  unreadCount: number;
+  writesRequireConfirmation: boolean;
+}
+
+/** The letter of a mail message (messages.context.email). */
+export interface EmailContext {
+  from: string;
+  fromName: string;
+  to: string[];
+  cc: string[];
+  subject: string;
+  mode: "direct" | "web_only";
+  quoted: string;
+  tooLarge: string[] | null;
+}
+
+export interface MessageContext {
+  email?: EmailContext;
+  confirmation?: { id: string; status: "approved" | "rejected"; summary: string };
+}
+
+/** A call of a tool that waits for the user (tech §3). */
+export interface Confirmation {
+  id: string;
+  conversationId: string;
+  server: string;
+  tool: string;
+  summary: string;
+  argsPreview: string;
+  status: string;
+  createdAt: string;
+  expiresAt: string;
 }
 
 export interface ToolStep {
@@ -86,6 +124,7 @@ export interface Message {
   status: "pending" | "streaming" | "done" | "failed";
   attachments: Attachment[];
   toolSteps: ToolStep[];
+  context?: MessageContext;
   model: string | null;
   errorClass: string | null;
   errorText: string | null;
@@ -133,6 +172,8 @@ export interface TaskRun {
   messageId: string | null;
   errorClass: string | null;
   errorText: string | null;
+  /** channel_unavailable: the result went to the web (R5). */
+  deliveryNote: string | null;
 }
 
 export interface SpaceInfo {
@@ -167,10 +208,6 @@ export interface CatalogItem {
   inDevelopment: boolean;
 }
 
-export interface Channels {
-  linked: ChannelLink[];
-  available: { type: string; bot: string }[];
-}
 
 // ─── administration ─────────────────────────────────────────────────
 
@@ -179,10 +216,95 @@ export interface AdminUser {
   email: string;
   name: string;
   isAdmin: boolean;
-  status: "invited" | "active" | "blocked";
+  status: "invited" | "active" | "blocked" | "archived";
   lastSeenAt: string | null;
   createdAt: string;
   channels: string[];
+  archivedAt?: string;
+  archivedBy?: string;
+  purgeAfter?: string;
+}
+
+/** A channel of the instance (tech §2.1). */
+export interface AdminChannel {
+  /** web, email, vkteams, telegram or the name of a product (a service client). */
+  kind: string;
+  enabled: boolean;
+  allUsers: boolean;
+  groupsEnabled: boolean;
+  usersCount: number;
+  status: string;
+  statusReason: string | null;
+  statusAt: string | null;
+  settings: Record<string, unknown>;
+  secrets: string[];
+  locked?: boolean;
+  product?: boolean;
+}
+
+export interface EmailSettings {
+  provider: "google" | "yandex360" | "vkworkmail";
+  mailbox: string;
+  aliases: string[];
+  domains: string[];
+  authservId: string;
+  imap: { host: string; port: number };
+  smtp: { host: string; port: number };
+}
+
+export interface EmailLogEntry {
+  id: number;
+  at: string;
+  from: string;
+  subject: string;
+  result: "accepted" | "rejected" | "ignored" | "unavailable";
+  reason: string | null;
+}
+
+export interface UserChannel {
+  kind: string;
+  available: boolean;
+  reason: "always" | "all_users" | "user" | "disabled";
+  binding?: { account: string; boundAt: string };
+}
+
+export interface GroupAgent {
+  id: string;
+  channel: string;
+  chatId: string;
+  chatTitle: string;
+  membersCount: number | null;
+  owner: { id: string; email: string; name: string } | null;
+  name: string;
+  tone: Tone;
+  connectionId: string | null;
+  model: string | null;
+  skills: string[];
+  status: "active" | "disabled" | "removed";
+  dataUntil: string | null;
+  costMonth: number;
+  createdAt: string;
+}
+
+export interface UserCard {
+  user: AdminUser;
+  channels: UserChannel[];
+  groupAgents: GroupAgent[];
+}
+
+export interface RestoreRequest {
+  id: string;
+  userId: string;
+  email: string;
+  name: string;
+  archivedAt: string | null;
+  requestedAt: string;
+  newIdentity: { issuer: string; subject: string } | null;
+}
+
+export interface ArchiveResult {
+  email: string;
+  result: "archived" | "restored" | "already_archived" | "already_active" | "not_found" | "purged";
 }
 
 export interface ModelDef {
@@ -292,6 +414,8 @@ export interface ServiceClient {
   agents: string[];
   canDelegate: boolean;
   canImport: boolean;
+  canArchive: boolean;
+  canRestore: boolean;
   enabled: boolean;
   prevSecretExpiresAt: string | null;
   createdAt: string;

@@ -7,6 +7,8 @@ export const EVENT_TYPES = [
   "conversation.updated", "space.state",
   "task.created", "task.updated", "task.run.finished",
   "memory.changed", "agent.updated", "connections.changed",
+  // FTR.NAB.CMN-0002 tech §3
+  "confirmation.created", "confirmation.resolved", "conversation.unread", "access.changed", "restore.requested",
 ] as const;
 export type EventType = (typeof EVENT_TYPES)[number];
 
