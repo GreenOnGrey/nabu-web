@@ -22,7 +22,7 @@ describe("locales (UI-04)", () => {
   for (const lng of LANGUAGES) {
     const msgs = flatten(resources[lng].translation as Tree);
     it(`${lng} has exactly the English keys`, () => {
-      expect(Object.keys(msgs).sort()).toEqual(Object.keys(en).sort());
+      expect(Object.keys(msgs).toSorted()).toEqual(Object.keys(en).toSorted());
     });
     it(`${lng} messages are valid ICU`, () => {
       for (const [key, msg] of Object.entries(msgs)) {
@@ -58,6 +58,9 @@ describe("i18n runtime", () => {
   });
 });
 
+// What users see: locale texts and string literals; comments may cite specifications.
+const visible = (src: string) => src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/.*$/gm, "$1");
+
 // HMR-09, R32a: the common interface of Nabu never names a client product.
 describe("no client products in the interface", () => {
   const files: string[] = [];
@@ -70,8 +73,6 @@ describe("no client products in the interface", () => {
   };
   walk(join(__dirname, ".."));
   walk(join(__dirname, "../../locales"));
-  // What users see: locale texts and string literals; comments may cite specifications.
-  const visible = (src: string) => src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/.*$/gm, "$1");
   it("has no word Hammurapi", () => {
     for (const f of files) expect(visible(readFileSync(f, "utf8")), f).not.toMatch(/hammurapi/i);
   });

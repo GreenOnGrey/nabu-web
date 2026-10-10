@@ -177,9 +177,9 @@ function EditItem({ item, type, onClose }: { item: AdminCatalogItem | null; type
                 </div>
               ))}
               <button className="btn ghost sm" onClick={() => setHeaders([...headers, { k: "", v: "" }])}><Icon name="plus" size={14} />{t("admin.catalog.addHeader")}</button>
-              <div style={{ marginTop: 10 }}><Switch on={readOnly} onChange={setReadOnly} label={t("admin.catalog.readOnly")} /></div>
             </div>
           )}
+          <div className="field"><Switch on={readOnly} onChange={setReadOnly} label={t("admin.catalog.readOnly")} /></div>
           <div className="field"><label>{t("admin.catalog.exposure")}</label>
             <div className="mini-seg" style={{ display: "inline-flex" }}>
               {["deferred", "direct"].map((k) => <button key={k} className={exposure === k ? "on" : ""} onClick={() => setExposure(k)}>{t(`admin.catalog.exposures.${k}`)}</button>)}

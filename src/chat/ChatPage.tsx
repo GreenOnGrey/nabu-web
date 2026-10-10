@@ -40,7 +40,12 @@ export function ChatPage() {
   const current = routeId ? all.find((c) => c.id === routeId) : main;
   const [creating, setCreating] = useState(false);
 
-  useEffect(() => setSideOpen(false), [routeId]);
+  // The sidebar closes when another conversation opens.
+  const [prevRouteId, setPrevRouteId] = useState(routeId);
+  if (prevRouteId !== routeId) {
+    setPrevRouteId(routeId);
+    setSideOpen(false);
+  }
 
   return (
     <div className="nb-app">
@@ -169,18 +174,24 @@ function Conversation({ conv, onMenu }: { conv: Conversation; onMenu: () => void
     const byId = new Map<string, Message>();
     for (const p of history.data?.pages ?? []) for (const m of p.items) byId.set(m.id, m);
     for (const m of Object.values(overrides)) if (m.conversationId === conv.id) byId.set(m.id, { ...byId.get(m.id), ...m });
-    return [...byId.values()].sort((a, b) => a.createdAt.localeCompare(b.createdAt) || (a.role === "user" ? -1 : 1));
+    return [...byId.values()].toSorted((a, b) => a.createdAt.localeCompare(b.createdAt) || (a.role === "user" ? -1 : 1));
   }, [history.data, overrides, conv.id]);
 
   const streaming = messages.some((m) => m.role === "assistant" && (m.status === "streaming" || m.status === "pending"));
-  useEffect(() => {
+  const [wasStreaming, setWasStreaming] = useState(streaming);
+  if (wasStreaming !== streaming) {
+    setWasStreaming(streaming);
     if (!streaming) setBusy(false);
-  }, [streaming]);
+  }
 
+  const tail = messages[messages.length - 1];
+  const tailText = tail?.text.length;
+  const tailSteps = tail?.toolSteps.length;
+  // The list follows new messages and the growth of the last one: the dependencies are the trigger.
   useLayoutEffect(() => {
     const el = listRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [messages.length, messages[messages.length - 1]?.text.length, messages[messages.length - 1]?.toolSteps.length]);
+  }, [messages.length, tailText, tailSteps]); // oxlint-disable-line react/exhaustive-effect-dependencies
 
   const put = (m: Partial<Message> & { id: string }) =>
     setOverrides((o) => ({ ...o, [m.id]: { ...(o[m.id] ?? ({} as Message)), ...m } as Message }));

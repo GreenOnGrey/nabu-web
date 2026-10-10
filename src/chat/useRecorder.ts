@@ -11,12 +11,12 @@ export function useRecorder() {
   const timer = useRef<number | undefined>(undefined);
   const stopped = useRef<((b: Blob | null) => void) | null>(null);
 
-  const cleanup = () => {
+  const cleanup = useCallback(() => {
     window.clearInterval(timer.current);
     rec.current?.stream.getTracks().forEach((tr) => tr.stop());
     rec.current = null;
     setRecording(false);
-  };
+  }, []);
 
   const start = useCallback(async () => {
     if (!supported || rec.current) return;
@@ -42,7 +42,7 @@ export function useRecorder() {
       setError(true);
       cleanup();
     }
-  }, [supported]);
+  }, [supported, cleanup]);
 
   const stop = useCallback(() => new Promise<Blob | null>((resolve) => {
     const r = rec.current;
@@ -51,7 +51,7 @@ export function useRecorder() {
     r.stop();
   }), []);
 
-  useEffect(() => () => cleanup(), []);
+  useEffect(() => () => cleanup(), [cleanup]);
 
   const mm = Math.floor(seconds / 60);
   const ss = String(seconds % 60).padStart(2, "0");

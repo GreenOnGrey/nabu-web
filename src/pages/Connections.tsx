@@ -30,7 +30,7 @@ export function ConnectionsPage() {
     if (!r) return;
     toast({ kind: r === "connected" ? "ok" : "error", title: t(`connections.oauth.${r}`, { defaultValue: t("connections.oauth.failed") }), text: params.get("item") ?? undefined });
     setParams({}, { replace: true });
-  }, [params]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [params, setParams, t, toast]);
 
   const connect = useMutation({
     mutationFn: ({ id, token }: { id: string; token?: string }) => api.post<{ connected: boolean; authorizeUrl?: string }>(`/api/v1/catalog/${id}/connect`, token ? { token } : {}),

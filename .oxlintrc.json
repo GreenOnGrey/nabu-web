@@ -19,7 +19,8 @@
     "unicorn/no-useless-fallback-in-spread": "warn",
     "unicorn/prefer-string-starts-ends-with": "error",
     "react/refs": "warn",
-    "react/immutability": "warn"
+    "react/immutability": "warn",
+    "import/no-unassigned-import": ["warn", { "allow": ["**/*.css"] }]
   },
   "ignorePatterns": [
     "dist/**",

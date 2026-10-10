@@ -1,4 +1,4 @@
-import i18n from "i18next";
+import { createInstance } from "i18next";
 import ICU from "i18next-icu";
 import { initReactI18next } from "react-i18next";
 import en from "../../locales/en.json";
@@ -37,7 +37,7 @@ export function detectLanguage(browser: readonly string[], fallback = "en"): Lan
 export const intlLocale = (lng: string) => (lng === "zh" ? "zh-CN" : lng);
 
 export function createI18n(lng: string) {
-  const inst = i18n.createInstance();
+  const inst = createInstance();
   inst.use(ICU).use(initReactI18next).init({
     resources,
     lng,

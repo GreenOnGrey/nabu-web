@@ -28,7 +28,7 @@ export function ProfileMenu({ onClose }: { onClose: () => void }) {
     onMutate: (p) => qc.setQueryData<Me>(keys.me, (old) => (old ? { ...old, ...p } : old)),
     onSettled: () => qc.invalidateQueries({ queryKey: keys.me }),
   });
-  const browserZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const browserZone = new Intl.DateTimeFormat().resolvedOptions().timeZone;
   const zones = Array.from(new Set([me.timezone, browserZone, ...ZONES])).filter(Boolean);
 
   const setLanguage = (lng: string) => {

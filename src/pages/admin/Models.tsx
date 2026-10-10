@@ -141,6 +141,8 @@ function ReplaceKey({ conn, onClose }: { conn: ModelConnection; onClose: () => v
   );
 }
 
+const same = (a: Choice | null, b: Choice) => !!a && a.connectionId === b.connectionId && a.model === b.model;
+
 /** The default and the selectable models of personal agents (R19). */
 function PersonalModelsBlock({ conns }: { conns: ModelConnection[] }) {
   const { t } = useTranslation();
@@ -154,7 +156,6 @@ function PersonalModelsBlock({ conns }: { conns: ModelConnection[] }) {
   });
   const all: Choice[] = conns.flatMap((c) => c.models.map((m) => ({ connectionId: c.id, model: m.id })));
   const label = (c: Choice) => `${conns.find((x) => x.id === c.connectionId)?.name ?? "?"} · ${c.model}`;
-  const same = (a: Choice | null, b: Choice) => !!a && a.connectionId === b.connectionId && a.model === b.model;
   if (!pm.data) return null;
   const cur = pm.data;
   const defModel = conns.find((c) => c.id === cur.default?.connectionId)?.models.find((m) => m.id === cur.default?.model);
