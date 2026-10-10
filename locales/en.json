@@ -132,6 +132,10 @@
       "cc": "Cc",
       "webOnly": "The bot was not the only recipient: the answer is only here, not by mail.",
       "quoted": "Quoted text"
+    },
+    "wait": {
+      "starting": "The agent is starting…",
+      "queued": "{count, plural, =0 {In the queue · you are next} one {In the queue · # ahead of you} other {In the queue · # ahead of you}}"
     }
   },
   "llm": {
@@ -148,7 +152,8 @@
       "agent_not_configured": "The agent is not configured: an administrator has to add a model connection.",
       "user_blocked": "Access to the agent is closed for your account.",
       "workspace_not_connected": "The workspace did not connect.",
-      "limit_exceeded": "The run exceeded its limits."
+      "limit_exceeded": "The run exceeded its limits.",
+      "no_capacity": "No free capacity for the agent."
     }
   },
   "tasks": {
@@ -628,6 +633,80 @@
       "confirmTitle": "Retention of the archive",
       "confirmText": "The new retention of {days} days applies to all archived accounts.",
       "willPurge": "{count, plural, =0 {No account is deleted by the next purge.} one {The next purge deletes # account.} other {The next purge deletes # accounts.}}"
+    },
+    "agent-pods": {
+      "title": "Agents",
+      "lead": "Every user and every group agent runs in a pod of its own. A stopped pod loses nothing: the conversation continues from the last answer.",
+      "local": "Agents run in the shared operator: pods of owners are off in this installation.",
+      "empty": "No agents are running now",
+      "emptyHint": "A pod starts with the first message of a user.",
+      "pods": "Pods",
+      "sources": {
+        "config": "ceiling from the settings",
+        "quota": "ceiling from the quota",
+        "cluster": "ceiling from the cluster",
+        "none": "no ceiling"
+      },
+      "warm": "Warm reserve · now / target",
+      "queue": "In the queue",
+      "queueOldest": "In the queue · up to {time}",
+      "starting": "Starting",
+      "legend": {
+        "active": "Active · {count}",
+        "warm": "Warm reserve · {count}",
+        "starting": "Starting · {count}",
+        "free": "Free · {count}"
+      },
+      "filters": {
+        "all": "All · {count}",
+        "busy": "Running a turn · {count}",
+        "warm": "Warm · {count}",
+        "starting": "Starting · {count}",
+        "groups": "Groups · {count}"
+      },
+      "cols": {
+        "owner": "Owner",
+        "state": "State",
+        "sessions": "Sessions",
+        "activity": "Last activity",
+        "node": "Node"
+      },
+      "kinds": {
+        "user": "user",
+        "group": "group"
+      },
+      "states": {
+        "busy": "Running a turn",
+        "ready": "Running",
+        "starting": "Starting · {time}",
+        "stopping": "Stopping · {reason}"
+      },
+      "reasons": {
+        "idle": "idle",
+        "evicted": "gave its place away",
+        "lifecycle": "the account is closed",
+        "admin": "stopped by an administrator",
+        "image": "new version",
+        "lost": "lost",
+        "unschedulable": "no room in the cluster",
+        "start_timeout": "did not start in time"
+      },
+      "warmMark": "warm",
+      "stop": "Stop",
+      "stopTitle": "Stop the pod of {owner}?",
+      "stopText": "The agent is answering the user now. The turn will be interrupted: the user will see an error and can send the message again. The conversation stays.",
+      "stopped": "The pod is stopping",
+      "full": "No free capacity.",
+      "fullQueue": "{count, plural, one {# message waits} other {# messages wait}} in the queue, the oldest for {time}.",
+      "fullSources": {
+        "config": "The ceiling of {max} pods comes from the settings (AGENT_PODS_MAX).",
+        "quota": "The ceiling of {max} pods comes from the quota of the namespace.",
+        "cluster": "The ceiling of {max} pods comes from the cluster: a new pod could not be placed at {when}.",
+        "none": ""
+      },
+      "fullProbe": "The next check is at {when}.",
+      "fullAdvice": "To serve more users, add nodes or lower the resource requests of a pod.",
+      "warmAll": "Warm reserve · every active owner"
     }
   },
   "errors": {
@@ -699,6 +778,8 @@
     "emails_required": "Enter at least one email.",
     "too_many_emails": "At most 500 emails per call.",
     "not_checkable": "This channel has no connection to check.",
-    "key_collision": "Try again."
+    "key_collision": "Try again.",
+    "agent_pod_not_found": "The owner has no agent pod.",
+    "agent_pod_busy": "The pod is running a turn."
   }
 }

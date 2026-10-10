@@ -2681,3 +2681,15 @@ select.inp.inherit {
 .reqbox{border:1px solid var(--border);border-left:3px solid var(--amber);border-radius:var(--r-m);background:var(--surface);padding:12px 14px;margin:0 0 14px}
 .warn-t{color:var(--amber)}
 .linklike{border:0;background:none;padding:0;color:inherit;cursor:pointer;text-align:left}.linklike.small{color:var(--violet-text);text-decoration:underline}
+
+/* FTR.NAB.CMN-0004 design §1: the state of a turn and the capacity of agent pods */
+.turnstate{display:flex;align-items:center;justify-content:flex-end;gap:6px;font-size:12px;color:var(--muted);margin-top:5px}
+.turnstate.q{color:var(--amber)}
+.spin{display:inline-block;width:11px;height:11px;border-radius:50%;border:2px solid var(--border-strong);border-top-color:var(--violet);animation:nb-spin 1s linear infinite}
+@keyframes nb-spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation:none}}
+.capbar{height:10px;border-radius:5px;background:var(--surface-2);overflow:hidden;display:flex;margin-top:8px}
+.capbar i{display:block;height:100%}
+.capbar .busy{background:var(--violet)}.capbar .warm{background:var(--amber)}.capbar .start{background:var(--border-strong)}
+.caplegend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:6px 0 16px}
+.caplegend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px}

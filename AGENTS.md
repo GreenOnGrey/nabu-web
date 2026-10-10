@@ -6,7 +6,8 @@ Guide for coding agents and developers working in this repository.
 
 Nabu is `nabu-core` (Go backend), `nabu-web` (this SPA) and `nabu` (docs, charts, deploy), checked
 out next to Hammurapi; the specifications are `hammurapi-specs/specs/NAB/CMN/FTR.NAB.CMN-0001/` and
-`FTR.NAB.CMN-0002/` (channels and accounts); `design/mockups.html` of each defines the screens.
+`FTR.NAB.CMN-0002/` (channels and accounts) and `FTR.NAB.CMN-0004/` (agent pods);
+`design/mockups.html` of each defines the screens.
 
 - Every change implements the feature specification; refer to it in comments as
   `FTR.NAB.CMN-0001 R12`, `design §3`.

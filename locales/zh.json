@@ -132,6 +132,10 @@
       "cc": "抄送",
       "webOnly": "机器人不是唯一收件人：回复仅在此处，不通过邮件发送。",
       "quoted": "引用内容"
+    },
+    "wait": {
+      "starting": "代理正在启动…",
+      "queued": "{count, plural, =0 {排队中 · 您是下一位} other {排队中 · 前面还有 # 位}}"
     }
   },
   "llm": {
@@ -148,7 +152,8 @@
       "agent_not_configured": "智能体尚未配置：需要管理员添加模型连接。",
       "user_blocked": "您的账号已被禁止访问智能体。",
       "workspace_not_connected": "工作空间未连接。",
-      "limit_exceeded": "运行超出了限制。"
+      "limit_exceeded": "运行超出了限制。",
+      "no_capacity": "代理没有空闲容量。"
     }
   },
   "tasks": {
@@ -628,6 +633,80 @@
       "confirmTitle": "归档保留期",
       "confirmText": "新的保留期 {days} 天适用于所有归档账户。",
       "willPurge": "{count, plural, =0 {下次清理不会删除任何账户。} other {下次清理将删除 # 个账户。}}"
+    },
+    "agent-pods": {
+      "title": "代理",
+      "lead": "每位用户和每个群组的代理都在各自的 Pod 中运行。停止 Pod 不会丢失任何内容：对话会从上一条回复继续。",
+      "local": "代理在共享操作器中运行：此安装未启用按所有者划分的 Pod。",
+      "empty": "当前没有运行中的代理",
+      "emptyHint": "用户发送第一条消息时会启动 Pod。",
+      "pods": "Pod",
+      "sources": {
+        "config": "上限来自设置",
+        "quota": "上限来自配额",
+        "cluster": "上限来自集群",
+        "none": "无上限"
+      },
+      "warm": "预热储备 · 当前 / 目标",
+      "queue": "排队中",
+      "queueOldest": "排队中 · 最长 {time}",
+      "starting": "启动中",
+      "legend": {
+        "active": "活跃 · {count}",
+        "warm": "预热储备 · {count}",
+        "starting": "启动中 · {count}",
+        "free": "空闲 · {count}"
+      },
+      "filters": {
+        "all": "全部 · {count}",
+        "busy": "正在回复 · {count}",
+        "warm": "预热 · {count}",
+        "starting": "启动中 · {count}",
+        "groups": "群组 · {count}"
+      },
+      "cols": {
+        "owner": "所有者",
+        "state": "状态",
+        "sessions": "会话",
+        "activity": "最近活动",
+        "node": "节点"
+      },
+      "kinds": {
+        "user": "用户",
+        "group": "群组"
+      },
+      "states": {
+        "busy": "正在回复",
+        "ready": "运行中",
+        "starting": "启动中 · {time}",
+        "stopping": "停止中 · {reason}"
+      },
+      "reasons": {
+        "idle": "空闲",
+        "evicted": "让出位置",
+        "lifecycle": "账户已关闭",
+        "admin": "由管理员停止",
+        "image": "新版本",
+        "lost": "已丢失",
+        "unschedulable": "集群没有空间",
+        "start_timeout": "未按时启动"
+      },
+      "warmMark": "预热",
+      "stop": "停止",
+      "stopTitle": "停止 {owner} 的 Pod？",
+      "stopText": "代理正在回复用户。本次回复将被中断：用户会看到错误并可以重新发送消息。对话会保留。",
+      "stopped": "Pod 正在停止",
+      "full": "没有空闲容量。",
+      "fullQueue": "队列中有 {count} 条消息在等待，最早的已等待 {time}。",
+      "fullSources": {
+        "config": "{max} 个 Pod 的上限来自设置（AGENT_PODS_MAX）。",
+        "quota": "{max} 个 Pod 的上限来自命名空间配额。",
+        "cluster": "{max} 个 Pod 的上限来自集群：{when} 时无法调度新的 Pod。",
+        "none": ""
+      },
+      "fullProbe": "下次检查时间：{when}。",
+      "fullAdvice": "要服务更多用户，请添加节点或降低 Pod 的资源请求。",
+      "warmAll": "预热储备 · 所有活跃所有者"
     }
   },
   "errors": {
@@ -699,6 +778,8 @@
     "emails_required": "请至少输入一个邮箱。",
     "too_many_emails": "每次最多 500 个邮箱。",
     "not_checkable": "此渠道没有可检查的连接。",
-    "key_collision": "请重试。"
+    "key_collision": "请重试。",
+    "agent_pod_not_found": "该所有者没有代理 Pod。",
+    "agent_pod_busy": "该 Pod 正在回复。"
   }
 }

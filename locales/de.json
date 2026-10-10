@@ -132,6 +132,10 @@
       "cc": "Kopie",
       "webOnly": "Der Bot war nicht der einzige Empfänger: Die Antwort steht nur hier, nicht per E-Mail.",
       "quoted": "Zitierter Text"
+    },
+    "wait": {
+      "starting": "Der Agent startet…",
+      "queued": "{count, plural, =0 {In der Warteschlange · Sie sind als Nächstes dran} other {In der Warteschlange · # vor Ihnen}}"
     }
   },
   "llm": {
@@ -148,7 +152,8 @@
       "agent_not_configured": "Der Agent ist nicht eingerichtet: Ein Administrator muss eine Modellverbindung hinzufügen.",
       "user_blocked": "Der Zugang zum Agenten ist für Ihr Konto gesperrt.",
       "workspace_not_connected": "Der Arbeitsbereich hat sich nicht verbunden.",
-      "limit_exceeded": "Der Lauf hat seine Limits überschritten."
+      "limit_exceeded": "Der Lauf hat seine Limits überschritten.",
+      "no_capacity": "Keine freie Kapazität für den Agenten."
     }
   },
   "tasks": {
@@ -628,6 +633,80 @@
       "confirmTitle": "Aufbewahrung des Archivs",
       "confirmText": "Die neue Aufbewahrung von {days} Tagen gilt für alle archivierten Konten.",
       "willPurge": "{count, plural, =0 {Die nächste Bereinigung löscht kein Konto.} one {Die nächste Bereinigung löscht # Konto.} other {Die nächste Bereinigung löscht # Konten.}}"
+    },
+    "agent-pods": {
+      "title": "Agenten",
+      "lead": "Der Agent jedes Benutzers und jeder Gruppe läuft in einem eigenen Pod. Ein gestoppter Pod verliert nichts: Die Unterhaltung geht mit der letzten Antwort weiter.",
+      "local": "Agenten laufen im gemeinsamen Operator: Pods der Besitzer sind in dieser Installation aus.",
+      "empty": "Zurzeit laufen keine Agenten",
+      "emptyHint": "Ein Pod startet mit der ersten Nachricht eines Benutzers.",
+      "pods": "Pods",
+      "sources": {
+        "config": "Obergrenze aus den Einstellungen",
+        "quota": "Obergrenze aus der Quota",
+        "cluster": "Obergrenze aus dem Cluster",
+        "none": "ohne Obergrenze"
+      },
+      "warm": "Warme Reserve · jetzt / Ziel",
+      "queue": "In der Warteschlange",
+      "queueOldest": "In der Warteschlange · bis {time}",
+      "starting": "Starten",
+      "legend": {
+        "active": "Aktiv · {count}",
+        "warm": "Warme Reserve · {count}",
+        "starting": "Starten · {count}",
+        "free": "Frei · {count}"
+      },
+      "filters": {
+        "all": "Alle · {count}",
+        "busy": "Antwortet · {count}",
+        "warm": "Warm · {count}",
+        "starting": "Starten · {count}",
+        "groups": "Gruppen · {count}"
+      },
+      "cols": {
+        "owner": "Besitzer",
+        "state": "Zustand",
+        "sessions": "Sitzungen",
+        "activity": "Letzte Aktivität",
+        "node": "Knoten"
+      },
+      "kinds": {
+        "user": "Benutzer",
+        "group": "Gruppe"
+      },
+      "states": {
+        "busy": "Antwortet",
+        "ready": "Läuft",
+        "starting": "Startet · {time}",
+        "stopping": "Stoppt · {reason}"
+      },
+      "reasons": {
+        "idle": "Leerlauf",
+        "evicted": "Platz abgegeben",
+        "lifecycle": "Konto geschlossen",
+        "admin": "vom Administrator gestoppt",
+        "image": "neue Version",
+        "lost": "verloren",
+        "unschedulable": "kein Platz im Cluster",
+        "start_timeout": "nicht rechtzeitig gestartet"
+      },
+      "warmMark": "warm",
+      "stop": "Stoppen",
+      "stopTitle": "Den Pod von {owner} stoppen?",
+      "stopText": "Der Agent antwortet dem Benutzer gerade. Die Antwort wird abgebrochen: Der Benutzer sieht einen Fehler und kann die Nachricht erneut senden. Die Unterhaltung bleibt erhalten.",
+      "stopped": "Der Pod wird gestoppt",
+      "full": "Keine freie Kapazität.",
+      "fullQueue": "{count, plural, one {# Nachricht wartet} other {# Nachrichten warten}} in der Warteschlange, die älteste seit {time}.",
+      "fullSources": {
+        "config": "Die Obergrenze von {max} Pods stammt aus den Einstellungen (AGENT_PODS_MAX).",
+        "quota": "Die Obergrenze von {max} Pods stammt aus der Quota des Namespace.",
+        "cluster": "Die Obergrenze von {max} Pods stammt aus dem Cluster: Ein neuer Pod konnte um {when} nicht platziert werden.",
+        "none": ""
+      },
+      "fullProbe": "Die nächste Prüfung ist um {when}.",
+      "fullAdvice": "Um mehr Benutzer zu bedienen, fügen Sie Knoten hinzu oder senken Sie die Ressourcenanforderungen eines Pods.",
+      "warmAll": "Warme Reserve · alle Aktiven"
     }
   },
   "errors": {
@@ -699,6 +778,8 @@
     "emails_required": "Geben Sie mindestens eine E-Mail an.",
     "too_many_emails": "Höchstens 500 E-Mails pro Aufruf.",
     "not_checkable": "Dieser Kanal hat keine prüfbare Verbindung.",
-    "key_collision": "Versuchen Sie es erneut."
+    "key_collision": "Versuchen Sie es erneut.",
+    "agent_pod_not_found": "Der Besitzer hat keinen Agenten-Pod.",
+    "agent_pod_busy": "Der Pod beantwortet gerade eine Nachricht."
   }
 }

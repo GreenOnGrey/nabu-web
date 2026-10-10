@@ -268,6 +268,39 @@ export interface UserChannel {
   binding?: { account: string; boundAt: string };
 }
 
+/** A turn waiting for the pod of the agent (FTR.NAB.CMN-0004 tech §2). */
+export interface AgentWait {
+  conversationId: string;
+  messageId: string;
+  state: "starting" | "queued";
+  position?: number;
+}
+
+/** GET /admin/api/v1/agent-pods (FTR.NAB.CMN-0004 tech §5). */
+export interface AgentPod {
+  ownerId: string;
+  ownerKind: "user" | "group";
+  title: string;
+  channel?: string;
+  state: "starting" | "ready" | "stopping";
+  stopReason?: string;
+  warm: boolean;
+  busy: boolean;
+  sessions: number;
+  startedAt: string;
+  lastActivityAt: string;
+  node?: string;
+  image: string;
+}
+export interface AgentPods {
+  enabled: boolean;
+  capacity: { max: number | null; source: "config" | "quota" | "cluster" | "none"; used: number; starting: number;
+    learnedAt: string | null; probeAfter: string | null };
+  warm: { now: number; target: number | null };
+  queue: { length: number; oldestSeconds: number };
+  pods: AgentPod[];
+}
+
 export interface GroupAgent {
   id: string;
   channel: string;

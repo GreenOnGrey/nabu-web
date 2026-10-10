@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { apiUrl } from "../api/base";
 import { api, ApiError } from "../api/client";
 import { keys, useAgent } from "../api/queries";
-import type { Confirmation, Conversation, List, Message, ToolStep } from "../api/types";
+import type { Confirmation, Conversation, List, Message, ToolStep, AgentWait } from "../api/types";
 import { useSession } from "../app/session";
 import { errorText } from "../lib/errors";
 import { intlLocale } from "../lib/i18n";
@@ -196,8 +196,16 @@ function Conversation({ conv, onMenu }: { conv: Conversation; onMenu: () => void
   const put = (m: Partial<Message> & { id: string }) =>
     setOverrides((o) => ({ ...o, [m.id]: { ...(o[m.id] ?? ({} as Message)), ...m } as Message }));
 
+  // FTR.NAB.CMN-0004 R7, R12: the pod of the agent starts, or the turn waits
+  // for a place; the line goes with the first event of the answer.
+  const [wait, setWait] = useState<AgentWait | null>(null);
+  useEvent("agent.state", (d: AgentWait) => {
+    if (d.conversationId === conv.id) setWait(d);
+  });
   useEvent("message.created", (m: Message) => {
-    if (m.conversationId === conv.id) put(m);
+    if (m.conversationId !== conv.id) return;
+    put(m);
+    if (m.role === "assistant") setWait(null);
   });
   useEvent("message.delta", (d: { messageId: string; conversationId: string; delta: string }) => {
     if (d.conversationId !== conv.id) return;
@@ -222,6 +230,7 @@ function Conversation({ conv, onMenu }: { conv: Conversation; onMenu: () => void
   useEvent("message.done", (m: Message) => {
     if (m.conversationId !== conv.id) return;
     put(m);
+    setWait(null);
     qc.invalidateQueries({ queryKey: ["conversations"] });
   });
 
@@ -326,7 +335,7 @@ function Conversation({ conv, onMenu }: { conv: Conversation; onMenu: () => void
         {messages.length === 0 && !history.isLoading && (
           <div className="empty"><div className="ic"><Icon name="spark" /></div><b>{t("chat.emptyTitle", { name: a?.name ?? "Nabu" })}</b>{t("chat.emptyHint")}</div>
         )}
-        {messages.map((m) => <MessageView key={m.id} m={m} busy={busy} onRetry={() => retry(m)} />)}
+        {messages.map((m) => <MessageView key={m.id} m={m} busy={busy} onRetry={() => retry(m)} wait={wait?.messageId === m.id ? wait : null} />)}
         {(confirmations.data?.items ?? []).map((c) => (
           <div className="confirm" key={c.id} role="group" aria-label={t("chat.confirm.title")}>
             <div className="h"><Icon name="alert" size={16} />{t("chat.confirm.title")}</div>
@@ -426,7 +435,7 @@ function stepText(t: (k: string, o?: Record<string, unknown>) => string, s: Tool
   return server ? `${server}: ${rest}` : rest;
 }
 
-function MessageView({ m, busy, onRetry }: { m: Message; busy: boolean; onRetry: () => void }) {
+function MessageView({ m, busy, onRetry, wait }: { m: Message; busy: boolean; onRetry: () => void; wait: AgentWait | null }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const steps = m.toolSteps ?? [];
@@ -458,6 +467,13 @@ function MessageView({ m, busy, onRetry }: { m: Message; busy: boolean; onRetry:
             {m.attachments.map((a) => (
               <a key={a.id} href={apiUrl(`/api/v1/attachments/${a.id}`)}><Icon name="clip" size={12} /> {a.fileName}</a>
             ))}
+          </div>
+        )}
+        {wait && (
+          <div className={`turnstate${wait.state === "queued" ? " q" : ""}`} role="status">
+            {wait.state === "queued"
+              ? <><Icon name="clock" size={12} />{t("chat.wait.queued", { count: wait.position ?? 0 })}</>
+              : <><span className="spin" aria-hidden="true" />{t("chat.wait.starting")}</>}
           </div>
         )}
       </div>

@@ -132,6 +132,10 @@
       "cc": "Copia",
       "webOnly": "El bot no era el único destinatario: la respuesta está solo aquí, no por correo.",
       "quoted": "Texto citado"
+    },
+    "wait": {
+      "starting": "El agente se está iniciando…",
+      "queued": "{count, plural, =0 {En cola · usted es el siguiente} other {En cola · # por delante}}"
     }
   },
   "llm": {
@@ -148,7 +152,8 @@
       "agent_not_configured": "El agente no está configurado: un administrador debe añadir una conexión de modelos.",
       "user_blocked": "El acceso al agente está cerrado para su cuenta.",
       "workspace_not_connected": "El espacio de trabajo no se conectó.",
-      "limit_exceeded": "La ejecución superó sus límites."
+      "limit_exceeded": "La ejecución superó sus límites.",
+      "no_capacity": "No hay capacidad libre para el agente."
     }
   },
   "tasks": {
@@ -628,6 +633,80 @@
       "confirmTitle": "Retención del archivo",
       "confirmText": "La nueva retención de {days} días se aplica a todas las cuentas archivadas.",
       "willPurge": "{count, plural, =0 {La próxima limpieza no elimina ninguna cuenta.} one {La próxima limpieza elimina # cuenta.} other {La próxima limpieza elimina # cuentas.}}"
+    },
+    "agent-pods": {
+      "title": "Agentes",
+      "lead": "El agente de cada usuario y de cada grupo se ejecuta en su propio pod. Detener un pod no pierde nada: la conversación continúa desde la última respuesta.",
+      "local": "Los agentes se ejecutan en el operador compartido: los pods por propietario están desactivados en esta instalación.",
+      "empty": "Ahora no hay agentes en ejecución",
+      "emptyHint": "Un pod se inicia con el primer mensaje de un usuario.",
+      "pods": "Pods",
+      "sources": {
+        "config": "límite de la configuración",
+        "quota": "límite de la cuota",
+        "cluster": "límite del clúster",
+        "none": "sin límite"
+      },
+      "warm": "Reserva activa · ahora / objetivo",
+      "queue": "En cola",
+      "queueOldest": "En cola · hasta {time}",
+      "starting": "Iniciándose",
+      "legend": {
+        "active": "Activos · {count}",
+        "warm": "Reserva activa · {count}",
+        "starting": "Iniciándose · {count}",
+        "free": "Libres · {count}"
+      },
+      "filters": {
+        "all": "Todos · {count}",
+        "busy": "Respondiendo · {count}",
+        "warm": "En reserva · {count}",
+        "starting": "Iniciándose · {count}",
+        "groups": "Grupos · {count}"
+      },
+      "cols": {
+        "owner": "Propietario",
+        "state": "Estado",
+        "sessions": "Sesiones",
+        "activity": "Última actividad",
+        "node": "Nodo"
+      },
+      "kinds": {
+        "user": "usuario",
+        "group": "grupo"
+      },
+      "states": {
+        "busy": "Respondiendo",
+        "ready": "En ejecución",
+        "starting": "Iniciándose · {time}",
+        "stopping": "Deteniéndose · {reason}"
+      },
+      "reasons": {
+        "idle": "inactividad",
+        "evicted": "cedió su lugar",
+        "lifecycle": "la cuenta está cerrada",
+        "admin": "detenido por un administrador",
+        "image": "nueva versión",
+        "lost": "perdido",
+        "unschedulable": "sin espacio en el clúster",
+        "start_timeout": "no se inició a tiempo"
+      },
+      "warmMark": "en reserva",
+      "stop": "Detener",
+      "stopTitle": "¿Detener el pod de {owner}?",
+      "stopText": "El agente está respondiendo al usuario ahora. La respuesta se interrumpirá: el usuario verá un error y podrá enviar el mensaje de nuevo. La conversación se conserva.",
+      "stopped": "El pod se está deteniendo",
+      "full": "No hay capacidad libre.",
+      "fullQueue": "{count, plural, one {# mensaje espera} other {# mensajes esperan}} en la cola, el más antiguo desde hace {time}.",
+      "fullSources": {
+        "config": "El límite de {max} pods viene de la configuración (AGENT_PODS_MAX).",
+        "quota": "El límite de {max} pods viene de la cuota del espacio de nombres.",
+        "cluster": "El límite de {max} pods viene del clúster: no se pudo ubicar un pod nuevo a las {when}.",
+        "none": ""
+      },
+      "fullProbe": "La próxima comprobación es a las {when}.",
+      "fullAdvice": "Para atender a más usuarios, añada nodos o reduzca las solicitudes de recursos de un pod.",
+      "warmAll": "Reserva activa · todos los activos"
     }
   },
   "errors": {
@@ -699,6 +778,8 @@
     "emails_required": "Indique al menos un correo.",
     "too_many_emails": "Como máximo 500 correos por llamada.",
     "not_checkable": "Este canal no tiene conexión que comprobar.",
-    "key_collision": "Inténtelo de nuevo."
+    "key_collision": "Inténtelo de nuevo.",
+    "agent_pod_not_found": "El propietario no tiene un pod de agente.",
+    "agent_pod_busy": "El pod está respondiendo ahora."
   }
 }
