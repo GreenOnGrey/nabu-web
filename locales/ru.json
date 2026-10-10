@@ -659,7 +659,7 @@
       },
       "filters": {
         "all": "Все · {count}",
-        "busy": "Идёт ход · {count}",
+        "busy": "Отвечают · {count}",
         "warm": "Тёплые · {count}",
         "starting": "Запускаются · {count}",
         "groups": "Группы · {count}"
@@ -676,7 +676,7 @@
         "group": "группа"
       },
       "states": {
-        "busy": "Идёт ход",
+        "busy": "Отвечает",
         "ready": "Работает",
         "starting": "Запускается · {time}",
         "stopping": "Останавливается · {reason}"
