@@ -119,7 +119,11 @@ function ChannelCard({ channel, onClose }: { channel: AdminChannel; onClose: () 
     onSuccess: (c) => { setCur(c); setSecret(""); qc.invalidateQueries({ queryKey: ["admin", "channels"] }); toast({ kind: "ok", title: t("common.saved") }); },
   });
   const check = useMutation({
-    mutationFn: () => api.post<AdminChannel>(`/admin/api/v1/channels/${kind}/check`),
+    // a typed secret is saved first: the check works with the stored one
+    mutationFn: async () => {
+      if (secret.trim()) await save.mutateAsync();
+      return api.post<AdminChannel>(`/admin/api/v1/channels/${kind}/check`);
+    },
     onSuccess: (c) => { setCur(c); toast({ kind: c.status === "ok" ? "ok" : "error", title: c.status === "ok" ? t("admin.channels.checkOk") : t("admin.channels.checkFailed"), text: c.statusReason ?? undefined }); },
     onError: (e) => toast({ kind: "error", title: errorText(t, e) }),
   });
