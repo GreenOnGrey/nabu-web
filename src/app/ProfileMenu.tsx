@@ -16,7 +16,8 @@ const ZONES = ["Europe/Moscow", "Europe/Kaliningrad", "Europe/Samara", "Asia/Yek
   "Asia/Shanghai", "America/New_York", "America/Los_Angeles", "UTC"];
 
 /** The profile menu (R31, design §3.6): language in one line, time zone,
- * theme, Administration for administrators, sign out. */
+ * theme, Connections (FTR.NAB.CMN-0003 design, decision 23), Administration
+ * for administrators, sign out. */
 export function ProfileMenu({ onClose }: { onClose: () => void }) {
   const { t, i18n } = useTranslation();
   const { me } = useSession();
@@ -87,11 +88,10 @@ export function ProfileMenu({ onClose }: { onClose: () => void }) {
           </select>
         </div>
       </div>
-      {me.isAdmin && (
-        <div className="sec">
-          <Link className="action" to="/admin" onClick={onClose}><Icon name="wrench" />{t("profile.admin")}</Link>
-        </div>
-      )}
+      <div className="sec">
+        <Link className="action" to="/connections" onClick={onClose}><Icon name="plug" />{t("nav.connections")}</Link>
+        {me.isAdmin && <Link className="action" to="/admin" onClick={onClose}><Icon name="wrench" />{t("profile.admin")}</Link>}
+      </div>
       <div className="sec">
         <button className="action danger" onClick={logout}><Icon name="out" />{t("profile.logout")}</button>
       </div>

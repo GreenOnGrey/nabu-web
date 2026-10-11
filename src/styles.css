@@ -1476,6 +1476,9 @@ textarea.inp {
   text-decoration: none;
   font-size: 14px;
 }
+.menu .action + .action {
+  margin-top: 10px;
+}
 .menu .action.danger {
   color: var(--red);
 }
@@ -1757,7 +1760,7 @@ table.t tr.clickable {
     grid-template-columns: minmax(0, 1fr);
   }
   .main {
-    padding: 16px 14px 90px;
+    padding: 16px 14px 32px;
   }
   .chat {
     position: fixed;
@@ -1859,7 +1862,7 @@ table.t tr.clickable {
   gap: 2px;
 }
 .nav a,
-.bnav a {
+.navmenu a {
   padding: 6px 12px;
   border-radius: var(--r-s);
   font-size: 14px;
@@ -1876,8 +1879,40 @@ table.t tr.clickable {
   color: var(--violet-text);
   font-weight: 500;
 }
-.bnav {
+/* the sections on a phone: a burger beside the avatar opens them as a list
+   (FTR.NAB.CMN-0003 design, decision 22) */
+.burger {
   display: none;
+  position: relative;
+}
+.burger .iconbtn.on {
+  background: var(--surface-2);
+  color: var(--text);
+}
+.navmenu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 40;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-l);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.navmenu a {
+  padding: 10px 12px;
+  font-size: 15px;
+  color: var(--text);
+}
+.navmenu a.on {
+  background: var(--violet-soft);
+  color: var(--violet-text);
+  font-weight: 600;
 }
 
 /* statuses */
@@ -2373,26 +2408,8 @@ table.cov tr.gap td {
   .nav {
     display: none;
   }
-  /* the last row of the shell, not an overlay: a fixed bar covered the bottom
-     of every page — the composer of the chat could not be reached */
-  .bnav.show-m {
-    display: flex;
-    flex: none;
-    justify-content: space-around;
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
-  }
-  .bnav a {
-    font-size: 12px;
-    padding: 6px 8px;
-  }
-  .bnav a.on {
-    color: var(--violet-text);
-    font-weight: 600;
-  }
-  .chat-fab {
-    bottom: 64px;
+  .burger {
+    display: block;
   }
   .board,
   .two-col,
@@ -2579,7 +2596,7 @@ select.inp.inherit {
    the chat with topics, channel marks, tool steps, the agent icon by tone,
    catalog cards and the dark sign-in screen with the motto. ═══ */
 .brand img{border-radius:8px}
-.nb-app{display:grid;grid-template-columns:260px minmax(0,1fr) auto;flex:1;min-height:0}
+.nb-app{position:relative;display:grid;grid-template-columns:260px minmax(0,1fr) auto;flex:1;min-height:0}
 .nb-side{border-right:1px solid var(--border);padding:14px 12px;background:var(--surface);overflow-y:auto}
 .nb-side .h{font-size:12px;color:var(--muted);margin:14px 6px 6px}
 .nb-side .it{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--r-m);font-size:14px;width:100%;border:0;background:none;text-align:left;color:var(--text)}
@@ -2588,6 +2605,7 @@ select.inp.inherit {
 .nb-side .it.arch{color:var(--muted)}
 .nb-side .it .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .nb-side .it .sub{margin-left:auto;font-size:11px;color:var(--muted);white-space:nowrap}
+.nb-scrim{display:none}
 .nb-chat{display:flex;flex-direction:column;min-width:0;min-height:0;position:relative}
 .nb-chat .hd{display:flex;align-items:center;gap:10px;padding:12px 20px;border-bottom:1px solid var(--border);background:var(--surface)}
 .nb-chat .msgs{flex:1;padding:18px 20px;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
@@ -2640,6 +2658,7 @@ select.inp.inherit {
   .nb-app{grid-template-columns:1fr}
   .nb-side{display:none}
   .nb-side.open{display:block;position:absolute;inset:0 30% 0 0;z-index:15;box-shadow:var(--shadow)}
+  .nb-scrim{display:block;position:absolute;inset:0;z-index:14;border:0;padding:0;background:rgba(0,0,0,.25)}
   .nb-chat .m,.nb-chat .m.u{max-width:92%}
   .memrow{grid-template-columns:1fr auto}
   .memrow .when{display:none}
@@ -2704,6 +2723,8 @@ select.inp.inherit {
 .mtabs::-webkit-scrollbar{display:none}
 .mtabs button{border:0;background:none;padding:8px 12px;font-size:14px;color:var(--text-2);border-bottom:2px solid transparent;display:flex;align-items:center;gap:6px;white-space:nowrap;cursor:pointer}
 .mtabs button.on{color:var(--text);border-color:var(--violet);font-weight:500}
+/* the settings tab stands apart from the tabs with data, at the right edge; on a phone the row scrolls */
+@media (min-width:861px){.mtabs button.end{margin-left:auto}}
 .mtabs .n{font-size:11px;background:var(--surface-2);border-radius:999px;padding:0 6px;color:var(--text-2);font-weight:400}
 .cbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .cbar .search{flex:0 1 260px;max-width:none;padding:6px 10px}

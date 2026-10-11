@@ -42,6 +42,13 @@ export function ChatPage() {
   const current = routeId ? all.find((c) => c.id === routeId) : main;
   const [creating, setCreating] = useState(false);
 
+  useEffect(() => {
+    if (!sideOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setSideOpen(false);
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [sideOpen]);
+
   // The sidebar closes when another conversation opens.
   const [prevRouteId, setPrevRouteId] = useState(routeId);
   if (prevRouteId !== routeId) {
@@ -53,7 +60,9 @@ export function ChatPage() {
     <div className="nb-app">
       <Sidebar open={sideOpen} main={main} topics={(active.data?.items ?? []).filter((c) => c.kind === "topic")}
         archived={archived.data?.items ?? []} currentId={current?.id} onNew={() => setCreating(true)}
-        onPick={(c) => navigate(c.kind === "main" ? "/" : `/chat/${c.id}`)} />
+        onPick={(c) => { setSideOpen(false); navigate(c.kind === "main" ? "/" : `/chat/${c.id}`); }} />
+      {/* on a phone the list lies over the conversation: a tap beside it closes it */}
+      {sideOpen && <button type="button" className="nb-scrim" aria-label={t("common.close")} onClick={() => setSideOpen(false)} />}
       {current ? (
         <Conversation key={current.id} conv={current} onMenu={() => setSideOpen((v) => !v)} />
       ) : (

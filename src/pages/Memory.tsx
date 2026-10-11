@@ -61,7 +61,7 @@ export function MemoryPage() {
       <p className="lead">{t("comm.lead")}</p>
       <div className="mtabs" role="tablist">
         {tabs.map((x) => (
-          <button key={x} role="tab" aria-selected={tab === x} className={tab === x ? "on" : ""} onClick={() => patch({ tab: x === "facts" ? null : x })}>
+          <button key={x} role="tab" aria-selected={tab === x} className={`${tab === x ? "on" : ""}${x === "tasks" ? " end" : ""}`} onClick={() => patch({ tab: x === "facts" ? null : x })}>
             {t(`comm.tabs.${x}`)}
             {x === "comm" && s.counts.notes > 0 && <span className="n">{s.counts.notes}</span>}
             {x === "commitments" && s.counts.openCommitments > 0 && <span className="n">{s.counts.openCommitments}</span>}
