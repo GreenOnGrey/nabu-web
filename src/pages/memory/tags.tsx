@@ -2,8 +2,9 @@ import type { TFunction } from "i18next";
 import type { CommTag } from "../../api/types";
 import { Icon } from "../../components/Icon";
 
-/** A person or a topic (FTR.NAB.CMN-0003 design §1): people are green with a
- * person icon, topics violet with a hash — the colour is not the only sign. */
+/** A person or a topic (FTR.NAB.CMN-0003 design §1, decision 19): a neutral
+ * chip with a green person icon or a violet hash — the colour is on the icon
+ * only and is not the only sign. */
 export function TagChip({ tag, onClick, onRemove, removeLabel }: {
   tag: Pick<CommTag, "kind" | "label">; onClick?: () => void; onRemove?: () => void; removeLabel?: string;
 }) {

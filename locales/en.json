@@ -136,6 +136,13 @@
     "wait": {
       "starting": "The agent is starting…",
       "queued": "{count, plural, =0 {In the queue · you are next} one {In the queue · # ahead of you} other {In the queue · # ahead of you}}"
+    },
+    "commitments": {
+      "show": "Show commitments",
+      "hide": "Collapse",
+      "empty": "No open commitments",
+      "all": "All commitments",
+      "count": "{count, plural, one {# commitment} other {# commitments}}"
     }
   },
   "llm": {
@@ -570,7 +577,8 @@
       "tool": "Tool",
       "result": "Result",
       "via": "via {client}",
-      "empty": "No records"
+      "empty": "No records",
+      "system": "System"
     },
     "channels": {
       "title": "Channels",

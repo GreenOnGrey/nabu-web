@@ -16,6 +16,7 @@ import { Icon } from "../components/Icon";
 import { Markdown } from "../components/Markdown";
 import { AgentIcon, Modal, useToast } from "../components/ui";
 import { AgentMenu } from "./AgentMenu";
+import { CommitmentsPanel } from "./CommitmentsPanel";
 import { DigestCardView } from "./DigestCard";
 import { useRecorder } from "./useRecorder";
 
@@ -58,6 +59,7 @@ export function ChatPage() {
       ) : (
         <div className="nb-chat"><div className="loading">{t("common.loading")}</div></div>
       )}
+      <CommitmentsPanel />
       {creating && <NewTopic onClose={() => setCreating(false)} onCreated={(c) => navigate(`/chat/${c.id}`)} />}
     </div>
   );

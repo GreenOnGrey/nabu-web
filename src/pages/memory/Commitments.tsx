@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -28,6 +28,37 @@ function bucketOf(c: Commitment, now: Date): Bucket {
   return c.due <= day(sunday) ? "week" : "later";
 }
 
+type Grouped = { c: Commitment; bucket: Bucket };
+
+/** The commitments of a filter, each with its group of the list. */
+export function useCommitments(query: string, enabled = true) {
+  return useQuery({
+    queryKey: keys.commitments(query),
+    enabled,
+    queryFn: async (): Promise<Grouped[]> => {
+      const r = await api.get<{ items: Commitment[] }>(`/api/v1/commitments?${query}`);
+      const now = new Date();
+      return r.items.map((c) => ({ c, bucket: bucketOf(c, now) }));
+    },
+  });
+}
+
+/** The list by due day (design §3.6): a heading with the count over each
+ * group that is not empty; the closed ones go without a heading. */
+export function CommitmentGroups({ items, row }: { items: Grouped[]; row: (c: Commitment) => ReactNode }) {
+  const { t } = useTranslation();
+  return BUCKETS.map((b) => {
+    const rows = items.filter((x) => x.bucket === b);
+    if (rows.length === 0) return null;
+    return (
+      <section key={b}>
+        {b !== "closed" && <div className={`cmgroup${b === "overdue" ? " late" : ""}`}>{t(`comm.cm.group.${b}`)} · {rows.length}</div>}
+        {rows.map(({ c }) => row(c))}
+      </section>
+    );
+  });
+}
+
 export function useCommitmentActions() {
   const qc = useQueryClient();
   const toast = useToast();
@@ -44,7 +75,9 @@ export function useCommitmentActions() {
 
 /** One commitment (R11, R12): the checkbox closes and returns it; a closed
  * one says who closed it. */
-export function CommitmentRow({ c, onTag, compact }: { c: Commitment; onTag?: (tag: CommTag) => void; compact?: boolean }) {
+export function CommitmentRow({ c, onTag, layout = "full" }: { c: Commitment; onTag?: (tag: CommTag) => void; layout?: "full" | "compact" | "narrow" }) {
+  // full: links and tags beside the text; compact: the text only; narrow: the tags under the text
+  const compact = layout !== "full", tagsBelow = layout === "narrow";
   const { t, i18n } = useTranslation();
   const lng = intlLocale(i18n.language);
   const act = useCommitmentActions();
@@ -66,6 +99,12 @@ export function CommitmentRow({ c, onTag, compact }: { c: Commitment; onTag?: (t
           </span>
         )}
         {c.state === "done" && c.closedBy === "agent" && <span className="auto">{t("comm.cm.byAgent")}</span>}
+        {tagsBelow && (c.person || c.topics.length > 0) && (
+          <span className="tgs who">
+            {c.person && <TagChip tag={c.person} onClick={onTag && (() => onTag(c.person!))} />}
+            {c.topics.map((x) => <TagChip key={x.id} tag={x} onClick={onTag && (() => onTag(x))} />)}
+          </span>
+        )}
         {!compact && (
           <span className="links">
             <Link to={`/memory?tab=comm&note=${c.noteId}`}>{c.noteTitle}</Link>
@@ -105,14 +144,7 @@ export function CommitmentsTab({ people, topics, onTag }: { people: CommTag[]; t
   if (direction) query.set("direction", direction);
   if (person) query.set("person", person);
   if (topic) query.set("topic", topic);
-  const list = useQuery({
-    queryKey: keys.commitments(query.toString()),
-    queryFn: async () => {
-      const r = await api.get<{ items: Commitment[] }>(`/api/v1/commitments?${query}`);
-      const now = new Date();
-      return r.items.map((c) => ({ c, bucket: bucketOf(c, now) }));
-    },
-  });
+  const list = useCommitments(query.toString());
   const items = list.data ?? [];
   return (
     <>
@@ -138,16 +170,7 @@ export function CommitmentsTab({ people, topics, onTag }: { people: CommTag[]; t
       </div>
       {list.error && <div className="err-text">{errorText(t, list.error)}</div>}
       {list.data && items.length === 0 && <Empty icon="check" title={t(state === "open" ? "comm.cm.empty" : "comm.cm.emptyClosed")} />}
-      {BUCKETS.map((b) => {
-        const rows = items.filter((x) => x.bucket === b);
-        if (rows.length === 0) return null;
-        return (
-          <section key={b}>
-            {b !== "closed" && <div className={`cmgroup${b === "overdue" ? " late" : ""}`}>{t(`comm.cm.group.${b}`)} · {rows.length}</div>}
-            {rows.map(({ c }) => <CommitmentRow key={c.id} c={c} onTag={onTag} />)}
-          </section>
-        );
-      })}
+      <CommitmentGroups items={items} row={(c) => <CommitmentRow key={c.id} c={c} onTag={onTag} />} />
     </>
   );
 }

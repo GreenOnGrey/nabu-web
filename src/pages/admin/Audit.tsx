@@ -1,3 +1,4 @@
+import type { TFunction } from "i18next";
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useInfiniteQuery } from "@tanstack/react-query";
@@ -14,6 +15,17 @@ const cache = new Map<number, string>();
 function periodStart(days: number): { days: number; from: string } {
   if (!cache.has(days)) cache.set(days, new Date(Date.now() - days * 86400_000).toISOString());
   return { days, from: cache.get(days)! };
+}
+
+/** On whose behalf an action ran. A service agent acts for its client, and
+ * the initiator is below; a built-in one (the collector of the memory of
+ * communications) has no client — it is the platform acting for the user
+ * whose mail it reads (FTR.NAB.CMN-0003 R30). A personal agent acts for its
+ * user, through a client if there was one. */
+function auditActor(e: AuditEntry, t: TFunction): { name: string | null; note: string | null } {
+  if (e.agentKind !== "service") return { name: e.userEmail, note: e.clientName && t("admin.audit.via", { client: e.clientName }) };
+  if (e.clientName) return { name: e.clientName, note: e.initiatorEmail };
+  return { name: t("admin.audit.system"), note: e.initiatorEmail || e.userEmail };
 }
 
 /** The audit (R28, design §3.10): filters by agent kind and period, CSV export;
@@ -52,16 +64,16 @@ export function AuditAdmin() {
         <table className="t">
           <thead><tr><th>{t("admin.audit.time")}</th><th>{t("admin.audit.agent")}</th><th>{t("admin.audit.onBehalf")}</th><th>{t("admin.audit.channel")}</th><th>{t("admin.audit.tool")}</th><th>{t("admin.audit.result")}</th></tr></thead>
           <tbody>
-            {rows.map((e) => (
+            {rows.map((e) => { const actor = auditActor(e, t); return (
               <tr key={e.id}>
                 <td className="small" style={{ whiteSpace: "nowrap" }}>{dateTime(e.at, lng)}</td>
                 <td>{e.agent}<div className="small muted">{t(`admin.audit.kinds.${e.agentKind}`)}</div></td>
-                <td>{e.agentKind === "service" ? <>{e.clientName}{e.initiatorEmail && <div className="small muted">{e.initiatorEmail}</div>}</> : <>{e.userEmail}{e.clientName && <div className="small muted">{t("admin.audit.via", { client: e.clientName })}</div>}</>}</td>
+                <td>{actor.name}{actor.note && <div className="small muted">{actor.note}</div>}</td>
                 <td className="small">{e.channel}</td>
                 <td><span className="mono small">{e.server ? `${e.server}: ` : ""}{e.tool}</span>{e.argsSummary && <div className="small muted mono" style={{ maxWidth: 380, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={e.argsSummary}>{e.argsSummary}</div>}</td>
                 <td>{e.result === "ok" ? <span className="ok-t">{t("admin.audit.results.ok")}</span> : <span className="err-t" title={e.error ?? ""}>{t("admin.audit.results.error")}</span>}</td>
               </tr>
-            ))}
+            ); })}
             {rows.length === 0 && !list.isLoading && <tr><td colSpan={6} className="muted">{t("admin.audit.empty")}</td></tr>}
           </tbody>
         </table>

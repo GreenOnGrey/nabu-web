@@ -136,6 +136,13 @@
     "wait": {
       "starting": "代理正在启动…",
       "queued": "{count, plural, =0 {排队中 · 您是下一位} other {排队中 · 前面还有 # 位}}"
+    },
+    "commitments": {
+      "show": "显示约定",
+      "hide": "收起",
+      "empty": "没有未完成的约定",
+      "all": "全部约定",
+      "count": "{count, plural, other {# 项约定}}"
     }
   },
   "llm": {
@@ -570,7 +577,8 @@
       "tool": "工具",
       "result": "结果",
       "via": "通过 {client}",
-      "empty": "没有记录"
+      "empty": "没有记录",
+      "system": "系统"
     },
     "channels": {
       "title": "渠道",

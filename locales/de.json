@@ -136,6 +136,13 @@
     "wait": {
       "starting": "Der Agent startet…",
       "queued": "{count, plural, =0 {In der Warteschlange · Sie sind als Nächstes dran} other {In der Warteschlange · # vor Ihnen}}"
+    },
+    "commitments": {
+      "show": "Vereinbarungen anzeigen",
+      "hide": "Einklappen",
+      "empty": "Keine offenen Vereinbarungen",
+      "all": "Alle Vereinbarungen",
+      "count": "{count, plural, one {# Vereinbarung} other {# Vereinbarungen}}"
     }
   },
   "llm": {
@@ -570,7 +577,8 @@
       "tool": "Werkzeug",
       "result": "Ergebnis",
       "via": "über {client}",
-      "empty": "Keine Einträge"
+      "empty": "Keine Einträge",
+      "system": "System"
     },
     "channels": {
       "title": "Kanäle",

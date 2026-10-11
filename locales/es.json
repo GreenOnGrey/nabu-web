@@ -136,6 +136,13 @@
     "wait": {
       "starting": "El agente se está iniciando…",
       "queued": "{count, plural, =0 {En cola · usted es el siguiente} other {En cola · # por delante}}"
+    },
+    "commitments": {
+      "show": "Mostrar acuerdos",
+      "hide": "Contraer",
+      "empty": "No hay acuerdos abiertos",
+      "all": "Todos los acuerdos",
+      "count": "{count, plural, one {# acuerdo} other {# acuerdos}}"
     }
   },
   "llm": {
@@ -570,7 +577,8 @@
       "tool": "Herramienta",
       "result": "Resultado",
       "via": "a través de {client}",
-      "empty": "Sin registros"
+      "empty": "Sin registros",
+      "system": "Sistema"
     },
     "channels": {
       "title": "Canales",

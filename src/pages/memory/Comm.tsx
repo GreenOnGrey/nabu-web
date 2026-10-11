@@ -296,7 +296,7 @@ function NotePanel({ id, onClose, onTag }: { id: string; onClose: () => void; on
             <div className="added" key={a.at}><div className="small muted">{t("comm.note.appended")} · {noteWhen(a.at, "minute", lng)}</div>{a.text}</div>
           ))}
 
-          {(n.commitments?.length ?? 0) > 0 && <><div className="lab">{t("comm.tabs.commitments")}</div>{n.commitments!.map((c) => <CommitmentRow key={c.id} c={c} compact />)}</>}
+          {(n.commitments?.length ?? 0) > 0 && <><div className="lab">{t("comm.tabs.commitments")}</div>{n.commitments!.map((c) => <CommitmentRow key={c.id} c={c} layout="compact" />)}</>}
 
           <div className="lab">{t("comm.note.sources")}</div>
           {(allSources ? n.messages! : n.messages!.slice(0, 3)).map((m) => (
