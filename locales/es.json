@@ -191,7 +191,21 @@
     "weekdays": "Los días laborables a las {time}",
     "weekly": "Cada {day} a las {time}",
     "everyMinutes": "{count, plural, one {Cada minuto} other {Cada # minutos}}",
-    "channelUnavailable": "canal no disponible, entregado en la web"
+    "channelUnavailable": "canal no disponible, entregado en la web",
+    "memory": {
+      "memory_collect": "Recopilación de comunicaciones",
+      "memory_digest_day": "Resumen diario",
+      "memory_digest_week": "Resumen semanal",
+      "memory_collect_text": "Correo y mensajería",
+      "memory_digest_day_text": "Compromisos de hoy",
+      "memory_digest_week_text": "Compromisos de la semana",
+      "configure": "Configurar en Memoria",
+      "pause": "Pausar",
+      "collected": "Mensajes: {messages}, notas nuevas: {notes}",
+      "items": "{count, plural, one {# punto} other {# puntos}}",
+      "nothing": "Nada que recordar",
+      "nothingNew": "Nada nuevo"
+    }
   },
   "memory": {
     "title": "Memoria",
@@ -707,6 +721,36 @@
       "fullProbe": "La próxima comprobación es a las {when}.",
       "fullAdvice": "Para atender a más usuarios, añada nodos o reduzca las solicitudes de recursos de un pod.",
       "warmAll": "Reserva activa · todos los activos"
+    },
+    "comm": {
+      "title": "Memoria de comunicaciones",
+      "lead": "Los usuarios activan ellos mismos la recopilación de su correo y mensajería, tras su consentimiento.",
+      "enabled": "Permitir la memoria de comunicaciones",
+      "retention": "Conservación de las notas",
+      "retentionHint": "Se cuenta desde el último mensaje. Una nota con un compromiso abierto se conserva hasta que se cierre.",
+      "model": "Modelo de la recopilación",
+      "notChosen": "No elegido",
+      "modelMissing": "Sin modelo la recopilación no se ejecuta.",
+      "limit": "Límite mensual por usuario",
+      "limitHint": "Al agotarse, la recopilación se pausa hasta el próximo mes; los resúmenes siguen funcionando. 0 — sin límite.",
+      "sources": "Fuentes de comunicaciones",
+      "sourcesHint": "Un servidor MCP personal pasa a ser fuente cuando existe un adaptador para él.",
+      "server": "Servidor MCP",
+      "adapter": "Adaptador",
+      "gives": "Ofrece",
+      "isSource": "Fuente",
+      "unpublished": "no publicado",
+      "usage": "Uso de este mes",
+      "enabledUsers": "Recopilación activada",
+      "notes": "Notas",
+      "runs": "Ejecuciones",
+      "cost": "Coste",
+      "user": "Usuario",
+      "noContent": "El contenido de las notas no está disponible para el administrador.",
+      "embeddings": "Modelo de la búsqueda por significado",
+      "embeddingsHint": "Un modelo de embeddings de una conexión. Tras un cambio los vectores se recalculan en segundo plano.",
+      "wordsOnly": "La búsqueda funciona solo por palabras: elija un modelo de embeddings.",
+      "noVectors": "La base de datos no tiene la extensión vector: la búsqueda funciona solo por palabras."
     }
   },
   "errors": {
@@ -780,6 +824,253 @@
     "not_checkable": "Este canal no tiene conexión que comprobar.",
     "key_collision": "Inténtelo de nuevo.",
     "agent_pod_not_found": "El propietario no tiene un pod de agente.",
-    "agent_pod_busy": "El pod está respondiendo ahora."
+    "agent_pod_busy": "El pod está respondiendo ahora.",
+    "comm_disabled": "La memoria de comunicaciones no está permitida en esta instancia.",
+    "comm_consent_required": "Acepte el consentimiento antes de activar la recopilación.",
+    "comm_source_not_connected": "La fuente no está conectada. Conéctela en Conexiones.",
+    "comm_adapter_missing": "Solo un servidor MCP personal con adaptador puede ser fuente de comunicaciones.",
+    "topic_exists": "Ya existe un tema con ese nombre. Combine los temas.",
+    "invalid_interval": "El intervalo es de 15 minutos, una hora, 4 horas o un día.",
+    "invalid_day": "Elija al menos un día.",
+    "invalid_time": "La hora tiene el formato HH:MM.",
+    "invalid_due": "El plazo es una fecha.",
+    "comm_source_tools_missing": "Al servidor le faltan las herramientas que necesita una fuente de comunicaciones.",
+    "consent_required": "Confirme el consentimiento para continuar.",
+    "invalid_filter": "Indique la persona o el tema.",
+    "invalid_min_links": "El número de vínculos no es válido.",
+    "invalid_person": "La persona no es válida.",
+    "invalid_topic": "El tema no es válido.",
+    "invalid_to": "El fin del período no es válido.",
+    "invalid_month": "El mes no es válido.",
+    "invalid_state": "El estado no es válido.",
+    "invalid_direction": "La dirección no es válida.",
+    "invalid_commitment": "El compromiso no es válido.",
+    "note_missing": "La nota de este hilo no existe.",
+    "invalid_note": "El título y el resumen son obligatorios; el resumen admite hasta 4000 caracteres.",
+    "invalid_topics": "Una nota tiene de uno a cinco temas.",
+    "invalid_tag": "La etiqueta no es válida.",
+    "invalid_channel": "El canal no es válido.",
+    "invalid_exclusion": "Una exclusión es una dirección o un identificador sin espacios, comillas ni paréntesis."
+  },
+  "comm": {
+    "lead": "Lo que el agente sabe de usted y de su correspondencia de trabajo",
+    "tabs": {
+      "facts": "Hechos",
+      "comm": "Comunicaciones",
+      "commitments": "Compromisos",
+      "tasks": "Tareas de memoria"
+    },
+    "people": "Personas",
+    "topics": "Temas",
+    "person": "Persona",
+    "topic": "Tema",
+    "notes": "Notas",
+    "source": "fuente",
+    "sourceFilter": "Fuente",
+    "sources": {
+      "gmail": "Gmail",
+      "vkmail": "VK WorkMail",
+      "vkteams": "VK Teams"
+    },
+    "search": "Buscar en las notas",
+    "retry": "Reintentar",
+    "removeFilter": "Quitar el filtro",
+    "resetFilters": "Restablecer los filtros",
+    "notFound": "Ninguna nota coincide con el filtro",
+    "empty": "Aún no hay notas",
+    "emptyHint": "Las notas aparecerán tras la próxima recopilación.",
+    "count": "{count, plural, one {# nota} other {# notas}}",
+    "period": {
+      "label": "Período",
+      "all": "Todo el tiempo",
+      "days": "{count, plural, one {# día} other {# días}}"
+    },
+    "view": {
+      "label": "Vista",
+      "table": "Tabla",
+      "graph": "Grafo"
+    },
+    "cols": {
+      "when": "Cuándo",
+      "source": "Fuente",
+      "summary": "Resumen",
+      "open": "Abiertos",
+      "openTitle": "Compromisos abiertos"
+    },
+    "invite": {
+      "title": "Aquí aparecerá su correspondencia de trabajo",
+      "text": "Nabu recopila cartas y mensajes y destaca personas, temas y compromisos.",
+      "action": "Activar la recopilación"
+    },
+    "banner": {
+      "backfill": "Recopilando el historial: {done} de {total} hilos procesados. Las notas aparecen a medida que se recopilan.",
+      "paused": "La recopilación está en pausa:",
+      "access": "no hay acceso a la fuente. Tras conectarla de nuevo la recopilación se reanuda sola.",
+      "budget": "se agotó el límite mensual. Se reanuda el próximo mes; los resúmenes siguen llegando.",
+      "byUser": "reanúdela en la sección Tareas.",
+      "off": "{days, plural, one {La recopilación está desactivada. Lo recopilado se conserva # día tras el último mensaje y sigue disponible para usted y el agente.} other {La recopilación está desactivada. Lo recopilado se conserva # días tras el último mensaje y sigue disponible para usted y el agente.}}"
+    },
+    "graph": {
+      "aria": "Grafo de personas y temas",
+      "node": "{count, plural, one {{label}, # nota} other {{label}, # notas}}",
+      "shown": "{shown} de {total} nodos",
+      "few": "Aún hay pocos vínculos",
+      "linked": "Vinculado con",
+      "panel": "Notas de la selección",
+      "showAll": "{count, plural, one {Mostrar # en la tabla} other {Mostrar los # en la tabla}}",
+      "minLinks": "{count, plural, one {Mostrar desde # vínculo} other {Mostrar desde # vínculos}}",
+      "zoomIn": "Acercar",
+      "zoomOut": "Alejar"
+    },
+    "note": {
+      "aria": "Nota",
+      "title": "Título",
+      "tags": "Personas y temas",
+      "removeTag": "Quitar la etiqueta",
+      "addTopic": "Añadir un tema",
+      "messages": "{count, plural, one {# mensaje} other {# mensajes}}",
+      "editHint": "Tras su edición el recopilador ya no reescribe el texto: lo nuevo se añade abajo como bloque aparte.",
+      "appended": "Añadido en la recopilación",
+      "sources": "Fuentes",
+      "open": "Abrir",
+      "more": "{count, plural, one {# más} other {# más}}",
+      "deleteTitle": "¿Eliminar la nota?",
+      "deleteText": "Se eliminarán la nota y sus compromisos. Este hilo no volverá a recopilarse."
+    },
+    "cm": {
+      "mine": "yo debo",
+      "theirs": "me deben",
+      "close": "Marcar como hecho",
+      "reopen": "Volver a abrir",
+      "cancel": "Cancelar",
+      "cancelled": "cancelado",
+      "auto": "cerrado automáticamente",
+      "byAgent": "cerrado por el agente",
+      "due": "Plazo",
+      "changeDue": "Cambiar el plazo",
+      "noDue": "sin plazo",
+      "empty": "No hay compromisos abiertos",
+      "emptyClosed": "No hay compromisos cerrados",
+      "filter": {
+        "all": "Todos",
+        "mine": "Yo debo",
+        "theirs": "Me deben",
+        "open": "Abiertos",
+        "closed": "Cerrados"
+      },
+      "group": {
+        "overdue": "Vencidos",
+        "today": "Hoy",
+        "week": "Esta semana",
+        "later": "Más tarde",
+        "undated": "Sin plazo",
+        "closed": "Cerrados"
+      }
+    },
+    "digest": {
+      "day": "No olvidar hoy",
+      "week": "No olvidar esta semana",
+      "count": "{count, plural, one {# compromiso} other {# compromisos}}",
+      "late": "{count, plural, one {# vencido} other {# vencidos}}"
+    },
+    "wizard": {
+      "title": "Activar la recopilación de comunicaciones",
+      "next": "Siguiente",
+      "enable": "Activar",
+      "steps": {
+        "consent": "1. Consentimiento",
+        "sources": "2. Fuentes",
+        "schedule": "3. Horario"
+      },
+      "read": {
+        "title": "Qué se lee.",
+        "text": "Sus cartas recibidas y enviadas y los chats donde escribió o fue mencionado."
+      },
+      "stored": {
+        "title": "Qué se guarda.",
+        "text": "Un resumen, los participantes, los temas y enlaces a los mensajes. El texto de los mensajes no se guarda."
+      },
+      "seen": {
+        "title": "Quién lo ve.",
+        "text": "Solo usted y su agente. El administrador no ve el contenido."
+      },
+      "remove": {
+        "title": "Cómo eliminar.",
+        "text": "Cualquier nota o todo lo recopilado — en Memoria, en cualquier momento."
+      },
+      "agree": "Entiendo que Nabu leerá mi correspondencia de trabajo y estoy de acuerdo",
+      "history": "Al activar se recopila la correspondencia de los últimos 30 días.",
+      "digests": "Resúmenes",
+      "digestDay": "Resumen diario — días laborables a las 9:00",
+      "digestWeek": "Resumen semanal — los lunes a las 9:00",
+      "digestHint": "El canal y la hora de los resúmenes pueden cambiarse después."
+    },
+    "tasks": {
+      "hint": "Las tareas activadas aparecen en la sección Tareas marcadas como Memoria. No cuentan para el límite de tareas activas.",
+      "collect": {
+        "title": "Recopilación de comunicaciones",
+        "text": "Lee cartas y mensajes nuevos, guarda notas y compromisos.",
+        "noSource": "Primero conecte una fuente de comunicaciones.",
+        "budget": "Límite mensual",
+        "budgetUsed": "{pct} % gastado"
+      },
+      "day": {
+        "title": "Resumen diario",
+        "text": "Qué hacer hoy según sus compromisos."
+      },
+      "week": {
+        "title": "Resumen semanal",
+        "text": "Qué hacer esta semana, incluidos los compromisos sin plazo."
+      },
+      "sources": "Fuentes",
+      "notConnected": "no conectada",
+      "interval": "Frecuencia",
+      "intervals": {
+        "15m": "Cada 15 minutos",
+        "1h": "Cada hora",
+        "4h": "Cada 4 horas",
+        "1d": "Una vez al día"
+      },
+      "hours": "Horas",
+      "roundTheClock": "Las 24 horas (si no, 8:00–20:00)",
+      "exclusions": "No recopilar",
+      "exclusionKind": "Tipo de exclusión",
+      "exclusionKinds": {
+        "senders": "Remitente",
+        "folders": "Carpeta",
+        "chats": "Chat"
+      },
+      "exclusionHint": {
+        "senders": "rrhh@empresa.es",
+        "folders": "Identificador de etiqueta o carpeta",
+        "chats": "Identificador del chat"
+      },
+      "addExclusion": "Añadir una exclusión",
+      "neverCollected": "Los boletines y las cartas automáticas nunca se recopilan.",
+      "days": "Días",
+      "weekday": "Día",
+      "time": "Hora",
+      "dayShort": {
+        "1": "Lun",
+        "2": "Mar",
+        "3": "Mié",
+        "4": "Jue",
+        "5": "Vie",
+        "6": "Sáb",
+        "7": "Dom"
+      },
+      "paused": {
+        "user": "En pausa. Reanúdela en la sección Tareas.",
+        "source_access": "En pausa: sin acceso a la fuente.",
+        "budget": "En pausa: límite mensual agotado.",
+        "archived": "En pausa: la cuenta estuvo archivada.",
+        "failed": "En pausa tras fallos. Vea el motivo en la sección Tareas."
+      },
+      "collected": "Recopilado",
+      "collectedText": "Notas: {notes}, compromisos abiertos: {commitments} · se conserva {days} días",
+      "deleteAll": "Eliminar lo recopilado",
+      "deleteAllTitle": "¿Eliminar todo lo recopilado?",
+      "deleteAllText": "Se eliminan las notas ({notes}), los compromisos ({commitments}), las personas y los temas, y se desactivan las tareas de memoria. Los hechos se conservan."
+    }
   }
 }

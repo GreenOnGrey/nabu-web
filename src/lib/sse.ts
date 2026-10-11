@@ -11,6 +11,8 @@ export const EVENT_TYPES = [
   "confirmation.created", "confirmation.resolved", "conversation.unread", "access.changed", "restore.requested",
   // FTR.NAB.CMN-0004 tech §2: a turn waits for the pod of the agent
   "agent.state",
+  // FTR.NAB.CMN-0003 tech §3.5: the memory of communications
+  "comm.changed", "commitments.changed", "comm.collect",
 ] as const;
 export type EventType = (typeof EVENT_TYPES)[number];
 

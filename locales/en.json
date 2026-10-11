@@ -191,7 +191,21 @@
     "weekdays": "Every weekday at {time}",
     "weekly": "Every {day} at {time}",
     "everyMinutes": "{count, plural, one {Every minute} other {Every # minutes}}",
-    "channelUnavailable": "channel unavailable, delivered to the web"
+    "channelUnavailable": "channel unavailable, delivered to the web",
+    "memory": {
+      "memory_collect": "Communications collection",
+      "memory_digest_day": "Daily digest",
+      "memory_digest_week": "Weekly digest",
+      "memory_collect_text": "Mail and messengers",
+      "memory_digest_day_text": "Commitments for today",
+      "memory_digest_week_text": "Commitments for the week",
+      "configure": "Configure in Memory",
+      "pause": "Pause",
+      "collected": "Messages: {messages}, new notes: {notes}",
+      "items": "{count, plural, one {# item} other {# items}}",
+      "nothing": "Nothing to remind of",
+      "nothingNew": "Nothing new"
+    }
   },
   "memory": {
     "title": "Memory",
@@ -707,6 +721,36 @@
       "fullProbe": "The next check is at {when}.",
       "fullAdvice": "To serve more users, add nodes or lower the resource requests of a pod.",
       "warmAll": "Warm reserve · every active owner"
+    },
+    "comm": {
+      "title": "Memory of communications",
+      "lead": "Users switch the collection of their mail and messengers on themselves, after their consent.",
+      "enabled": "Allow the memory of communications",
+      "retention": "Retention of notes",
+      "retentionHint": "Counted from the last message. A note with an open commitment is kept until the commitment is closed.",
+      "model": "Model of the collection",
+      "notChosen": "Not chosen",
+      "modelMissing": "Without a model the collection does not run.",
+      "limit": "Monthly limit per user",
+      "limitHint": "When it is spent the collection pauses until next month; digests keep working. 0 — no limit.",
+      "sources": "Sources of communications",
+      "sourcesHint": "A personal MCP server becomes a source when an adapter exists for it.",
+      "server": "MCP server",
+      "adapter": "Adapter",
+      "gives": "Gives",
+      "isSource": "Source",
+      "unpublished": "not published",
+      "usage": "Usage this month",
+      "enabledUsers": "Collection switched on",
+      "notes": "Notes",
+      "runs": "Runs",
+      "cost": "Cost",
+      "user": "User",
+      "noContent": "The content of notes is not available to the administrator.",
+      "embeddings": "Model of the search by meaning",
+      "embeddingsHint": "An embeddings model of a connection. After a change the vectors are recounted in the background.",
+      "wordsOnly": "The search works by words only: choose an embeddings model.",
+      "noVectors": "The database has no vector extension: the search works by words only."
     }
   },
   "errors": {
@@ -780,6 +824,253 @@
     "not_checkable": "This channel has no connection to check.",
     "key_collision": "Try again.",
     "agent_pod_not_found": "The owner has no agent pod.",
-    "agent_pod_busy": "The pod is running a turn."
+    "agent_pod_busy": "The pod is running a turn.",
+    "comm_disabled": "The memory of communications is not allowed in this instance.",
+    "comm_consent_required": "Accept the consent before switching the collection on.",
+    "comm_source_not_connected": "The source is not connected. Connect it in Connections.",
+    "comm_adapter_missing": "Only a personal MCP server with an adapter can be a source of communications.",
+    "topic_exists": "A topic with this name exists. Merge the topics instead.",
+    "invalid_interval": "The interval is 15 minutes, an hour, 4 hours or a day.",
+    "invalid_day": "Choose at least one day.",
+    "invalid_time": "The time is HH:MM.",
+    "invalid_due": "The due day is a date.",
+    "comm_source_tools_missing": "The server lacks the tools a source of communications needs.",
+    "consent_required": "Confirm the consent to continue.",
+    "invalid_filter": "Name the person or the topic.",
+    "invalid_min_links": "The number of links is not valid.",
+    "invalid_person": "The person is not valid.",
+    "invalid_topic": "The topic is not valid.",
+    "invalid_to": "The end of the period is not valid.",
+    "invalid_month": "The month is not valid.",
+    "invalid_state": "The state is not valid.",
+    "invalid_direction": "The direction is not valid.",
+    "invalid_commitment": "The commitment is not valid.",
+    "note_missing": "The note of this thread does not exist.",
+    "invalid_note": "The title and the summary are required; the summary is up to 4000 characters.",
+    "invalid_topics": "A note has from one to five topics.",
+    "invalid_tag": "The tag is not valid.",
+    "invalid_channel": "The channel is not valid.",
+    "invalid_exclusion": "An exclusion is an address or an identifier without spaces, quotes and brackets."
+  },
+  "comm": {
+    "lead": "What the agent knows about you and your work correspondence",
+    "tabs": {
+      "facts": "Facts",
+      "comm": "Communications",
+      "commitments": "Commitments",
+      "tasks": "Memory tasks"
+    },
+    "people": "People",
+    "topics": "Topics",
+    "person": "Person",
+    "topic": "Topic",
+    "notes": "Notes",
+    "source": "source",
+    "sourceFilter": "Source",
+    "sources": {
+      "gmail": "Gmail",
+      "vkmail": "VK WorkMail",
+      "vkteams": "VK Teams"
+    },
+    "search": "Search the notes",
+    "retry": "Retry",
+    "removeFilter": "Remove the filter",
+    "resetFilters": "Reset the filters",
+    "notFound": "No notes match the filter",
+    "empty": "No notes yet",
+    "emptyHint": "Notes appear after the next collection.",
+    "count": "{count, plural, one {# note} other {# notes}}",
+    "period": {
+      "label": "Period",
+      "all": "All time",
+      "days": "{count, plural, one {# day} other {# days}}"
+    },
+    "view": {
+      "label": "View",
+      "table": "Table",
+      "graph": "Graph"
+    },
+    "cols": {
+      "when": "When",
+      "source": "Source",
+      "summary": "Summary",
+      "open": "Open",
+      "openTitle": "Open commitments"
+    },
+    "invite": {
+      "title": "Your work correspondence will appear here",
+      "text": "Nabu collects letters and messages and picks out people, topics and commitments.",
+      "action": "Switch the collection on"
+    },
+    "banner": {
+      "backfill": "Collecting the history: {done} of {total} threads processed. Notes appear as they are collected.",
+      "paused": "The collection is paused:",
+      "access": "there is no access to the source. After you connect it again the collection resumes by itself.",
+      "budget": "the monthly limit is spent. It resumes next month; digests keep coming.",
+      "byUser": "resume it in the Tasks section.",
+      "off": "{days, plural, one {The collection is off. What is collected is kept for # day after the last message and stays available to you and the agent.} other {The collection is off. What is collected is kept for # days after the last message and stays available to you and the agent.}}"
+    },
+    "graph": {
+      "aria": "The graph of people and topics",
+      "node": "{count, plural, one {{label}, # note} other {{label}, # notes}}",
+      "shown": "{shown} of {total} nodes",
+      "few": "Too few links yet",
+      "linked": "Linked with",
+      "panel": "Notes of the selection",
+      "showAll": "{count, plural, one {Show # in the table} other {Show all # in the table}}",
+      "minLinks": "{count, plural, one {Show from # link} other {Show from # links}}",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out"
+    },
+    "note": {
+      "aria": "Note",
+      "title": "Title",
+      "tags": "People and topics",
+      "removeTag": "Remove the tag",
+      "addTopic": "Add a topic",
+      "messages": "{count, plural, one {# message} other {# messages}}",
+      "editHint": "After your edit the collector no longer rewrites the text: news are added below as a separate block.",
+      "appended": "Added by the collection",
+      "sources": "Sources",
+      "open": "Open",
+      "more": "{count, plural, one {# more} other {# more}}",
+      "deleteTitle": "Delete the note?",
+      "deleteText": "The note and its commitments are deleted. This thread will not be collected again."
+    },
+    "cm": {
+      "mine": "I owe",
+      "theirs": "owed to me",
+      "close": "Mark as done",
+      "reopen": "Return to open",
+      "cancel": "Cancel",
+      "cancelled": "cancelled",
+      "auto": "closed automatically",
+      "byAgent": "closed by the agent",
+      "due": "Due day",
+      "changeDue": "Change the due day",
+      "noDue": "no due day",
+      "empty": "No open commitments",
+      "emptyClosed": "No closed commitments",
+      "filter": {
+        "all": "All",
+        "mine": "I owe",
+        "theirs": "Owed to me",
+        "open": "Open",
+        "closed": "Closed"
+      },
+      "group": {
+        "overdue": "Overdue",
+        "today": "Today",
+        "week": "This week",
+        "later": "Later",
+        "undated": "No due day",
+        "closed": "Closed"
+      }
+    },
+    "digest": {
+      "day": "Do not forget today",
+      "week": "Do not forget this week",
+      "count": "{count, plural, one {# commitment} other {# commitments}}",
+      "late": "{count, plural, one {# overdue} other {# overdue}}"
+    },
+    "wizard": {
+      "title": "Switch the collection of communications on",
+      "next": "Next",
+      "enable": "Switch on",
+      "steps": {
+        "consent": "1. Consent",
+        "sources": "2. Sources",
+        "schedule": "3. Schedule"
+      },
+      "read": {
+        "title": "What is read.",
+        "text": "Your incoming and sent letters and the chats where you wrote or were mentioned."
+      },
+      "stored": {
+        "title": "What is stored.",
+        "text": "A summary, the participants, the topics and links to the messages. The text of messages is not stored."
+      },
+      "seen": {
+        "title": "Who sees it.",
+        "text": "Only you and your agent. The administrator does not see the content."
+      },
+      "remove": {
+        "title": "How to delete.",
+        "text": "Any note or everything collected — in Memory, at any time."
+      },
+      "agree": "I understand that Nabu will read my work correspondence, and I agree",
+      "history": "When switched on, the correspondence of the last 30 days is collected.",
+      "digests": "Digests",
+      "digestDay": "Daily digest — on weekdays at 9:00",
+      "digestWeek": "Weekly digest — on Monday at 9:00",
+      "digestHint": "The channel and the time of digests can be changed afterwards."
+    },
+    "tasks": {
+      "hint": "Switched-on tasks appear in the Tasks section marked Memory. They do not count towards the limit of active tasks.",
+      "collect": {
+        "title": "Communications collection",
+        "text": "Reads new letters and messages, saves notes and commitments.",
+        "noSource": "Connect a source of communications first.",
+        "budget": "Limit for the month",
+        "budgetUsed": "{pct} % spent"
+      },
+      "day": {
+        "title": "Daily digest",
+        "text": "What to do today by your commitments."
+      },
+      "week": {
+        "title": "Weekly digest",
+        "text": "What to do this week, including commitments without a due day."
+      },
+      "sources": "Sources",
+      "notConnected": "not connected",
+      "interval": "How often",
+      "intervals": {
+        "15m": "Every 15 minutes",
+        "1h": "Every hour",
+        "4h": "Every 4 hours",
+        "1d": "Once a day"
+      },
+      "hours": "Hours",
+      "roundTheClock": "Round the clock (otherwise 8:00–20:00)",
+      "exclusions": "Do not collect",
+      "exclusionKind": "Kind of exclusion",
+      "exclusionKinds": {
+        "senders": "Sender",
+        "folders": "Folder",
+        "chats": "Chat"
+      },
+      "exclusionHint": {
+        "senders": "hr@company.com",
+        "folders": "The id of a label or a folder",
+        "chats": "The id of a chat"
+      },
+      "addExclusion": "Add an exclusion",
+      "neverCollected": "Mailings and automatic letters are never collected.",
+      "days": "Days",
+      "weekday": "Day",
+      "time": "Time",
+      "dayShort": {
+        "1": "Mon",
+        "2": "Tue",
+        "3": "Wed",
+        "4": "Thu",
+        "5": "Fri",
+        "6": "Sat",
+        "7": "Sun"
+      },
+      "paused": {
+        "user": "Paused. Resume it in the Tasks section.",
+        "source_access": "Paused: no access to the source.",
+        "budget": "Paused: the monthly limit is spent.",
+        "archived": "Paused: the account was archived.",
+        "failed": "Paused after failures. See the reason in the Tasks section."
+      },
+      "collected": "Collected",
+      "collectedText": "Notes: {notes}, open commitments: {commitments} · kept for {days} days",
+      "deleteAll": "Delete everything collected",
+      "deleteAllTitle": "Delete everything collected?",
+      "deleteAllText": "Notes ({notes}), commitments ({commitments}), people and topics are deleted and the memory tasks are switched off. The facts of the memory stay."
+    }
   }
 }

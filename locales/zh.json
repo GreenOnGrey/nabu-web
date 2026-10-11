@@ -191,7 +191,21 @@
     "weekdays": "工作日 {time}",
     "weekly": "每{day} {time}",
     "everyMinutes": "{count, plural, other {每 # 分钟}}",
-    "channelUnavailable": "渠道不可用，已送达网页端"
+    "channelUnavailable": "渠道不可用，已送达网页端",
+    "memory": {
+      "memory_collect": "沟通收集",
+      "memory_digest_day": "每日摘要",
+      "memory_digest_week": "每周摘要",
+      "memory_collect_text": "邮件和即时通讯",
+      "memory_digest_day_text": "今天的约定",
+      "memory_digest_week_text": "本周的约定",
+      "configure": "在“记忆”中设置",
+      "pause": "暂停",
+      "collected": "消息：{messages}，新笔记：{notes}",
+      "items": "{count, plural, other {# 项}}",
+      "nothing": "没有需要提醒的",
+      "nothingNew": "没有新内容"
+    }
   },
   "memory": {
     "title": "记忆",
@@ -707,6 +721,36 @@
       "fullProbe": "下次检查时间：{when}。",
       "fullAdvice": "要服务更多用户，请添加节点或降低 Pod 的资源请求。",
       "warmAll": "预热储备 · 所有活跃所有者"
+    },
+    "comm": {
+      "title": "沟通记忆",
+      "lead": "用户在同意后自行开启邮件和即时通讯的收集。",
+      "enabled": "允许沟通记忆",
+      "retention": "笔记保留期限",
+      "retentionHint": "从最后一条消息起计算。含未完成约定的笔记会保留到约定关闭。",
+      "model": "收集所用模型",
+      "notChosen": "未选择",
+      "modelMissing": "未选择模型时不会进行收集。",
+      "limit": "每位用户的月度额度",
+      "limitHint": "用完后收集暂停至下月；摘要继续工作。0 表示不限。",
+      "sources": "沟通来源",
+      "sourcesHint": "个人 MCP 服务器在有对应适配器时可作为来源。",
+      "server": "MCP 服务器",
+      "adapter": "适配器",
+      "gives": "提供",
+      "isSource": "来源",
+      "unpublished": "未发布",
+      "usage": "本月用量",
+      "enabledUsers": "已开启收集",
+      "notes": "笔记",
+      "runs": "运行次数",
+      "cost": "费用",
+      "user": "用户",
+      "noContent": "管理员无法查看笔记内容。",
+      "embeddings": "语义搜索模型",
+      "embeddingsHint": "某个连接的嵌入模型。更换后向量会在后台重新计算。",
+      "wordsOnly": "目前仅按词搜索：请选择嵌入模型。",
+      "noVectors": "数据库没有 vector 扩展：仅按词搜索。"
     }
   },
   "errors": {
@@ -780,6 +824,253 @@
     "not_checkable": "此渠道没有可检查的连接。",
     "key_collision": "请重试。",
     "agent_pod_not_found": "该所有者没有代理 Pod。",
-    "agent_pod_busy": "该 Pod 正在回复。"
+    "agent_pod_busy": "该 Pod 正在回复。",
+    "comm_disabled": "此实例未启用沟通记忆。",
+    "comm_consent_required": "开启收集前请先确认同意。",
+    "comm_source_not_connected": "来源未连接。请在“连接”中连接。",
+    "comm_adapter_missing": "只有带适配器的个人 MCP 服务器才能作为沟通来源。",
+    "topic_exists": "已存在同名主题。请合并主题。",
+    "invalid_interval": "间隔为 15 分钟、1 小时、4 小时或 1 天。",
+    "invalid_day": "请至少选择一天。",
+    "invalid_time": "时间格式为 HH:MM。",
+    "invalid_due": "期限应为日期。",
+    "comm_source_tools_missing": "该服务器缺少沟通来源所需的工具。",
+    "consent_required": "请确认同意后继续。",
+    "invalid_filter": "请指定人员或主题。",
+    "invalid_min_links": "关联数量无效。",
+    "invalid_person": "人员无效。",
+    "invalid_topic": "主题无效。",
+    "invalid_to": "时间段的结束无效。",
+    "invalid_month": "月份无效。",
+    "invalid_state": "状态无效。",
+    "invalid_direction": "方向无效。",
+    "invalid_commitment": "约定无效。",
+    "note_missing": "此会话的笔记不存在。",
+    "invalid_note": "标题和摘要必填；摘要最多 4000 个字符。",
+    "invalid_topics": "一条笔记有一到五个主题。",
+    "invalid_tag": "标签无效。",
+    "invalid_channel": "渠道无效。",
+    "invalid_exclusion": "排除项应为不含空格、引号和括号的地址或标识。"
+  },
+  "comm": {
+    "lead": "助手了解的关于您和您工作往来的信息",
+    "tabs": {
+      "facts": "事实",
+      "comm": "沟通",
+      "commitments": "约定",
+      "tasks": "记忆任务"
+    },
+    "people": "人员",
+    "topics": "主题",
+    "person": "人员",
+    "topic": "主题",
+    "notes": "笔记",
+    "source": "来源",
+    "sourceFilter": "来源",
+    "sources": {
+      "gmail": "Gmail",
+      "vkmail": "VK WorkMail",
+      "vkteams": "VK Teams"
+    },
+    "search": "搜索笔记",
+    "retry": "重试",
+    "removeFilter": "移除筛选",
+    "resetFilters": "重置筛选",
+    "notFound": "没有符合筛选的笔记",
+    "empty": "暂无笔记",
+    "emptyHint": "下次收集后会出现笔记。",
+    "count": "{count, plural, other {# 条笔记}}",
+    "period": {
+      "label": "时间段",
+      "all": "全部时间",
+      "days": "{count, plural, other {# 天}}"
+    },
+    "view": {
+      "label": "视图",
+      "table": "表格",
+      "graph": "图谱"
+    },
+    "cols": {
+      "when": "时间",
+      "source": "来源",
+      "summary": "摘要",
+      "open": "未完成",
+      "openTitle": "未完成的约定"
+    },
+    "invite": {
+      "title": "您的工作往来将显示在这里",
+      "text": "Nabu 会收集邮件和消息，并提取人员、主题和约定。",
+      "action": "开启收集"
+    },
+    "banner": {
+      "backfill": "正在收集历史：已处理 {done}/{total} 个会话。笔记会陆续出现。",
+      "paused": "收集已暂停：",
+      "access": "无法访问来源。重新连接后收集会自动恢复。",
+      "budget": "本月额度已用完。下月恢复；摘要仍会发送。",
+      "byUser": "请在“任务”中恢复。",
+      "off": "{days, plural, other {收集已关闭。已收集的内容在最后一条消息后保留 # 天，您和助手仍可使用。}}"
+    },
+    "graph": {
+      "aria": "人员与主题关系图",
+      "node": "{count, plural, other {{label}，# 条笔记}}",
+      "shown": "显示 {shown}/{total} 个节点",
+      "few": "关联还太少",
+      "linked": "关联",
+      "panel": "所选项的笔记",
+      "showAll": "{count, plural, other {在表格中显示全部 # 条}}",
+      "minLinks": "{count, plural, other {显示至少 # 个关联}}",
+      "zoomIn": "放大",
+      "zoomOut": "缩小"
+    },
+    "note": {
+      "aria": "笔记",
+      "title": "标题",
+      "tags": "人员和主题",
+      "removeTag": "移除标签",
+      "addTopic": "添加主题",
+      "messages": "{count, plural, other {# 条消息}}",
+      "editHint": "您编辑后，收集器不再改写文本：新内容会作为单独区块追加在下方。",
+      "appended": "收集时追加",
+      "sources": "来源",
+      "open": "打开",
+      "more": "{count, plural, other {另外 # 条}}",
+      "deleteTitle": "删除笔记？",
+      "deleteText": "笔记及其约定将被删除。此会话不会再被收集。"
+    },
+    "cm": {
+      "mine": "我需完成",
+      "theirs": "对方需完成",
+      "close": "标记为已完成",
+      "reopen": "恢复为未完成",
+      "cancel": "取消",
+      "cancelled": "已取消",
+      "auto": "已自动关闭",
+      "byAgent": "由助手关闭",
+      "due": "期限",
+      "changeDue": "更改期限",
+      "noDue": "无期限",
+      "empty": "没有未完成的约定",
+      "emptyClosed": "没有已关闭的约定",
+      "filter": {
+        "all": "全部",
+        "mine": "我需完成",
+        "theirs": "对方需完成",
+        "open": "未完成",
+        "closed": "已关闭"
+      },
+      "group": {
+        "overdue": "已逾期",
+        "today": "今天",
+        "week": "本周",
+        "later": "之后",
+        "undated": "无期限",
+        "closed": "已关闭"
+      }
+    },
+    "digest": {
+      "day": "今天别忘了",
+      "week": "本周别忘了",
+      "count": "{count, plural, other {# 项约定}}",
+      "late": "{count, plural, other {# 项已逾期}}"
+    },
+    "wizard": {
+      "title": "开启沟通收集",
+      "next": "下一步",
+      "enable": "开启",
+      "steps": {
+        "consent": "1. 同意",
+        "sources": "2. 来源",
+        "schedule": "3. 时间表"
+      },
+      "read": {
+        "title": "读取的内容。",
+        "text": "您收到和发出的邮件，以及您发言或被提及的聊天。"
+      },
+      "stored": {
+        "title": "保存的内容。",
+        "text": "摘要、参与者、主题和消息链接。不保存消息原文。"
+      },
+      "seen": {
+        "title": "谁能看到。",
+        "text": "只有您和您的助手。管理员看不到内容。"
+      },
+      "remove": {
+        "title": "如何删除。",
+        "text": "随时可在“记忆”中删除任一笔记或全部内容。"
+      },
+      "agree": "我了解 Nabu 将读取我的工作往来，并表示同意",
+      "history": "开启后会收集最近 30 天的往来。",
+      "digests": "摘要",
+      "digestDay": "每日摘要 — 工作日 9:00",
+      "digestWeek": "每周摘要 — 周一 9:00",
+      "digestHint": "之后可以更改摘要的渠道和时间。"
+    },
+    "tasks": {
+      "hint": "已开启的任务会显示在“任务”中并标记为“记忆”。它们不计入活动任务上限。",
+      "collect": {
+        "title": "沟通收集",
+        "text": "读取新邮件和消息，保存笔记和约定。",
+        "noSource": "请先连接一个沟通来源。",
+        "budget": "本月额度",
+        "budgetUsed": "已用 {pct}%"
+      },
+      "day": {
+        "title": "每日摘要",
+        "text": "今天按约定要做的事。"
+      },
+      "week": {
+        "title": "每周摘要",
+        "text": "本周要做的事，包括无期限的约定。"
+      },
+      "sources": "来源",
+      "notConnected": "未连接",
+      "interval": "频率",
+      "intervals": {
+        "15m": "每 15 分钟",
+        "1h": "每小时",
+        "4h": "每 4 小时",
+        "1d": "每天一次"
+      },
+      "hours": "时段",
+      "roundTheClock": "全天（否则 8:00–20:00）",
+      "exclusions": "不收集",
+      "exclusionKind": "排除类型",
+      "exclusionKinds": {
+        "senders": "发件人",
+        "folders": "文件夹",
+        "chats": "聊天"
+      },
+      "exclusionHint": {
+        "senders": "hr@company.com",
+        "folders": "标签或文件夹的标识",
+        "chats": "聊天的标识"
+      },
+      "addExclusion": "添加排除项",
+      "neverCollected": "群发邮件和自动邮件从不收集。",
+      "days": "日期",
+      "weekday": "星期",
+      "time": "时间",
+      "dayShort": {
+        "1": "一",
+        "2": "二",
+        "3": "三",
+        "4": "四",
+        "5": "五",
+        "6": "六",
+        "7": "日"
+      },
+      "paused": {
+        "user": "已暂停。请在“任务”中恢复。",
+        "source_access": "已暂停：无法访问来源。",
+        "budget": "已暂停：本月额度已用完。",
+        "archived": "已暂停：账户曾被归档。",
+        "failed": "多次失败后已暂停。原因见“任务”。"
+      },
+      "collected": "已收集",
+      "collectedText": "笔记：{notes}，未完成约定：{commitments} · 保留 {days} 天",
+      "deleteAll": "删除已收集的内容",
+      "deleteAllTitle": "删除全部已收集的内容？",
+      "deleteAllText": "将删除笔记（{notes}）、约定（{commitments}）、人员和主题，并关闭记忆任务。记忆中的事实会保留。"
+    }
   }
 }

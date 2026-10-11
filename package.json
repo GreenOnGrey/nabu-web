@@ -13,6 +13,8 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.103.2",
+    "@types/d3-force": "^3.0.10",
+    "d3-force": "^3.0.0",
     "i18next": "^26.4.2",
     "i18next-icu": "^2.4.4",
     "intl-messageformat": "^11.2.15",

@@ -84,6 +84,16 @@ function Authenticated() {
         qc.invalidateQueries({ queryKey: ["taskRuns"] });
       }),
       onEvent("memory.changed", inv(["memories"])),
+      // FTR.NAB.CMN-0003: the memory of communications
+      onEvent("comm.changed", inv(["comm"])),
+      onEvent("commitments.changed", () => {
+        qc.invalidateQueries({ queryKey: ["commitments"] });
+        qc.invalidateQueries({ queryKey: ["comm"] });
+      }),
+      onEvent("comm.collect", () => {
+        qc.invalidateQueries({ queryKey: ["comm"] });
+        qc.invalidateQueries({ queryKey: keys.memoryTasks });
+      }),
       onEvent("agent.updated", inv(keys.agent)),
       onEvent("space.state", () => {
         qc.invalidateQueries({ queryKey: keys.space });

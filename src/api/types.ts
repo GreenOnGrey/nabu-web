@@ -125,6 +125,8 @@ export interface Message {
   attachments: Attachment[];
   toolSteps: ToolStep[];
   context?: MessageContext;
+  /** FTR.NAB.CMN-0003 tech §3.5: the digest of commitments drawn instead of the text. */
+  card?: DigestCard;
   model: string | null;
   errorClass: string | null;
   errorText: string | null;
@@ -161,6 +163,150 @@ export interface Task {
   pauseReason: string | null;
   lastRun: { at: string; status: string; summary: string | null; error?: string | null } | null;
   createdAt: string;
+  /** FTR.NAB.CMN-0003 R14: agent — created in the chat; the rest are prepared memory tasks. */
+  kind: "agent" | "memory_collect" | "memory_digest_day" | "memory_digest_week";
+  pauseKind: "user" | "source_access" | "budget" | "archived" | null;
+  /** the settings of a memory task */
+  settings?: { interval?: "15m" | "1h" | "4h" | "1d"; roundTheClock?: boolean };
+}
+
+// ─── FTR.NAB.CMN-0003: the memory of communications (tech §3) ───────
+export interface CommTag {
+  id: string;
+  kind: "person" | "topic";
+  label: string;
+  email?: string;
+  notes?: number;
+}
+
+export interface CommMessage {
+  id: string;
+  author: string;
+  sentAt: string | null;
+  title: string;
+  url: string;
+}
+
+export interface Commitment {
+  id: string;
+  text: string;
+  direction: "mine" | "theirs";
+  person: CommTag | null;
+  topics: CommTag[];
+  due: string | null;
+  overdue: boolean;
+  state: "open" | "done" | "cancelled";
+  closedBy: "user" | "agent" | "collector" | null;
+  closedAt: string | null;
+  noteId: string;
+  noteTitle: string;
+  basisUrl: string;
+  closeBasisUrl?: string;
+}
+
+export interface CommNote {
+  id: string;
+  title: string;
+  excerpt: string;
+  source: string;
+  firstAt: string;
+  lastAt: string;
+  timePrecision: "minute" | "day";
+  messageCount: number;
+  people: CommTag[];
+  topics: CommTag[];
+  openCommitments: number;
+  userEdited: boolean;
+  summary?: string;
+  appended?: { at: string; text: string }[];
+  messages?: CommMessage[];
+  commitments?: Commitment[];
+}
+
+export interface CommGraph {
+  nodes: { id: string; kind: "person" | "topic"; label: string; notes: number; links: number }[];
+  edges: { a: string; b: string; notes: number }[];
+  totalNodes: number;
+}
+
+export interface CommSource {
+  itemId: string;
+  source: string;
+  title: string;
+  connected: boolean;
+  enabled: boolean;
+}
+
+export interface CommState {
+  /** the administrator allows the function now */
+  allowed: boolean;
+  /** the tabs are shown: allowed, or switched off with something collected to see (R24) */
+  available: boolean;
+  consentAt: string | null;
+  retentionDays: number;
+  semantic: boolean;
+  sources: CommSource[];
+  collect: {
+    status: "off" | "active" | "paused";
+    pauseKind: Task["pauseKind"];
+    nextRunAt: string | null;
+    backfill: { done: number; total: number } | null;
+    budgetUsedPct: number;
+  };
+  counts: { notes: number; openCommitments: number };
+}
+
+export interface CollectSettings {
+  sources: { itemId: string; source: string }[];
+  interval: "15m" | "1h" | "4h" | "1d";
+  roundTheClock: boolean;
+  exclusions: { senders: string[]; folders: string[]; chats: string[] };
+}
+
+export interface DigestSettings {
+  time: string;
+  days?: number[];
+  weekday?: number;
+  channel: string;
+}
+
+export interface MemoryTask {
+  kind: "collect" | "digest_day" | "digest_week";
+  enabled: boolean;
+  taskId: string | null;
+  status: "off" | "active" | "paused";
+  pauseKind: Task["pauseKind"];
+  nextRunAt: string | null;
+  lastRun: Task["lastRun"];
+  settings: CollectSettings & DigestSettings;
+}
+
+export interface DigestCard {
+  type: "digest";
+  period: "day" | "week";
+  items: {
+    commitmentId: string;
+    text: string;
+    direction: "mine" | "theirs";
+    group: "overdue" | "due" | "theirs" | "undated";
+    person: CommTag | null;
+    topics: CommTag[];
+    due: string | null;
+    state: string;
+    noteId: string;
+    url: string;
+  }[];
+}
+
+export interface CommAdminSettings {
+  enabled: boolean;
+  retentionDays: number;
+  model: { connectionId: string; model: string } | null;
+  embeddings: { connectionId: string; model: string } | null;
+  monthlyLimitUsd: number;
+  /** the database has the vector extension; the chosen model of embeddings resolves */
+  vectorsAvailable: boolean;
+  semantic: boolean;
 }
 
 export interface TaskRun {

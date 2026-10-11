@@ -16,6 +16,7 @@ import { Icon } from "../components/Icon";
 import { Markdown } from "../components/Markdown";
 import { AgentIcon, Modal, useToast } from "../components/ui";
 import { AgentMenu } from "./AgentMenu";
+import { DigestCardView } from "./DigestCard";
 import { useRecorder } from "./useRecorder";
 
 /** The chat with the personal agent (R30, design §3.2): the main
@@ -496,7 +497,7 @@ function MessageView({ m, busy, onRetry, wait }: { m: Message; busy: boolean; on
         </div>
       ))}
       {waiting && <div className="bub"><span className="typing" aria-label={t("chat.typing")}><i /><i /><i /></span></div>}
-      {m.text && <div className="bub"><Markdown text={m.text} /></div>}
+      {m.card?.type === "digest" ? <DigestCardView card={m.card} /> : m.text && <div className="bub"><Markdown text={m.text} /></div>}
       {m.status === "failed" && m.errorClass && (
         <div className={`llmerr${transientLLMError(m.errorClass) ? " amber" : ""}`} role="alert" style={{ marginTop: 6 }}>
           <span>{llmErrorText(t, m.errorClass)}</span>

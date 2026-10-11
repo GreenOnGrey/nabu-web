@@ -191,7 +191,21 @@
     "weekdays": "Werktags um {time}",
     "weekly": "Jeden {day} um {time}",
     "everyMinutes": "{count, plural, one {Jede Minute} other {Alle # Minuten}}",
-    "channelUnavailable": "Kanal nicht verfügbar, im Web zugestellt"
+    "channelUnavailable": "Kanal nicht verfügbar, im Web zugestellt",
+    "memory": {
+      "memory_collect": "Erfassung der Kommunikation",
+      "memory_digest_day": "Tagesübersicht",
+      "memory_digest_week": "Wochenübersicht",
+      "memory_collect_text": "Mail und Messenger",
+      "memory_digest_day_text": "Zusagen für heute",
+      "memory_digest_week_text": "Zusagen für die Woche",
+      "configure": "Im Gedächtnis einstellen",
+      "pause": "Pausieren",
+      "collected": "Nachrichten: {messages}, neue Notizen: {notes}",
+      "items": "{count, plural, one {# Punkt} other {# Punkte}}",
+      "nothing": "Nichts zu erinnern",
+      "nothingNew": "Nichts Neues"
+    }
   },
   "memory": {
     "title": "Gedächtnis",
@@ -707,6 +721,36 @@
       "fullProbe": "Die nächste Prüfung ist um {when}.",
       "fullAdvice": "Um mehr Benutzer zu bedienen, fügen Sie Knoten hinzu oder senken Sie die Ressourcenanforderungen eines Pods.",
       "warmAll": "Warme Reserve · alle Aktiven"
+    },
+    "comm": {
+      "title": "Kommunikationsgedächtnis",
+      "lead": "Nutzer schalten die Erfassung ihrer Mail und Messenger selbst ein, nach ihrer Einwilligung.",
+      "enabled": "Kommunikationsgedächtnis erlauben",
+      "retention": "Aufbewahrung der Notizen",
+      "retentionHint": "Gerechnet ab der letzten Nachricht. Eine Notiz mit offener Zusage bleibt, bis die Zusage geschlossen ist.",
+      "model": "Modell der Erfassung",
+      "notChosen": "Nicht gewählt",
+      "modelMissing": "Ohne Modell läuft die Erfassung nicht.",
+      "limit": "Monatslimit pro Nutzer",
+      "limitHint": "Ist es aufgebraucht, pausiert die Erfassung bis zum nächsten Monat; Übersichten laufen weiter. 0 — kein Limit.",
+      "sources": "Kommunikationsquellen",
+      "sourcesHint": "Ein persönlicher MCP-Server wird zur Quelle, wenn es einen Adapter für ihn gibt.",
+      "server": "MCP-Server",
+      "adapter": "Adapter",
+      "gives": "Liefert",
+      "isSource": "Quelle",
+      "unpublished": "nicht veröffentlicht",
+      "usage": "Nutzung in diesem Monat",
+      "enabledUsers": "Erfassung eingeschaltet",
+      "notes": "Notizen",
+      "runs": "Läufe",
+      "cost": "Kosten",
+      "user": "Nutzer",
+      "noContent": "Der Inhalt der Notizen ist für den Administrator nicht zugänglich.",
+      "embeddings": "Modell der Bedeutungssuche",
+      "embeddingsHint": "Ein Embedding-Modell einer Verbindung. Nach einem Wechsel werden die Vektoren im Hintergrund neu berechnet.",
+      "wordsOnly": "Die Suche arbeitet nur nach Wörtern: Wählen Sie ein Embedding-Modell.",
+      "noVectors": "Die Datenbank hat keine Vektor-Erweiterung: Die Suche arbeitet nur nach Wörtern."
     }
   },
   "errors": {
@@ -780,6 +824,253 @@
     "not_checkable": "Dieser Kanal hat keine prüfbare Verbindung.",
     "key_collision": "Versuchen Sie es erneut.",
     "agent_pod_not_found": "Der Besitzer hat keinen Agenten-Pod.",
-    "agent_pod_busy": "Der Pod beantwortet gerade eine Nachricht."
+    "agent_pod_busy": "Der Pod beantwortet gerade eine Nachricht.",
+    "comm_disabled": "Das Kommunikationsgedächtnis ist in dieser Instanz nicht erlaubt.",
+    "comm_consent_required": "Bestätigen Sie die Einwilligung, bevor Sie die Erfassung einschalten.",
+    "comm_source_not_connected": "Die Quelle ist nicht verbunden. Verbinden Sie sie unter „Verbindungen“.",
+    "comm_adapter_missing": "Nur ein persönlicher MCP-Server mit Adapter kann Kommunikationsquelle sein.",
+    "topic_exists": "Ein Thema mit diesem Namen existiert bereits. Führen Sie die Themen zusammen.",
+    "invalid_interval": "Das Intervall ist 15 Minuten, eine Stunde, 4 Stunden oder ein Tag.",
+    "invalid_day": "Wählen Sie mindestens einen Tag.",
+    "invalid_time": "Die Zeit hat das Format HH:MM.",
+    "invalid_due": "Die Frist ist ein Datum.",
+    "comm_source_tools_missing": "Dem Server fehlen die Werkzeuge, die eine Kommunikationsquelle braucht.",
+    "consent_required": "Bestätigen Sie die Einwilligung, um fortzufahren.",
+    "invalid_filter": "Geben Sie die Person oder das Thema an.",
+    "invalid_min_links": "Die Anzahl der Verbindungen ist ungültig.",
+    "invalid_person": "Die Person ist ungültig.",
+    "invalid_topic": "Das Thema ist ungültig.",
+    "invalid_to": "Das Ende des Zeitraums ist ungültig.",
+    "invalid_month": "Der Monat ist ungültig.",
+    "invalid_state": "Der Zustand ist ungültig.",
+    "invalid_direction": "Die Richtung ist ungültig.",
+    "invalid_commitment": "Die Zusage ist ungültig.",
+    "note_missing": "Die Notiz dieses Threads existiert nicht.",
+    "invalid_note": "Titel und Zusammenfassung sind erforderlich; die Zusammenfassung hat bis zu 4000 Zeichen.",
+    "invalid_topics": "Eine Notiz hat ein bis fünf Themen.",
+    "invalid_tag": "Das Tag ist ungültig.",
+    "invalid_channel": "Der Kanal ist ungültig.",
+    "invalid_exclusion": "Ein Ausschluss ist eine Adresse oder Kennung ohne Leerzeichen, Anführungszeichen und Klammern."
+  },
+  "comm": {
+    "lead": "Was der Agent über Sie und Ihre Arbeitskorrespondenz weiß",
+    "tabs": {
+      "facts": "Fakten",
+      "comm": "Kommunikation",
+      "commitments": "Zusagen",
+      "tasks": "Gedächtnisaufgaben"
+    },
+    "people": "Personen",
+    "topics": "Themen",
+    "person": "Person",
+    "topic": "Thema",
+    "notes": "Notizen",
+    "source": "Quelle",
+    "sourceFilter": "Quelle",
+    "sources": {
+      "gmail": "Gmail",
+      "vkmail": "VK WorkMail",
+      "vkteams": "VK Teams"
+    },
+    "search": "Notizen durchsuchen",
+    "retry": "Wiederholen",
+    "removeFilter": "Filter entfernen",
+    "resetFilters": "Filter zurücksetzen",
+    "notFound": "Keine Notizen zum Filter",
+    "empty": "Noch keine Notizen",
+    "emptyHint": "Notizen erscheinen nach der nächsten Erfassung.",
+    "count": "{count, plural, one {# Notiz} other {# Notizen}}",
+    "period": {
+      "label": "Zeitraum",
+      "all": "Gesamte Zeit",
+      "days": "{count, plural, one {# Tag} other {# Tage}}"
+    },
+    "view": {
+      "label": "Ansicht",
+      "table": "Tabelle",
+      "graph": "Graph"
+    },
+    "cols": {
+      "when": "Wann",
+      "source": "Quelle",
+      "summary": "Zusammenfassung",
+      "open": "Offen",
+      "openTitle": "Offene Zusagen"
+    },
+    "invite": {
+      "title": "Hier erscheint Ihre Arbeitskorrespondenz",
+      "text": "Nabu erfasst Briefe und Nachrichten und hebt Personen, Themen und Zusagen hervor.",
+      "action": "Erfassung einschalten"
+    },
+    "banner": {
+      "backfill": "Verlauf wird erfasst: {done} von {total} Threads verarbeitet. Notizen erscheinen nach und nach.",
+      "paused": "Die Erfassung ist pausiert:",
+      "access": "kein Zugriff auf die Quelle. Nach erneutem Verbinden läuft die Erfassung von selbst weiter.",
+      "budget": "das Monatslimit ist aufgebraucht. Im nächsten Monat geht es weiter; Übersichten kommen weiterhin.",
+      "byUser": "setzen Sie sie im Bereich „Aufgaben“ fort.",
+      "off": "{days, plural, one {Die Erfassung ist aus. Erfasstes wird # Tag nach der letzten Nachricht aufbewahrt und bleibt für Sie und den Agenten verfügbar.} other {Die Erfassung ist aus. Erfasstes wird # Tage nach der letzten Nachricht aufbewahrt und bleibt für Sie und den Agenten verfügbar.}}"
+    },
+    "graph": {
+      "aria": "Graph der Personen und Themen",
+      "node": "{count, plural, one {{label}, # Notiz} other {{label}, # Notizen}}",
+      "shown": "{shown} von {total} Knoten",
+      "few": "Noch zu wenige Verbindungen",
+      "linked": "Verbunden mit",
+      "panel": "Notizen der Auswahl",
+      "showAll": "{count, plural, one {# in der Tabelle zeigen} other {Alle # in der Tabelle zeigen}}",
+      "minLinks": "{count, plural, one {Ab # Verbindung zeigen} other {Ab # Verbindungen zeigen}}",
+      "zoomIn": "Vergrößern",
+      "zoomOut": "Verkleinern"
+    },
+    "note": {
+      "aria": "Notiz",
+      "title": "Titel",
+      "tags": "Personen und Themen",
+      "removeTag": "Tag entfernen",
+      "addTopic": "Thema hinzufügen",
+      "messages": "{count, plural, one {# Nachricht} other {# Nachrichten}}",
+      "editHint": "Nach Ihrer Änderung überschreibt der Sammler den Text nicht mehr: Neues wird unten als eigener Block ergänzt.",
+      "appended": "Bei der Erfassung ergänzt",
+      "sources": "Quellen",
+      "open": "Öffnen",
+      "more": "{count, plural, one {# weitere} other {# weitere}}",
+      "deleteTitle": "Notiz löschen?",
+      "deleteText": "Die Notiz und ihre Zusagen werden gelöscht. Dieser Thread wird nicht erneut erfasst."
+    },
+    "cm": {
+      "mine": "ich schulde",
+      "theirs": "mir geschuldet",
+      "close": "Als erledigt markieren",
+      "reopen": "Wieder öffnen",
+      "cancel": "Verwerfen",
+      "cancelled": "verworfen",
+      "auto": "automatisch geschlossen",
+      "byAgent": "vom Agenten geschlossen",
+      "due": "Frist",
+      "changeDue": "Frist ändern",
+      "noDue": "ohne Frist",
+      "empty": "Keine offenen Zusagen",
+      "emptyClosed": "Keine geschlossenen Zusagen",
+      "filter": {
+        "all": "Alle",
+        "mine": "Ich schulde",
+        "theirs": "Mir geschuldet",
+        "open": "Offen",
+        "closed": "Geschlossen"
+      },
+      "group": {
+        "overdue": "Überfällig",
+        "today": "Heute",
+        "week": "Diese Woche",
+        "later": "Später",
+        "undated": "Ohne Frist",
+        "closed": "Geschlossen"
+      }
+    },
+    "digest": {
+      "day": "Heute nicht vergessen",
+      "week": "Diese Woche nicht vergessen",
+      "count": "{count, plural, one {# Zusage} other {# Zusagen}}",
+      "late": "{count, plural, one {# überfällig} other {# überfällig}}"
+    },
+    "wizard": {
+      "title": "Erfassung der Kommunikation einschalten",
+      "next": "Weiter",
+      "enable": "Einschalten",
+      "steps": {
+        "consent": "1. Einwilligung",
+        "sources": "2. Quellen",
+        "schedule": "3. Zeitplan"
+      },
+      "read": {
+        "title": "Was gelesen wird.",
+        "text": "Ihre eingehenden und gesendeten Briefe und die Chats, in denen Sie schrieben oder erwähnt wurden."
+      },
+      "stored": {
+        "title": "Was gespeichert wird.",
+        "text": "Eine Zusammenfassung, die Teilnehmer, die Themen und Links zu den Nachrichten. Der Nachrichtentext wird nicht gespeichert."
+      },
+      "seen": {
+        "title": "Wer es sieht.",
+        "text": "Nur Sie und Ihr Agent. Der Administrator sieht den Inhalt nicht."
+      },
+      "remove": {
+        "title": "Wie man löscht.",
+        "text": "Jede Notiz oder alles Erfasste — im Gedächtnis, jederzeit."
+      },
+      "agree": "Ich verstehe, dass Nabu meine Arbeitskorrespondenz lesen wird, und stimme zu",
+      "history": "Beim Einschalten wird die Korrespondenz der letzten 30 Tage erfasst.",
+      "digests": "Übersichten",
+      "digestDay": "Tagesübersicht — werktags um 9:00",
+      "digestWeek": "Wochenübersicht — montags um 9:00",
+      "digestHint": "Kanal und Zeit der Übersichten lassen sich danach ändern."
+    },
+    "tasks": {
+      "hint": "Eingeschaltete Aufgaben erscheinen im Bereich „Aufgaben“ mit der Markierung „Gedächtnis“. Sie zählen nicht zum Limit aktiver Aufgaben.",
+      "collect": {
+        "title": "Erfassung der Kommunikation",
+        "text": "Liest neue Briefe und Nachrichten, speichert Notizen und Zusagen.",
+        "noSource": "Verbinden Sie zuerst eine Kommunikationsquelle.",
+        "budget": "Monatslimit",
+        "budgetUsed": "{pct} % verbraucht"
+      },
+      "day": {
+        "title": "Tagesübersicht",
+        "text": "Was heute laut Ihren Zusagen zu tun ist."
+      },
+      "week": {
+        "title": "Wochenübersicht",
+        "text": "Was diese Woche zu tun ist, einschließlich Zusagen ohne Frist."
+      },
+      "sources": "Quellen",
+      "notConnected": "nicht verbunden",
+      "interval": "Häufigkeit",
+      "intervals": {
+        "15m": "Alle 15 Minuten",
+        "1h": "Stündlich",
+        "4h": "Alle 4 Stunden",
+        "1d": "Einmal täglich"
+      },
+      "hours": "Zeit",
+      "roundTheClock": "Rund um die Uhr (sonst 8:00–20:00)",
+      "exclusions": "Nicht erfassen",
+      "exclusionKind": "Art des Ausschlusses",
+      "exclusionKinds": {
+        "senders": "Absender",
+        "folders": "Ordner",
+        "chats": "Chat"
+      },
+      "exclusionHint": {
+        "senders": "hr@firma.de",
+        "folders": "Kennung eines Labels oder Ordners",
+        "chats": "Kennung eines Chats"
+      },
+      "addExclusion": "Ausschluss hinzufügen",
+      "neverCollected": "Rundschreiben und automatische Briefe werden nie erfasst.",
+      "days": "Tage",
+      "weekday": "Tag",
+      "time": "Uhrzeit",
+      "dayShort": {
+        "1": "Mo",
+        "2": "Di",
+        "3": "Mi",
+        "4": "Do",
+        "5": "Fr",
+        "6": "Sa",
+        "7": "So"
+      },
+      "paused": {
+        "user": "Pausiert. Im Bereich „Aufgaben“ fortsetzen.",
+        "source_access": "Pausiert: kein Zugriff auf die Quelle.",
+        "budget": "Pausiert: Monatslimit aufgebraucht.",
+        "archived": "Pausiert: das Konto war archiviert.",
+        "failed": "Nach Fehlern pausiert. Den Grund finden Sie unter „Aufgaben“."
+      },
+      "collected": "Erfasstes",
+      "collectedText": "Notizen: {notes}, offene Zusagen: {commitments} · Aufbewahrung {days} Tage",
+      "deleteAll": "Erfasstes löschen",
+      "deleteAllTitle": "Alles Erfasste löschen?",
+      "deleteAllText": "Notizen ({notes}), Zusagen ({commitments}), Personen und Themen werden gelöscht und die Gedächtnisaufgaben ausgeschaltet. Die Fakten bleiben."
+    }
   }
 }
