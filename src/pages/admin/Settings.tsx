@@ -5,7 +5,6 @@ import { api } from "../../api/client";
 import { errorText } from "../../lib/errors";
 import { Icon } from "../../components/Icon";
 import { Modal, useToast } from "../../components/ui";
-import { CommSettings } from "./CommSettings";
 
 interface Archive { retentionDays: number; willPurge?: number }
 
@@ -46,7 +45,6 @@ export function SettingsAdmin() {
           <div className="hint">{t("admin.settings.retentionHint")}</div>
         </div>
       </div>
-      <CommSettings />
       {confirm && (
         <Modal title={t("admin.settings.confirmTitle")} onClose={() => setConfirm(null)} footer={<>
           <button className="btn ghost" onClick={() => setConfirm(null)}>{t("common.cancel")}</button>

@@ -521,7 +521,7 @@ export interface PersonalModels {
 }
 
 export interface CheckResult {
-  results: { model: string; ok: boolean; latencyMs?: number; errorClass?: string; httpStatus?: number; message?: string }[];
+  results: { model: string; ok: boolean; latencyMs?: number; errorClass?: string; httpStatus?: number; message?: string; embeddings?: boolean }[];
 }
 
 export interface Harness {

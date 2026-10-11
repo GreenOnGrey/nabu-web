@@ -21,6 +21,7 @@ export function ModelsAdmin() {
   const toast = useToast();
   const [adding, setAdding] = useState(false);
   const [keyFor, setKeyFor] = useState<ModelConnection | null>(null);
+  const [modelsFor, setModelsFor] = useState<ModelConnection | null>(null);
   const [checks, setChecks] = useState<Record<string, CheckResult>>({});
   const conns = useQuery({ queryKey: ["admin", "connections"], queryFn: () => api.get<ConnList>("/admin/api/v1/model-connections") });
   const inv = () => qc.invalidateQueries({ queryKey: ["admin", "connections"] });
@@ -62,13 +63,14 @@ export function ModelsAdmin() {
             <div className="small" style={{ marginBottom: 8 }}>
               {checks[c.id].results.map((r) => (
                 <div key={r.model}>{r.ok ? <span className="ok-t">✓</span> : <span className="err-t">✗</span>} <span className="mono">{r.model}</span>{" "}
-                  {r.ok ? `${r.latencyMs ?? ""} ms` : llmErrorText(t, r.errorClass ?? "bad_request")}</div>
+                  {r.ok ? `${r.embeddings ? `${t("admin.models.embeddingsModel")} · ` : ""}${r.latencyMs ?? ""} ms` : llmErrorText(t, r.errorClass ?? "bad_request")}</div>
               ))}
             </div>
           )}
           <div className="row" style={{ gap: 8 }}>
             <button className="btn sm" disabled={check.isPending} onClick={() => check.mutate(c.id)}><Icon name="play" size={14} />{t("admin.models.check")}</button>
             <button className="btn sm" onClick={() => setKeyFor(c)}>{t("admin.models.replaceKey")}</button>
+            <button className="btn sm" onClick={() => setModelsFor(c)}>{t("admin.models.editModels")}</button>
             <button className="btn sm danger" onClick={() => del.mutate(c.id)}>{t("common.delete")}</button>
           </div>
         </div>
@@ -76,6 +78,7 @@ export function ModelsAdmin() {
       {conns.data && <PersonalModelsBlock conns={conns.data.items} />}
       {adding && conns.data && <AddConnection types={conns.data.types} onClose={() => setAdding(false)} />}
       {keyFor && <ReplaceKey conn={keyFor} onClose={() => setKeyFor(null)} />}
+      {modelsFor && conns.data && <EditModels conn={modelsFor} preset={conns.data.types.find((x) => x.type === modelsFor.type)?.models} onClose={() => setModelsFor(null)} />}
     </>
   );
 }
@@ -115,7 +118,7 @@ function AddConnection({ types, onClose }: { types: ConnList["types"]; onClose: 
           <div className="hint">{t("admin.models.modelsHint")}</div></div>
       )}
       {draft.data && draft.data.results.map((r) => (
-        <div key={r.model} className="small">{r.ok ? <span className="ok-t">✓</span> : <span className="err-t">✗</span>} <span className="mono">{r.model}</span> {r.ok ? "" : llmErrorText(t, r.errorClass ?? "bad_request")}</div>
+        <div key={r.model} className="small">{r.ok ? <span className="ok-t">✓</span> : <span className="err-t">✗</span>} <span className="mono">{r.model}</span> {r.ok ? (r.embeddings ? t("admin.models.embeddingsModel") : "") : llmErrorText(t, r.errorClass ?? "bad_request")}</div>
       ))}
       {(draft.error || create.error) && <div className="err-text">{errorText(t, draft.error ?? create.error)}</div>}
     </Modal>
@@ -136,6 +139,40 @@ function ReplaceKey({ conn, onClose }: { conn: ModelConnection; onClose: () => v
       <button className="btn primary" disabled={key.length < 8 || save.isPending} onClick={() => save.mutate()}>{t("common.save")}</button>
     </>}>
       <input type="password" autoComplete="off" className="inp" value={key} onChange={(e) => setKey(e.target.value)} aria-label={t("admin.models.key")} />
+      {save.error && <div className="err-text">{errorText(t, save.error)}</div>}
+    </Modal>
+  );
+}
+
+/** The list of models of an existing connection: a fixed set to tick for a
+ * type that has one, identifiers through a comma otherwise. */
+function EditModels({ conn, preset, onClose }: { conn: ModelConnection; preset?: ModelDef[]; onClose: () => void }) {
+  const { t } = useTranslation();
+  const qc = useQueryClient();
+  const fixed = !!preset?.length;
+  const [text, setText] = useState(conn.models.map((m) => m.id).join(", "));
+  const [picked, setPicked] = useState(() => new Set(conn.models.map((m) => m.id)));
+  const ids = fixed ? preset.map((m) => m.id).filter((id) => picked.has(id)) : text.split(/[\s,]+/).filter(Boolean);
+  const save = useMutation({
+    mutationFn: () => api.patch(`/admin/api/v1/model-connections/${conn.id}`, { models: ids }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin"] }); onClose(); },
+  });
+  const toggle = (id: string) => setPicked((cur) => { const next = new Set(cur); if (!next.delete(id)) next.add(id); return next; });
+  return (
+    <Modal title={`${t("admin.models.editModels")} — ${conn.name}`} onClose={onClose} footer={<>
+      <button className="btn ghost" onClick={onClose}>{t("common.cancel")}</button>
+      <button className="btn primary" disabled={!ids.length || save.isPending} onClick={() => save.mutate()}>{t("common.save")}</button>
+    </>}>
+      {fixed ? preset.map((m) => (
+        <label key={m.id} className="row" style={{ gap: 8, padding: "4px 0" }}>
+          <input type="checkbox" checked={picked.has(m.id)} onChange={() => toggle(m.id)} /><span className="mono">{m.id}</span>
+        </label>
+      )) : (
+        <div className="field"><label htmlFor="e-models">{t("admin.models.models")}</label>
+          <input id="e-models" className="inp" value={text} onChange={(e) => setText(e.target.value)} />
+          <div className="hint">{t("admin.models.modelsHint")}</div></div>
+      )}
+      <div className="hint">{t("admin.models.editModelsHint")}</div>
       {save.error && <div className="err-text">{errorText(t, save.error)}</div>}
     </Modal>
   );

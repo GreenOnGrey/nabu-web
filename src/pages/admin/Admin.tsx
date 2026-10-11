@@ -16,6 +16,7 @@ import { ChannelsAdmin } from "./Channels";
 import { GroupAgentsAdmin } from "./GroupAgents";
 import { AgentPodsAdmin } from "./AgentPods";
 import { SettingsAdmin } from "./Settings";
+import { CommAdmin } from "./Comm";
 
 const SECTIONS = [
   { path: "users", icon: "users" },
@@ -26,6 +27,7 @@ const SECTIONS = [
   { path: "harness", icon: "box" },
   { path: "catalog", icon: "plug" },
   { path: "service-agents", icon: "spark" },
+  { path: "comm", icon: "brain" },
   { path: "clients", icon: "server" },
   { path: "usage", icon: "chart" },
   { path: "audit", icon: "shield" },
@@ -61,6 +63,7 @@ export function AdminPage() {
           <Route path="channels" element={<ChannelsAdmin />} />
           <Route path="group-agents" element={<GroupAgentsAdmin />} />
           <Route path="agent-pods" element={<AgentPodsAdmin />} />
+          <Route path="comm" element={<CommAdmin />} />
           <Route path="settings" element={<SettingsAdmin />} />
           <Route path="*" element={<Navigate to={adminPath("users")} replace />} />
         </Routes>

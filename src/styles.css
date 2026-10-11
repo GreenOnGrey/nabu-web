@@ -2696,8 +2696,9 @@ select.inp.inherit {
 
 /* FTR.NAB.CMN-0003 design §1: the memory of communications — people are green, topics are violet */
 .page.wide{max-width:1320px}
-.mtabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin:0 0 16px;overflow-x:auto}
-.mtabs button{border:0;background:none;padding:8px 12px;font-size:14px;color:var(--text-2);border-bottom:2px solid transparent;margin-bottom:-1px;display:flex;align-items:center;gap:6px;white-space:nowrap;cursor:pointer}
+.mtabs{display:flex;gap:4px;box-shadow:inset 0 -1px 0 var(--border);margin:0 0 16px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+.mtabs::-webkit-scrollbar{display:none}
+.mtabs button{border:0;background:none;padding:8px 12px;font-size:14px;color:var(--text-2);border-bottom:2px solid transparent;display:flex;align-items:center;gap:6px;white-space:nowrap;cursor:pointer}
 .mtabs button.on{color:var(--text);border-color:var(--violet);font-weight:500}
 .mtabs .n{font-size:11px;background:var(--surface-2);border-radius:999px;padding:0 6px;color:var(--text-2);font-weight:400}
 .cbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}

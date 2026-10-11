@@ -11,10 +11,10 @@ interface SourceItem { id: string; name: string; title: string; mode: string; ad
 interface Usage { enabledUsers: number; notes: number; costUsd: number; monthlyLimitUsd: number; items: { userId: string; email: string; notes: number; runs: number; costUsd: number; limitUsedPct: number }[] }
 
 /** The memory of communications in the administration (FTR.NAB.CMN-0003 R29,
- * design §3.10): whether it is allowed, the retention, the model of the
+ * design §3.10), a section of its own: whether it is allowed, the retention, the model of the
  * collection, the monthly limit, which MCP servers are sources, and the
  * usage. Nothing here shows what is collected (R22). */
-export function CommSettings() {
+export function CommAdmin() {
   const { t, i18n } = useTranslation();
   const qc = useQueryClient();
   const toast = useToast();
@@ -43,7 +43,7 @@ export function CommSettings() {
   const d = Number(days ?? s.retentionDays), l = Number((limit ?? String(s.monthlyLimitUsd)).replace(",", "."));
   return (
     <>
-      <h3 style={{ margin: "28px 0 4px" }}>{t("admin.comm.title")}</h3>
+      <h2 style={{ margin: 0 }}>{t("admin.comm.title")}</h2>
       <p className="lead">{t("admin.comm.lead")}</p>
       <div className="svc" style={{ maxWidth: 640 }}>
         <Switch on={s.enabled} disabled={save.isPending} onChange={(on) => save.mutate({ enabled: on })} label={t("admin.comm.enabled")} />
