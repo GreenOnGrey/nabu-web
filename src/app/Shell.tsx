@@ -5,13 +5,14 @@ import { Avatar } from "../components/ui";
 import { ProfileMenu } from "./ProfileMenu";
 import { useSession } from "./session";
 
-// The top menu of the site (FTR.NAB.CMN-0001 design §2): Chat, Tasks, Memory,
-// Space, Connections; the avatar opens the profile menu on the right.
+// The top menu of the site (FTR.NAB.CMN-0001 design §2; the order —
+// FTR.NAB.CMN-0003 design, decision 21): Chat, Memory, Space, Tasks,
+// Connections; the avatar opens the profile menu on the right.
 export const SECTIONS = [
   { to: "/", key: "chat", match: (p: string) => p === "/" || p.startsWith("/chat") },
-  { to: "/tasks", key: "tasks", match: (p: string) => p.startsWith("/tasks") },
   { to: "/memory", key: "memory", match: (p: string) => p.startsWith("/memory") },
   { to: "/space", key: "space", match: (p: string) => p.startsWith("/space") },
+  { to: "/tasks", key: "tasks", match: (p: string) => p.startsWith("/tasks") },
   { to: "/connections", key: "connections", match: (p: string) => p.startsWith("/connections") },
 ] as const;
 
