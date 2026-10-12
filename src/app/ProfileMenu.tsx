@@ -6,8 +6,7 @@ import { api } from "../api/client";
 import { keys } from "../api/queries";
 import type { Me } from "../api/types";
 import { LANGUAGES, LANGUAGE_NAMES, LANGUAGE_SHORT, setDocumentLanguage } from "../lib/i18n";
-import { Icon } from "../components/Icon";
-import { Avatar, useOutside } from "../components/ui";
+import { Avatar, Icon, useOutside } from "@green-on-grey/ui-kit";
 import { useSession } from "./session";
 
 /** Common time zones offered in the profile; the browser's own zone comes first. */

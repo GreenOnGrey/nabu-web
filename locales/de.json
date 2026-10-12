@@ -1,6 +1,5 @@
 {
   "nav": {
-    "title": "Bereiche",
     "chat": "Chat",
     "tasks": "Aufgaben",
     "memory": "Gedächtnis",
@@ -79,50 +78,20 @@
     "6": "Samstag"
   },
   "chat": {
-    "title": "Chat",
     "conversations": "Gespräche",
-    "conversation": "Gespräch",
     "main": "Hauptgespräch",
-    "topics": "Themen",
-    "archive": "Archiv",
-    "noTopics": "Noch keine Themen",
-    "newTopic": "Neues Thema",
-    "topicTitle": "Thema",
-    "topicHint": "Ein Thema hat einen eigenen Verlauf, aber dasselbe Gedächtnis und denselben Arbeitsbereich.",
     "mainHint": "Ein Gespräch in allen Kanälen",
     "noModel": "kein Modell",
-    "loadOlder": "Frühere Nachrichten",
-    "emptyTitle": "Hallo, ich bin {name}",
     "emptyHint": "Bitten Sie mich, E-Mails zu sortieren, etwas in Ihren Tools zu finden oder Sie später zu erinnern.",
-    "placeholder": "Nachricht an {name}…",
-    "send": "Senden",
-    "attach": "Dateien anhängen",
-    "typing": "Der Agent schreibt",
     "archivedHint": "Das Thema ist archiviert und schreibgeschützt.",
     "unarchive": "Wiederherstellen",
     "taskMark": "Aufgabe",
-    "moreSteps": "{count, plural, one {# weiterer Schritt} other {# weitere Schritte}}",
-    "hideSteps": "Schritte ausblenden",
     "tools": {
       "memory": "Gedächtnis",
       "task": "Aufgaben",
       "space": "Arbeitsbereich"
     },
-    "voice": {
-      "hold": "Zum Aufnehmen gedrückt halten",
-      "stop": "Aufnahme beenden",
-      "recording": "Aufnahme… {seconds} s",
-      "review": "Prüfen Sie die Transkription vor dem Senden",
-      "notRecognized": "Die Sprache wurde nicht erkannt",
-      "micDenied": "Kein Zugriff auf das Mikrofon",
-      "unsupported": "Spracheingabe wird von diesem Browser nicht unterstützt"
-    },
-    "unread": "{count, plural, one {# ungelesene Antwort} other {# ungelesene Antworten}}",
     "confirm": {
-      "title": "Aktion bestätigen",
-      "text": "Der Agent möchte ausführen: {action}",
-      "approve": "Ausführen",
-      "reject": "Ablehnen",
       "approved": "Sie haben bestätigt: {action}",
       "rejected": "Sie haben abgelehnt: {action}"
     },
@@ -132,10 +101,6 @@
       "cc": "Kopie",
       "webOnly": "Der Bot war nicht der einzige Empfänger: Die Antwort steht nur hier, nicht per E-Mail.",
       "quoted": "Zitierter Text"
-    },
-    "wait": {
-      "starting": "Der Agent startet…",
-      "queued": "{count, plural, =0 {In der Warteschlange · Sie sind als Nächstes dran} other {In der Warteschlange · # vor Ihnen}}"
     },
     "commitments": {
       "show": "Vereinbarungen anzeigen",

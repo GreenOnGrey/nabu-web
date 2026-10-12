@@ -6,8 +6,7 @@ import type { AdminChannel, EmailLogEntry, EmailSettings, List } from "../../api
 import { errorText } from "../../lib/errors";
 import { intlLocale } from "../../lib/i18n";
 import { dateTime } from "../../lib/format";
-import { Icon } from "../../components/Icon";
-import { Modal, Switch, useToast } from "../../components/ui";
+import { Icon, Modal, Switch, useToast } from "@green-on-grey/ui-kit";
 
 const ICONS: Record<string, "globe" | "mail" | "msg" | "tg"> = { web: "globe", email: "mail", vkteams: "msg", telegram: "tg" };
 

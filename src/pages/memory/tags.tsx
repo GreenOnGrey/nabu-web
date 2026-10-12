@@ -1,6 +1,6 @@
 import type { TFunction } from "i18next";
 import type { CommTag } from "../../api/types";
-import { Icon } from "../../components/Icon";
+import { Icon } from "@green-on-grey/ui-kit";
 
 /** A person or a topic (FTR.NAB.CMN-0003 design §1, decision 19): a neutral
  * chip with a green person icon or a violet hash — the colour is on the icon

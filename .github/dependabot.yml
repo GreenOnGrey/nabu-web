@@ -1,0 +1,10 @@
+# FTR.NAB.CMN-0005 R25, R26: the kit is pinned to an exact version and updated by a
+# pull request of its own, so a release never finds it more than one minor behind.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule: { interval: weekly }
+    allow:
+      - dependency-name: "@green-on-grey/ui-kit"
+    commit-message: { prefix: "FTR.NAB.CMN-0005" }

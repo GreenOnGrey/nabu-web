@@ -9,8 +9,7 @@ import type { List, SpaceFile, SpaceInfo } from "../api/types";
 import { errorText } from "../lib/errors";
 import { intlLocale } from "../lib/i18n";
 import { bytes, dateTime } from "../lib/format";
-import { Icon } from "../components/Icon";
-import { Empty, useToast } from "../components/ui";
+import { Empty, Icon, useToast } from "@green-on-grey/ui-kit";
 
 /** The personal space (R31, design §3.4): state, used space, upload; files
  * with path, size, when and by whom changed, download. */

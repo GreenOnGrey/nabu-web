@@ -5,7 +5,8 @@ import { api } from "../api/client";
 import { keys } from "../api/queries";
 import { TONES, type Agent, type Tone } from "../api/types";
 import { errorText } from "../lib/errors";
-import { AgentIcon, useOutside, useToast } from "../components/ui";
+import { useOutside, useToast } from "@green-on-grey/ui-kit";
+import { AgentIcon } from "./tones";
 
 /** The agent menu under the agent's icon (R31, design §3.6a): the name and
  * the tone as tiles; the icon in the header changes at once (UI-03). */

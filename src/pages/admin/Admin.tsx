@@ -1,8 +1,7 @@
 import { Navigate, NavLink, Route, Routes } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useSession } from "../../app/session";
-import { Icon } from "../../components/Icon";
-import { Empty } from "../../components/ui";
+import { Empty, Icon } from "@green-on-grey/ui-kit";
 import { adminPath } from "./paths";
 import { UsersAdmin } from "./Users";
 import { ModelsAdmin } from "./Models";
@@ -42,14 +41,14 @@ export function AdminPage() {
     return <main className="main"><Empty icon="lock" title={t("admin.noAccess")} /></main>;
   }
   return (
-    <div className="admin">
+    <div className="admin nb-adm">
       <nav className="side" aria-label={t("admin.title")}>
         <div className="lab">{t("admin.title")}</div>
         {SECTIONS.map((s) => (
           <NavLink key={s.path} to={adminPath(s.path)}><Icon name={s.icon} />{t(`admin.${s.path}.title`)}</NavLink>
         ))}
       </nav>
-      <main className="main">
+      <main className="main nb-adm-main">
         <Routes>
           <Route index element={<Navigate to={adminPath("users")} replace />} />
           <Route path="users" element={<UsersAdmin />} />

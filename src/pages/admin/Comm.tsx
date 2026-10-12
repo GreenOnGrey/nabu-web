@@ -4,8 +4,7 @@ import { useTranslation } from "react-i18next";
 import { api } from "../../api/client";
 import type { CommAdminSettings, ModelConnection } from "../../api/types";
 import { errorText } from "../../lib/errors";
-import { Icon } from "../../components/Icon";
-import { Switch, useToast } from "../../components/ui";
+import { Icon, Switch, useToast } from "@green-on-grey/ui-kit";
 
 interface SourceItem { id: string; name: string; title: string; mode: string; adapter: string | null; commSource: boolean; published: boolean; commSources: { key: string; title: string }[] }
 interface Usage { enabledUsers: number; notes: number; costUsd: number; monthlyLimitUsd: number; items: { userId: string; email: string; notes: number; runs: number; costUsd: number; limitUsedPct: number }[] }
@@ -123,7 +122,7 @@ export function CommAdmin() {
                 <tbody>
                   {usage.data.items.map((u) => (
                     <tr key={u.userId}><td>{u.email}</td><td>{u.notes}</td><td>{u.runs}</td><td>{money.format(u.costUsd)}</td>
-                      <td style={{ minWidth: 120 }}>{usage.data!.monthlyLimitUsd > 0 ? <div className="meter"><i className={u.limitUsedPct >= 90 ? "warn" : ""} style={{ width: `${Math.min(100, u.limitUsedPct)}%` }} /></div> : "—"}</td></tr>
+                      <td style={{ minWidth: 120 }}>{usage.data!.monthlyLimitUsd > 0 ? <div className="meter"><i className={u.limitUsedPct >= 90 ? "hot" : ""} style={{ width: `${Math.min(100, u.limitUsedPct)}%` }} /></div> : "—"}</td></tr>
                   ))}
                 </tbody>
               </table>

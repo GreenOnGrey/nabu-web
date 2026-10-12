@@ -6,8 +6,7 @@ import type { AdminUser, GroupAgent } from "../../api/types";
 import { errorText } from "../../lib/errors";
 import { intlLocale } from "../../lib/i18n";
 import { dateTime } from "../../lib/format";
-import { Icon } from "../../components/Icon";
-import { Empty, Modal, useToast } from "../../components/ui";
+import { Empty, Icon, Modal, useToast } from "@green-on-grey/ui-kit";
 
 /** Group agents (FTR.NAB.CMN-0002 R16–R17, R24, design §3.5): the chat, the
  * owner, the model, the cost of the month, the state; transfer and disable. */

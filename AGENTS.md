@@ -17,32 +17,35 @@ out next to Hammurapi; the specifications are `hammurapi-specs/specs/NAB/CMN/FTR
 
 ## Stack
 
-React 19, TypeScript, Vite, TanStack Query, React Router 7, i18next with ICU. Node 24. The style
-and components follow Hammurapi (`styles.css` is shared, Nabu adds its own section at the end).
+React 19, TypeScript, Vite, TanStack Query, React Router 7, i18next with ICU. Node 24. The shared
+look — tokens, buttons, fields, tables, the top bar, the chat, sign-in, icons — comes from
+`@green-on-grey/ui-kit` (FTR.NAB.CMN-0005); `src/styles.css` holds the screens of Nabu only.
 
 ```sh
 npm ci
 npm run dev        # http://localhost:5173; /api, /admin/api, /auth go to localhost:8080
 npm test           # vitest
-npm run lint       # oxlint + tsc (warnings are tolerated, errors are not)
+npm run lint       # oxlint + tsc + ui-kit-check (warnings are tolerated, errors are not)
+UI_KIT_SRC=../ui-kit npm run dev   # with the kit from its sources, to try a change of the kit
 npm run build      # typecheck + production build
 ```
 
-CI runs lint, tests, `deploy/sync-ref.sh --check` and actionlint.
+CI runs lint, tests, `deploy/sync-ref.sh --check` and actionlint; a release also runs `deploy/kit-lag.sh`.
 
 ## Layout
 
 ```text
 src/api/          client (fetch, nabu_csrf cookie, ApiError), types.ts (mirrors core JSON), queries.ts
 src/app/          App (routes), Shell (navigation), ProfileMenu, session
-src/chat/         chat page: conversations, agent menu, voice
+src/chat/         chat page: adapter.tsx (requests, events, API → the view types of the kit), ChatPage
+                  (the layout around Chat and ConversationList of the kit), agent menu, tones, commitments
 src/pages/        Tasks, Memory, Space, Connections, Login; memory/ — the tabs of Memory (FTR.NAB.CMN-0003):
                   Comm (table, note panel), Graph (d3-force), Commitments, MemoryTasks (cards, wizard);
                   admin/ — Administration (paths.ts):
                   Users (archive), Channels, GroupAgents, Settings, …
-src/components/   ui, icons (tone icons of the agent), Markdown
 src/lib/          sse, i18n, format, errors, llm
 locales/*.json    en (default and fallback), ru, de, es, zh — shown as EN RU DE ES ZH
+e2e/              the screen comparison: mock.mjs (a fixed API), screens.ts, screens.spec.ts (Playwright), compare.mjs
 ```
 
 ## Rules
@@ -54,7 +57,26 @@ locales/*.json    en (default and fallback), ru, de, es, zh — shown as EN RU D
 - **SSE events** are listed in `src/lib/sse.ts`.
 - No `Date.now()` or other impure calls during render (oxlint purity rules): compute in handlers or
   query functions.
-- Check UI changes in a browser at desktop and phone width; tests do not cover layout.
+- Check UI changes in a browser at desktop and phone width; unit tests do not cover layout.
+- **Screens are compared, not eyeballed, when the look must not change** (a move to a new version of the kit, a
+  refactoring of styles): the `visual` workflow builds two commits, shoots every screen of `e2e/screens.ts` on the
+  fixed API of `e2e/mock.mjs` and compares the shots with zero tolerance. A new screen or a state behind a click is
+  added to `e2e/screens.ts`, its data — to `e2e/mock.mjs`. Locally: `npm run build && SHOTS_DIR=shots/after npm run shots`.
+
+## UI kit
+
+- **Take from the kit**: `Icon`, `Modal`, `useToast`, `Avatar`, `Switch`, `Empty`, `Loading`, `TopBar`, `Menu`, `Tabs`,
+  `Markdown` from `@green-on-grey/ui-kit`; `Chat`, `ChatLayout`, `ConversationList` from `…/chat`; `LoginScreen` from
+  `…/login`. Its showcase lists every class and state: <https://greenongrey.github.io/ui-kit/>.
+- **Do not restyle the kit** (R23). A rule in `src/styles.css` styles a class of Nabu: `.mailcard .send`, never
+  `.mailcard .btn`. `ui-kit-check` in `npm run lint` fails on a rule whose target is an element of the kit, on a rule
+  without a class of Nabu and on a redefined token. Need another look — give the element a class of its own or change the kit.
+- **A new shared element** goes to the kit when Hammurapi needs it too; a new icon goes to the kit at once.
+- **The chat** never calls the API from the component: `src/chat/adapter.tsx` turns answers and events into the types
+  of the kit and gives the handlers. No handler — no control.
+- **The version of the kit is exact** (`0.1.3`, no `^`); Dependabot proposes updates; `deploy/kit-lag.sh` stops a release
+  that is more than one minor behind.
+- The strings of the components of the kit live in the namespace `uikit`; the keys of Nabu stay in `locales/*.json`.
 
 ## Releases
 

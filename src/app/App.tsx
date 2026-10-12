@@ -6,7 +6,7 @@ import { ApiError } from "../api/client";
 import { keys, useConfig, useMe } from "../api/queries";
 import { connectEvents, disconnectEvents, onEvent, onReconnect } from "../lib/sse";
 import { setDocumentLanguage } from "../lib/i18n";
-import { Empty, Loading } from "../components/ui";
+import { Empty, Loading } from "@green-on-grey/ui-kit";
 import { SessionProvider } from "./session";
 import { Shell } from "./Shell";
 import { LoginPage } from "../pages/Login";

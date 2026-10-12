@@ -1,0 +1,41 @@
+# Сравнение экранов двух сборок (FTR.NAB.CMN-0005 qa §5): «было» — указанный
+# коммит, «стало» — ветка запуска. Обе сборки получают одни и те же данные от
+# e2e/mock.mjs и снимаются одним набором на одной машине; допуск — ноль пикселей.
+# Запускается вручную: при переходе на кит и перед обновлением его major-версии.
+name: visual
+on:
+  workflow_dispatch:
+    inputs:
+      base: { description: "Коммит или тег «было»", required: true, type: string }
+      report_only: { description: "Только отчёт: отличия ожидаемы, их принимает человек", required: false, default: false, type: boolean }
+permissions: { contents: read }
+
+jobs:
+  compare:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with: { node-version: 24, cache: npm }
+      - name: Сборка «стало»
+        run: npm ci --no-audit --no-fund && npm run build
+      - name: Сборка «было»
+        env:
+          BASE: ${{ inputs.base }}
+        run: |
+          git worktree add --detach ../before "$BASE"
+          cd ../before && npm ci --no-audit --no-fund && npm run build
+      - run: npx playwright install --with-deps chromium
+      # один и тот же набор снимает обе сборки: он ищет элементы по тому, что видит пользователь
+      - name: Снимки «было»
+        run: DIST=../before/dist SHOTS_DIR=shots/before npx playwright test
+      - name: Снимки «стало»
+        run: DIST=dist SHOTS_DIR=shots/after npx playwright test
+      - name: Сравнение
+        env:
+          REPORT_ONLY: ${{ inputs.report_only && '--report-only' || '' }}
+        run: node e2e/compare.mjs shots/before shots/after shots/report $REPORT_ONLY
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with: { name: screens, path: shots/report, if-no-files-found: ignore }

@@ -3,8 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { api } from "../../api/client";
 import { errorText } from "../../lib/errors";
-import { Icon } from "../../components/Icon";
-import { Modal, useToast } from "../../components/ui";
+import { Icon, Modal, useToast } from "@green-on-grey/ui-kit";
 
 interface Archive { retentionDays: number; willPurge?: number }
 

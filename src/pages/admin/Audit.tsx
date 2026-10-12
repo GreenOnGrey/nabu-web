@@ -8,7 +8,7 @@ import { api, qs } from "../../api/client";
 import type { AuditEntry, List } from "../../api/types";
 import { intlLocale } from "../../lib/i18n";
 import { dateTime } from "../../lib/format";
-import { Icon } from "../../components/Icon";
+import { Icon } from "@green-on-grey/ui-kit";
 
 /** The period start is fixed per choice so the query key stays stable. */
 const cache = new Map<number, string>();

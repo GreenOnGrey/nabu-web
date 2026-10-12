@@ -1,6 +1,5 @@
 {
   "nav": {
-    "title": "栏目",
     "chat": "聊天",
     "tasks": "任务",
     "memory": "记忆",
@@ -79,50 +78,20 @@
     "6": "星期六"
   },
   "chat": {
-    "title": "聊天",
     "conversations": "对话",
-    "conversation": "对话",
     "main": "主对话",
-    "topics": "话题",
-    "archive": "归档",
-    "noTopics": "暂无话题",
-    "newTopic": "新话题",
-    "topicTitle": "话题",
-    "topicHint": "话题有独立的历史记录，记忆和空间与主对话相同。",
     "mainHint": "所有渠道共用一个对话",
     "noModel": "未选择模型",
-    "loadOlder": "更早的消息",
-    "emptyTitle": "你好，我是 {name}",
     "emptyHint": "可以让我整理邮件、在工具中查找信息或稍后提醒你。",
-    "placeholder": "给 {name} 发消息…",
-    "send": "发送",
-    "attach": "附加文件",
-    "typing": "智能体正在输入",
     "archivedHint": "该话题已归档，只能查看。",
     "unarchive": "取消归档",
     "taskMark": "任务",
-    "moreSteps": "{count, plural, other {另外 # 个步骤}}",
-    "hideSteps": "隐藏步骤",
     "tools": {
       "memory": "记忆",
       "task": "任务",
       "space": "空间"
     },
-    "voice": {
-      "hold": "按住录音",
-      "stop": "停止录音",
-      "recording": "录音中… {seconds} 秒",
-      "review": "发送前请检查转写文本",
-      "notRecognized": "未能识别语音",
-      "micDenied": "无法访问麦克风",
-      "unsupported": "此浏览器不支持语音输入"
-    },
-    "unread": "{count} 条未读回复",
     "confirm": {
-      "title": "确认操作",
-      "text": "代理想要执行：{action}",
-      "approve": "执行",
-      "reject": "拒绝",
       "approved": "您已确认：{action}",
       "rejected": "您已拒绝：{action}"
     },
@@ -132,10 +101,6 @@
       "cc": "抄送",
       "webOnly": "机器人不是唯一收件人：回复仅在此处，不通过邮件发送。",
       "quoted": "引用内容"
-    },
-    "wait": {
-      "starting": "代理正在启动…",
-      "queued": "{count, plural, =0 {排队中 · 您是下一位} other {排队中 · 前面还有 # 位}}"
     },
     "commitments": {
       "show": "显示约定",

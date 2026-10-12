@@ -15,5 +15,5 @@
     "noEmit": true,
     "types": ["vite/client", "node"]
   },
-  "include": ["src", "locales", "vite.config.ts"]
+  "include": ["src", "locales", "e2e", "vite.config.ts", "playwright.config.ts"]
 }

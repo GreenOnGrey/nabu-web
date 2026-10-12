@@ -1,6 +1,5 @@
 {
   "nav": {
-    "title": "Sections",
     "chat": "Chat",
     "tasks": "Tasks",
     "memory": "Memory",
@@ -79,50 +78,20 @@
     "6": "Saturday"
   },
   "chat": {
-    "title": "Chat",
     "conversations": "Conversations",
-    "conversation": "Conversation",
     "main": "Main",
-    "topics": "Topics",
-    "archive": "Archive",
-    "noTopics": "No topics yet",
-    "newTopic": "New topic",
-    "topicTitle": "Topic",
-    "topicHint": "A topic has its own history and the same memory and space.",
     "mainHint": "One conversation in every channel",
     "noModel": "no model",
-    "loadOlder": "Earlier messages",
-    "emptyTitle": "Hi, I am {name}",
     "emptyHint": "Ask me to sort mail, find something in your tools or remind you later.",
-    "placeholder": "Message {name}…",
-    "send": "Send",
-    "attach": "Attach files",
-    "typing": "The agent is typing",
     "archivedHint": "The topic is archived and read-only.",
     "unarchive": "Unarchive",
     "taskMark": "Task",
-    "moreSteps": "{count, plural, one {# more step} other {# more steps}}",
-    "hideSteps": "Hide steps",
     "tools": {
       "memory": "Memory",
       "task": "Tasks",
       "space": "Space"
     },
-    "voice": {
-      "hold": "Hold to record",
-      "stop": "Stop recording",
-      "recording": "Recording… {seconds} s",
-      "review": "Check the transcript before sending",
-      "notRecognized": "The speech was not recognized",
-      "micDenied": "No access to the microphone",
-      "unsupported": "Voice input is not supported in this browser"
-    },
-    "unread": "{count, plural, one {# unread answer} other {# unread answers}}",
     "confirm": {
-      "title": "Confirm the action",
-      "text": "The agent wants to perform: {action}",
-      "approve": "Execute",
-      "reject": "Reject",
       "approved": "You confirmed: {action}",
       "rejected": "You rejected: {action}"
     },
@@ -132,10 +101,6 @@
       "cc": "Cc",
       "webOnly": "The bot was not the only recipient: the answer is only here, not by mail.",
       "quoted": "Quoted text"
-    },
-    "wait": {
-      "starting": "The agent is starting…",
-      "queued": "{count, plural, =0 {In the queue · you are next} one {In the queue · # ahead of you} other {In the queue · # ahead of you}}"
     },
     "commitments": {
       "show": "Show commitments",

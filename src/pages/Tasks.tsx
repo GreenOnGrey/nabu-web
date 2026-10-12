@@ -8,8 +8,7 @@ import type { List, Task, TaskRun } from "../api/types";
 import { errorText } from "../lib/errors";
 import { intlLocale } from "../lib/i18n";
 import { dateTime } from "../lib/format";
-import { Icon } from "../components/Icon";
-import { Empty, Modal, useToast } from "../components/ui";
+import { Empty, Icon, Modal, useToast } from "@green-on-grey/ui-kit";
 
 const FILTERS = ["active", "done", "cancelled"] as const;
 

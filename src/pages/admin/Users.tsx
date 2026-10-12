@@ -9,8 +9,7 @@ import { errorText } from "../../lib/errors";
 import { intlLocale } from "../../lib/i18n";
 import { dateTime, relativeTime } from "../../lib/format";
 import { useEvent } from "../../lib/sse";
-import { Icon } from "../../components/Icon";
-import { Avatar, Modal, Switch, useToast } from "../../components/ui";
+import { Avatar, Icon, Modal, Switch, useToast } from "@green-on-grey/ui-kit";
 import { adminPath } from "./paths";
 import { channelLabel } from "./Channels";
 

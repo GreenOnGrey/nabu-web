@@ -102,7 +102,7 @@ export function Graph({ graph, picked, onPick }: { graph: CommGraph; picked: Pic
           })}
         </g>
       </svg>
-      <div className="gleg"><span><i className="p" />{t("comm.people")}</span><span><i className="t" />{t("comm.topics")}</span></div>
+      <div className="gleg"><span><i className="p" />{t("comm.people")}</span><span><i className="tp" />{t("comm.topics")}</span></div>
       <div className="gzoom">
         <button type="button" onClick={() => zoom(1.3)} aria-label={t("comm.graph.zoomIn")}>+</button>
         <button type="button" onClick={() => zoom(1 / 1.3)} aria-label={t("comm.graph.zoomOut")}>−</button>

@@ -7,8 +7,7 @@ import { keys } from "../../api/queries";
 import type { CommTag, Commitment } from "../../api/types";
 import { errorText } from "../../lib/errors";
 import { intlLocale } from "../../lib/i18n";
-import { Icon } from "../../components/Icon";
-import { Empty, useToast } from "../../components/ui";
+import { Empty, Icon, useToast } from "@green-on-grey/ui-kit";
 import { TagChip, dueText } from "./tags";
 
 type Bucket = "overdue" | "today" | "week" | "later" | "undated" | "closed";

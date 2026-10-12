@@ -5,7 +5,7 @@ import { api } from "../api/client";
 import { keys } from "../api/queries";
 import type { Commitment, DigestCard } from "../api/types";
 import { intlLocale } from "../lib/i18n";
-import { Icon } from "../components/Icon";
+import { Icon } from "@green-on-grey/ui-kit";
 import { useCommitmentActions } from "../pages/memory/Commitments";
 import { TagChip, dueText } from "../pages/memory/tags";
 

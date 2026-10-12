@@ -5,8 +5,7 @@ import { api } from "../../api/client";
 import type { CheckResult, Choice, ModelConnection, ModelDef, PersonalModels } from "../../api/types";
 import { errorText } from "../../lib/errors";
 import { llmErrorText } from "../../lib/llm";
-import { Icon } from "../../components/Icon";
-import { Modal, Switch, useToast } from "../../components/ui";
+import { Icon, Modal, Switch, useToast } from "@green-on-grey/ui-kit";
 
 interface ConnList {
   items: ModelConnection[];

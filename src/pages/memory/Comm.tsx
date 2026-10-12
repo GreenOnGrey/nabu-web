@@ -7,8 +7,7 @@ import { keys } from "../../api/queries";
 import type { CommGraph, CommNote, CommState, CommTag, List } from "../../api/types";
 import { errorText } from "../../lib/errors";
 import { intlLocale } from "../../lib/i18n";
-import { Icon } from "../../components/Icon";
-import { Empty, Modal, useToast } from "../../components/ui";
+import { Empty, Icon, Modal, useToast } from "@green-on-grey/ui-kit";
 import { CommitmentRow } from "./Commitments";
 import { Graph, type Picked } from "./Graph";
 import { TagChip, noteWhen, sourceIcon, sourceName } from "./tags";
@@ -66,7 +65,7 @@ export function CommTab({ state, filter, setFilter, view, setView, noteId, setNo
     <>
       <CollectBanner state={state} />
       <div className="cbar">
-        <div className="search">
+        <div className="search cm-search">
           <Icon name="search" />
           <input value={filter.q} onChange={(e) => setFilter({ q: e.target.value })} placeholder={t("comm.search")} aria-label={t("comm.search")} />
         </div>
@@ -214,7 +213,7 @@ function PickedPanel({ picked, graph, filter, onClose, onNote, onAll }: {
     ? graph.edges.filter((e) => e.a === picked.id || e.b === picked.id).map((e) => graph.nodes.find((n) => n.id === (e.a === picked.id ? e.b : e.a))!).filter(Boolean)
     : [];
   return (
-    <aside className="panel" aria-label={t("comm.graph.panel")}>
+    <aside className="panel gpanel" aria-label={t("comm.graph.panel")}>
       <div className="panel-h">
         <div className="tgs grow">{tags.map((n) => <TagChip key={n.id} tag={n} />)}</div>
         <button className="iconbtn" onClick={onClose} aria-label={t("common.close")}><Icon name="x" size={16} /></button>

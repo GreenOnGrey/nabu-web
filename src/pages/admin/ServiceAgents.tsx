@@ -6,8 +6,7 @@ import type { AdminCatalogItem, Harness, List, ModelConnection, Run, ServiceAgen
 import { errorText } from "../../lib/errors";
 import { intlLocale } from "../../lib/i18n";
 import { dateTime } from "../../lib/format";
-import { Icon } from "../../components/Icon";
-import { Modal, Switch } from "../../components/ui";
+import { Icon, Modal, Switch } from "@green-on-grey/ui-kit";
 
 /** Service agents (R15–R17, design §3.8): the table and the configuration form, the run log. */
 export function ServiceAgentsAdmin() {

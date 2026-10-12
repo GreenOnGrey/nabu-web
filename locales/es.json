@@ -1,6 +1,5 @@
 {
   "nav": {
-    "title": "Secciones",
     "chat": "Chat",
     "tasks": "Tareas",
     "memory": "Memoria",
@@ -79,50 +78,20 @@
     "6": "sábado"
   },
   "chat": {
-    "title": "Chat",
     "conversations": "Conversaciones",
-    "conversation": "Conversación",
     "main": "Principal",
-    "topics": "Temas",
-    "archive": "Archivo",
-    "noTopics": "Aún no hay temas",
-    "newTopic": "Nuevo tema",
-    "topicTitle": "Tema",
-    "topicHint": "Un tema tiene su propio historial y la misma memoria y espacio.",
     "mainHint": "Una conversación en todos los canales",
     "noModel": "sin modelo",
-    "loadOlder": "Mensajes anteriores",
-    "emptyTitle": "Hola, soy {name}",
     "emptyHint": "Pídame ordenar el correo, buscar algo en sus herramientas o recordarle algo más tarde.",
-    "placeholder": "Mensaje para {name}…",
-    "send": "Enviar",
-    "attach": "Adjuntar archivos",
-    "typing": "El agente está escribiendo",
     "archivedHint": "El tema está archivado y es de solo lectura.",
     "unarchive": "Desarchivar",
     "taskMark": "Tarea",
-    "moreSteps": "{count, plural, one {# paso más} other {# pasos más}}",
-    "hideSteps": "Ocultar pasos",
     "tools": {
       "memory": "Memoria",
       "task": "Tareas",
       "space": "Espacio"
     },
-    "voice": {
-      "hold": "Mantenga pulsado para grabar",
-      "stop": "Detener la grabación",
-      "recording": "Grabando… {seconds} s",
-      "review": "Revise la transcripción antes de enviar",
-      "notRecognized": "No se reconoció la voz",
-      "micDenied": "Sin acceso al micrófono",
-      "unsupported": "Este navegador no admite la entrada de voz"
-    },
-    "unread": "{count, plural, one {# respuesta sin leer} other {# respuestas sin leer}}",
     "confirm": {
-      "title": "Confirme la acción",
-      "text": "El agente quiere ejecutar: {action}",
-      "approve": "Ejecutar",
-      "reject": "Rechazar",
       "approved": "Usted confirmó: {action}",
       "rejected": "Usted rechazó: {action}"
     },
@@ -132,10 +101,6 @@
       "cc": "Copia",
       "webOnly": "El bot no era el único destinatario: la respuesta está solo aquí, no por correo.",
       "quoted": "Texto citado"
-    },
-    "wait": {
-      "starting": "El agente se está iniciando…",
-      "queued": "{count, plural, =0 {En cola · usted es el siguiente} other {En cola · # por delante}}"
     },
     "commitments": {
       "show": "Mostrar acuerdos",

@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { api } from "../api/client";
 import { keys } from "../api/queries";
 import type { CommState } from "../api/types";
-import { Icon } from "../components/Icon";
+import { Icon } from "@green-on-grey/ui-kit";
 import { errorText } from "../lib/errors";
 import { CommitmentGroups, CommitmentRow, useCommitments } from "../pages/memory/Commitments";
 
@@ -69,8 +69,8 @@ export function CommitmentsPanel() {
       </div>
       <div className="bd">
         {list.error && <div className="err-text">{errorText(t, list.error)}</div>}
-        {list.isLoading && <div className="small muted">{t("common.loading")}</div>}
-        {list.data && items.length === 0 && <div className="small muted">{t("chat.commitments.empty")}</div>}
+        {list.isLoading && <div className="small muted cm-note">{t("common.loading")}</div>}
+        {list.data && items.length === 0 && <div className="small muted cm-note">{t("chat.commitments.empty")}</div>}
         <CommitmentGroups items={items} row={(c) => (
           <CommitmentRow key={c.id} c={c} layout="narrow" onTag={(tag) => navigate(`/memory?tab=comm&${tag.kind}=${tag.id}`)} />
         )} />

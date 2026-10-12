@@ -7,3 +7,8 @@ coverage/
 
 # Codegraph
 .codegraph/
+
+# screen comparison
+shots/
+e2e/shots/
+test-results/

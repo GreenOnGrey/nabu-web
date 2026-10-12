@@ -8,8 +8,7 @@ import type { CatalogItem, MyChannel } from "../api/types";
 import { errorText } from "../lib/errors";
 import { intlLocale } from "../lib/i18n";
 import { dateTime } from "../lib/format";
-import { Icon } from "../components/Icon";
-import { Empty, Modal, useToast } from "../components/ui";
+import { Empty, Icon, Modal, useToast } from "@green-on-grey/ui-kit";
 
 const FILTERS = ["all", "connected", "mcp", "skill"] as const;
 
@@ -60,7 +59,7 @@ export function ConnectionsPage() {
       <div className="cardgrid">
         {items.map((it) => (
           <div className="ccard" key={it.id}>
-            <div className="t"><Icon name={it.type === "mcp" ? "plug" : "spark"} size={16} />{it.title}</div>
+            <div className="ct"><Icon name={it.type === "mcp" ? "plug" : "spark"} size={16} />{it.title}</div>
             <div className="row" style={{ gap: 6 }}>
               {it.type === "mcp" && it.mode === "personal" && <span className="mode p">{t("connections.personal")}</span>}
               {it.type === "mcp" && it.mode === "platform" && <span className="mode">{it.readOnly ? t("connections.platformRead") : t("connections.platform")}</span>}
@@ -132,7 +131,7 @@ function ChannelsBlock() {
       <div className="channels">
         {items.map((c) => (
           <div className="ccard" key={c.kind}>
-            <div className="t"><Icon name={c.kind === "telegram" ? "tg" : c.kind === "email" ? "mail" : "msg"} size={16} />{t(`channels.${c.kind}`)}
+            <div className="ct"><Icon name={c.kind === "telegram" ? "tg" : c.kind === "email" ? "mail" : "msg"} size={16} />{t(`channels.${c.kind}`)}
               {c.address && <span className="small muted mono">{c.address}</span>}</div>
             {!c.available ? (
               <div className="d"><Icon name="lock" size={14} /> {t("connections.channelUnavailable")}</div>

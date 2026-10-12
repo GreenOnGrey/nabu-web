@@ -4,8 +4,7 @@ import { useTranslation } from "react-i18next";
 import { api, request } from "../../api/client";
 import type { AdminCatalogItem } from "../../api/types";
 import { errorText } from "../../lib/errors";
-import { Icon } from "../../components/Icon";
-import { Modal, Switch, useToast } from "../../components/ui";
+import { Icon, Modal, Switch, useToast } from "@green-on-grey/ui-kit";
 
 /** The catalog of skills and MCP (R11–R14, design §3.11): source (URL, upload,
  * git), access mode, publication, check of MCP servers; items in development are marked. */

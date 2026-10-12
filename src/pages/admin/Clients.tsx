@@ -6,8 +6,7 @@ import type { ServiceAgent, ServiceClient } from "../../api/types";
 import { errorText } from "../../lib/errors";
 import { intlLocale } from "../../lib/i18n";
 import { dateTime } from "../../lib/format";
-import { Icon } from "../../components/Icon";
-import { Modal, Switch, useToast } from "../../components/ui";
+import { Icon, Modal, Switch, useToast } from "@green-on-grey/ui-kit";
 
 const inFuture = (iso: string) => new Date(iso).getTime() > Date.now();
 

@@ -6,8 +6,10 @@ import { I18nextProvider } from "react-i18next";
 import { ApiError } from "./api/client";
 import { loadRuntimeConfig } from "./api/base";
 import { i18nInstance, setDocumentLanguage } from "./lib/i18n";
-import { ToastProvider } from "./components/ui";
+import { ToastProvider } from "@green-on-grey/ui-kit";
 import { App } from "./app/App";
+// the styles of the kit first: the screens of Nabu add their own classes after them (FTR.NAB.CMN-0005 R23)
+import "@green-on-grey/ui-kit/styles.css";
 import "./styles.css";
 
 const queryClient = new QueryClient({

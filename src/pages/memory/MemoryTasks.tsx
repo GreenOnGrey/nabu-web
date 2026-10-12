@@ -8,8 +8,7 @@ import type { CollectSettings, CommState, DigestSettings, MemoryTask } from "../
 import { errorText } from "../../lib/errors";
 import { intlLocale } from "../../lib/i18n";
 import { dateTime } from "../../lib/format";
-import { Icon } from "../../components/Icon";
-import { Modal, Switch, useToast } from "../../components/ui";
+import { Icon, Modal, Switch, useToast } from "@green-on-grey/ui-kit";
 import { sourceName } from "./tags";
 
 const INTERVALS = ["15m", "1h", "4h", "1d"] as const;
@@ -64,7 +63,7 @@ export function MemoryTasksTab({ state }: { state: CommState }) {
             )}
             {collect.enabled && state.collect.budgetUsedPct > 0 && (
               <div className="kvrow"><span className="muted">{t("comm.tasks.collect.budget")}</span>
-                <span><div className="meter"><i className={state.collect.budgetUsedPct >= 90 ? "warn" : ""} style={{ width: `${Math.min(100, state.collect.budgetUsedPct)}%` }} /></div>
+                <span><div className="meter"><i className={state.collect.budgetUsedPct >= 90 ? "hot" : ""} style={{ width: `${Math.min(100, state.collect.budgetUsedPct)}%` }} /></div>
                   <span className="small muted">{t("comm.tasks.collect.budgetUsed", { pct: state.collect.budgetUsedPct })}</span></span></div>
             )}
           </TaskCard>
