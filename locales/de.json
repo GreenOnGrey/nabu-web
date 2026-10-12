@@ -57,7 +57,6 @@
   },
   "agent": {
     "menu": "Agent",
-    "name": "Name des Agenten",
     "tone": "Ton",
     "everywhere": "Die Änderung gilt in allen Kanälen und verbundenen Diensten."
   },

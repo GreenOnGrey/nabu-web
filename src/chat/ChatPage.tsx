@@ -1,15 +1,15 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Icon, Loading } from "@green-on-grey/ui-kit";
-import { Chat, ChatLayout, ConversationList } from "@green-on-grey/ui-kit/chat";
+import { AgentButton, Chat, ChatLayout, ConversationList } from "@green-on-grey/ui-kit/chat";
 import { ApiError } from "../api/client";
 import { useAgent } from "../api/queries";
 import type { Conversation } from "../api/types";
 import { useConversation, useConversations } from "./adapter";
 import { AgentMenu } from "./AgentMenu";
 import { CommitmentsPanel } from "./CommitmentsPanel";
-import { AgentIcon } from "./tones";
+import { TONE_ICONS } from "./tones";
 
 /** The chat with the personal agent (R30, design §3.2): the main
  * conversation and topics on the left; the conversation on the right with
@@ -50,6 +50,7 @@ function ConversationView({ conv, onMenu }: { conv: Conversation; onMenu: () => 
   const { t } = useTranslation();
   const agent = useAgent();
   const [agentMenu, setAgentMenu] = useState(false);
+  const closeAgentMenu = useCallback(() => setAgentMenu(false), []);
   const { unarchive, ...chat } = useConversation(conv);
   const a = agent.data;
   return (
@@ -65,10 +66,8 @@ function ConversationView({ conv, onMenu }: { conv: Conversation; onMenu: () => 
           <div className="hd">
             <button className="iconbtn show-m" onClick={onMenu} aria-label={t("chat.conversations")}><Icon name="msg2" /></button>
             {a && (
-              <button className="agentbtn" onMouseDown={(e) => agentMenu && e.stopPropagation()} onClick={() => setAgentMenu((v) => !v)}
-                aria-label={t("agent.menu")} aria-expanded={agentMenu} title={t(`tones.${a.tone}`)}>
-                <AgentIcon tone={a.tone} />
-              </button>
+              <AgentButton icon={TONE_ICONS[a.tone] ?? "tBusiness"} label={t("agent.menu")} title={t(`tones.${a.tone}`)}
+                expanded={agentMenu} onClick={() => setAgentMenu((v) => !v)} />
             )}
             <div style={{ minWidth: 0 }}>
               <b>{a?.name ?? "…"}</b>
@@ -80,7 +79,7 @@ function ConversationView({ conv, onMenu }: { conv: Conversation; onMenu: () => 
             <span className="spacer" />
             <span className="small muted hide-m">{conv.kind === "main" ? t("chat.mainHint") : <>{conv.source === "email" && <Icon name="mail" size={13} />} {conv.title}</>}</span>
           </div>
-          {agentMenu && a && <AgentMenu agent={a} onClose={() => setAgentMenu(false)} />}
+          {agentMenu && a && <AgentMenu agent={a} onClose={closeAgentMenu} />}
         </>
       )} />
   );
