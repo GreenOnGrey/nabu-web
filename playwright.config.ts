@@ -10,7 +10,14 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   reporter: process.env.CI ? "github" : "list",
-  use: { baseURL: `http://localhost:${PORT}`, locale: "ru-RU", timezoneId: "Europe/Moscow" },
+  use: {
+    baseURL: `http://localhost:${PORT}`, locale: "ru-RU", timezoneId: "Europe/Moscow",
+    // Repeatable rendering. Without these two flags a build differs from itself by
+    // 1–25 pixels on a few screens of every run — gradients, pictures and icons
+    // under a translucent layer — and a zero tolerance cannot hold
+    // (FTR.NAB.CMN-0005 qa, decision 3). With them three runs of 118 shots were identical.
+    launchOptions: { args: ["--disable-partial-raster", "--disable-skia-runtime-opts"] },
+  },
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 860 } } },
     { name: "phone", use: { ...devices["Desktop Chrome"], viewport: { width: 390, height: 844 }, hasTouch: true } },
