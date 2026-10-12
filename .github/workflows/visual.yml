@@ -34,8 +34,11 @@ jobs:
         run: DIST=dist SHOTS_DIR=shots/after npx playwright test
       - name: Сравнение
         env:
-          REPORT_ONLY: ${{ inputs.report_only && '--report-only' || '' }}
-        run: node e2e/compare.mjs shots/before shots/after shots/report $REPORT_ONLY
+          REPORT_ONLY: ${{ inputs.report_only }}
+        run: |
+          args=(shots/before shots/after shots/report)
+          [[ $REPORT_ONLY == true ]] && args+=(--report-only)
+          node e2e/compare.mjs "${args[@]}"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with: { name: screens, path: shots/report, if-no-files-found: ignore }
