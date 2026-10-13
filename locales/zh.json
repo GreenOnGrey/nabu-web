@@ -499,7 +499,10 @@
       "secretTitle": "{name} 的凭据",
       "secretOnce": "请立即复制密钥：它只显示一次。",
       "name": "名称",
-      "url": "地址"
+      "url": "地址",
+      "editTitle": "{name} 的地址",
+      "deleteTitle": "删除 {name}？",
+      "deleteText": "其凭据将立即失效。有运行记录的客户端无法删除，以便历史记录保留其名称：请改为停用。"
     },
     "usage": {
       "title": "用量",
@@ -749,6 +752,7 @@
     "space_quota_exceeded": "空间已满。",
     "invalid_path": "路径无效。",
     "name_taken": "名称已被占用。",
+    "client_has_runs": "该客户端有运行记录，因此无法删除。请改为停用。",
     "connection_in_use": "有服务智能体正在使用此连接。",
     "user_exists": "该邮箱的用户已存在。",
     "invalid_email": "邮箱无效。",

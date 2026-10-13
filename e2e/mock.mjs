@@ -58,6 +58,12 @@ const users = [{ id: "u1", email: "ada@example.com", name: "Ада Лавлей�
   { id: "u3", email: "grace@example.com", name: "Грейс Хоппер", isAdmin: false, status: "blocked", lastSeenAt: T("10:00", "04"), createdAt: T("09:00", "02"), channels: [] }];
 const commState = { allowed: false, available: false, consentAt: null, retentionDays: 90, semantic: false, sources: [], collect: { status: "off", pauseKind: null, nextRunAt: null, backfill: null, budgetUsedPct: 0 }, counts: { notes: 0, openCommitments: 0 } };
 
+// A service client with an address: the edit and the delete dialogs open from its card (SVC-10, SVC-11).
+const clients = [
+  { id: "c1", name: "billing", url: "https://billing.example.org", clientId: "billing", agents: [], canDelegate: true, canImport: false,
+    canArchive: false, canRestore: false, enabled: true, prevSecretExpiresAt: null, createdAt: "2026-01-12T09:00:00Z" },
+];
+
 function api(url, theme) {
   const p = url.pathname;
   if (p === "/api/v1/me") return me(theme);
@@ -75,6 +81,7 @@ function api(url, theme) {
   if (p === "/api/v1/catalog") return { items: catalog };
   if (p === "/api/v1/channels") return { items: me().channels };
   if (p === "/api/v1/comm/state") return commState;
+  if (p === "/admin/api/v1/clients") return { items: clients };
   if (p === "/admin/api/v1/users") return { items: url.searchParams.get("status") === "archived" ? [] : users };
   return { items: [], nextCursor: null };
 }

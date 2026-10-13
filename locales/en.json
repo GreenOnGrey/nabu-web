@@ -499,7 +499,10 @@
       "secretTitle": "Credentials of {name}",
       "secretOnce": "Copy the secret now: it is shown only once.",
       "name": "Name",
-      "url": "Address"
+      "url": "Address",
+      "editTitle": "Address of {name}",
+      "deleteTitle": "Delete {name}?",
+      "deleteText": "Its credentials stop working at once. A client that has runs cannot be deleted, so that the history keeps its name: disable it instead."
     },
     "usage": {
       "title": "Usage",
@@ -749,6 +752,7 @@
     "space_quota_exceeded": "The space is full.",
     "invalid_path": "Invalid path.",
     "name_taken": "The name is taken.",
+    "client_has_runs": "The client has runs, so it cannot be deleted. Disable it instead.",
     "connection_in_use": "Service agents use this connection.",
     "user_exists": "A user with this email exists.",
     "invalid_email": "Invalid email.",

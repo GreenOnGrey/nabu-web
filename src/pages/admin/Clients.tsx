@@ -11,13 +11,16 @@ import { Icon, Modal, Switch, useToast } from "@green-on-grey/ui-kit";
 const inFuture = (iso: string) => new Date(iso).getTime() > Date.now();
 
 /** Service clients (R17, R1a, design §3.9): the client and its address,
- * allowed service agents, delegation and import, credentials with reissue. */
+ * allowed service agents, delegation and import, credentials with reissue;
+ * the address is edited, a client without runs is deleted (SVC-10, SVC-11). */
 export function ClientsAdmin() {
   const { t, i18n } = useTranslation();
   const qc = useQueryClient();
   const toast = useToast();
   const [creating, setCreating] = useState(false);
   const [secret, setSecret] = useState<ServiceClient | null>(null);
+  const [editing, setEditing] = useState<ServiceClient | null>(null);
+  const [deleting, setDeleting] = useState<ServiceClient | null>(null);
   const list = useQuery({ queryKey: ["admin", "clients"], queryFn: () => api.get<{ items: ServiceClient[] }>("/admin/api/v1/clients") });
   const agents = useQuery({ queryKey: ["admin", "service-agents"], queryFn: () => api.get<{ items: ServiceAgent[] }>("/admin/api/v1/service-agents") });
   const inv = () => qc.invalidateQueries({ queryKey: ["admin", "clients"] });
@@ -42,6 +45,8 @@ export function ClientsAdmin() {
           <div className="h">
             <Icon name="server" /><b>{c.name}</b>{c.url && <span className="small muted mono">{c.url}</span>}
             <span className="spacer" />
+            <button className="btn sm" onClick={() => setEditing(c)}>{t("common.edit")}</button>
+            <button className="btn sm danger" onClick={() => setDeleting(c)}>{t("common.delete")}</button>
             <Switch on={c.enabled} onChange={(v) => patch.mutate({ id: c.id, enabled: v })} label={t("admin.clients.enabled")} />
           </div>
           <dl className="kv">
@@ -73,6 +78,8 @@ export function ClientsAdmin() {
         </div>
       ))}
       {creating && <CreateClient onClose={() => setCreating(false)} onCreated={(c) => { setCreating(false); setSecret(c); }} />}
+      {editing && <EditClient client={editing} onClose={() => setEditing(null)} />}
+      {deleting && <DeleteClient client={deleting} onClose={() => setDeleting(null)} />}
       {secret?.secret && (
         <Modal title={t("admin.clients.secretTitle", { name: secret.name })} onClose={() => setSecret(null)} footer={<button className="btn primary" onClick={() => setSecret(null)}>{t("common.done")}</button>}>
           <p style={{ marginTop: 0 }}>{t("admin.clients.secretOnce")}</p>
@@ -103,6 +110,45 @@ function CreateClient({ onClose, onCreated }: { onClose: () => void; onCreated: 
       <div className="field"><label htmlFor="cl-u">{t("admin.clients.url")}</label><input id="cl-u" className="inp mono" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://api.example.org" /></div>
       <Switch on={canDelegate} onChange={setCanDelegate} label={t("admin.clients.delegate")} />
       {create.error && <div className="err-text">{errorText(t, create.error)}</div>}
+    </Modal>
+  );
+}
+
+/** The address is the only thing of a client that is typed: the name is its client_id and never changes. */
+function EditClient({ client, onClose }: { client: ServiceClient; onClose: () => void }) {
+  const { t } = useTranslation();
+  const qc = useQueryClient();
+  const [url, setUrl] = useState(client.url);
+  const save = useMutation({
+    mutationFn: () => api.patch<ServiceClient>(`/admin/api/v1/clients/${client.id}`, { url: url.trim() }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin", "clients"] }); onClose(); },
+  });
+  return (
+    <Modal title={t("admin.clients.editTitle", { name: client.name })} onClose={onClose} footer={<>
+      <button className="btn ghost" onClick={onClose}>{t("common.cancel")}</button>
+      <button className="btn primary" disabled={save.isPending || url.trim() === client.url} onClick={() => save.mutate()}>{t("common.save")}</button>
+    </>}>
+      <div className="field"><label htmlFor="cl-eu">{t("admin.clients.url")}</label><input id="cl-eu" className="inp mono" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://api.example.org" /></div>
+      {save.error && <div className="err-text">{errorText(t, save.error)}</div>}
+    </Modal>
+  );
+}
+
+/** SVC-10, SVC-11: a client that has runs is refused by the server (client_has_runs) and stays. */
+function DeleteClient({ client, onClose }: { client: ServiceClient; onClose: () => void }) {
+  const { t } = useTranslation();
+  const qc = useQueryClient();
+  const del = useMutation({
+    mutationFn: () => api.del(`/admin/api/v1/clients/${client.id}`),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin", "clients"] }); qc.invalidateQueries({ queryKey: ["admin", "service-agents"] }); onClose(); },
+  });
+  return (
+    <Modal title={t("admin.clients.deleteTitle", { name: client.name })} onClose={onClose} footer={<>
+      <button className="btn ghost" onClick={onClose}>{t("common.cancel")}</button>
+      <button className="btn danger" disabled={del.isPending} onClick={() => del.mutate()}>{t("common.delete")}</button>
+    </>}>
+      <p style={{ marginTop: 0 }}>{t("admin.clients.deleteText")}</p>
+      {del.error && <div className="err-text">{errorText(t, del.error)}</div>}
     </Modal>
   );
 }

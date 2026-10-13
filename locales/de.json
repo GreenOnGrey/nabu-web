@@ -499,7 +499,10 @@
       "secretTitle": "Zugangsdaten von {name}",
       "secretOnce": "Kopieren Sie das Secret jetzt: Es wird nur einmal angezeigt.",
       "name": "Name",
-      "url": "Adresse"
+      "url": "Adresse",
+      "editTitle": "Adresse von {name}",
+      "deleteTitle": "{name} löschen?",
+      "deleteText": "Die Zugangsdaten werden sofort ungültig. Ein Client mit Läufen kann nicht gelöscht werden, damit der Verlauf seinen Namen behält: Deaktivieren Sie ihn stattdessen."
     },
     "usage": {
       "title": "Nutzung",
@@ -749,6 +752,7 @@
     "space_quota_exceeded": "Der Arbeitsbereich ist voll.",
     "invalid_path": "Ungültiger Pfad.",
     "name_taken": "Der Name ist vergeben.",
+    "client_has_runs": "Der Client hat Läufe und kann daher nicht gelöscht werden. Deaktivieren Sie ihn stattdessen.",
     "connection_in_use": "Dienstagenten verwenden diese Verbindung.",
     "user_exists": "Ein Benutzer mit dieser E-Mail existiert.",
     "invalid_email": "Ungültige E-Mail.",

@@ -38,4 +38,6 @@ export const SCREENS: Screen[] = [
   { name: "connections", path: "/connections" },
   { name: "admin", path: "/admin" },
   ...ADMIN.map((s) => ({ name: `admin-${s}`, path: `/admin/${s}` })),
+  { name: "admin-clients-edit", path: "/admin/clients", act: click("Изменить") },
+  { name: "admin-clients-delete", path: "/admin/clients", act: click("Удалить") },
 ];

@@ -499,7 +499,10 @@
       "secretTitle": "Credenciales de {name}",
       "secretOnce": "Copie el secreto ahora: se muestra una sola vez.",
       "name": "Nombre",
-      "url": "Dirección"
+      "url": "Dirección",
+      "editTitle": "Dirección de {name}",
+      "deleteTitle": "¿Eliminar {name}?",
+      "deleteText": "Sus credenciales dejan de funcionar de inmediato. Un cliente con ejecuciones no se puede eliminar, para que el historial conserve su nombre: desactívelo en su lugar."
     },
     "usage": {
       "title": "Uso",
@@ -749,6 +752,7 @@
     "space_quota_exceeded": "El espacio está lleno.",
     "invalid_path": "Ruta no válida.",
     "name_taken": "El nombre está ocupado.",
+    "client_has_runs": "El cliente tiene ejecuciones, por lo que no se puede eliminar. Desactívelo en su lugar.",
     "connection_in_use": "Hay agentes de servicio que usan esta conexión.",
     "user_exists": "Ya existe un usuario con este correo.",
     "invalid_email": "Correo no válido.",
