@@ -5,9 +5,12 @@ import { api, request } from "../../api/client";
 import type { AdminCatalogItem } from "../../api/types";
 import { errorText } from "../../lib/errors";
 import { Icon, Modal, Switch, useToast } from "@green-on-grey/ui-kit";
+import { ToolsBlock, type ToolsValue } from "./CatalogTools";
+import { allowedCount, allowedOf, bytesToMb, DEFAULT_FILE_MAX_BYTES, mbToBytes, readOnlyPreset, type ToolChoice } from "./catalogTools";
 
 /** The catalog of skills and MCP (R11–R14, design §3.11): source (URL, upload,
- * git), access mode, publication, check of MCP servers; items in development are marked. */
+ * git), access mode, publication, check of MCP servers; items in development are marked.
+ * The tools the agent sees and the file arguments — FTR.NAB.CMN-0006 design §3. */
 export function CatalogAdmin() {
   const { t } = useTranslation();
   const qc = useQueryClient();
@@ -42,13 +45,14 @@ export function CatalogAdmin() {
               <tr key={it.id}>
                 <td><b>{it.title || it.name}</b> <span className="mono small muted">{it.name}</span>
                   {it.inDevelopment && <> <span className="mode dev">{t("connections.inDevelopment")}</span></>}
-                  <div className="small muted">{it.type === "skill" ? t("admin.catalog.skills", { count: it.skills.length }) : t("admin.catalog.tools", { count: it.tools.length })}</div></td>
+                  <div className="small muted">{it.type === "skill" ? t("admin.catalog.skills", { count: it.skills.length }) : toolsLabel(t, it)}</div></td>
                 <td className="small">{it.source.kind === "url" ? <span className="mono">{it.source.url}</span>
                   : it.source.kind === "git" ? <span className="mono">{it.source.repo}/{it.source.path}@{it.source.ref || "main"}</span>
                   : t("admin.catalog.upload")}</td>
                 <td>{it.type === "mcp" ? (it.mode === "personal" ? <span className="mode p">{t("connections.personal")}</span>
                   : <span className="mode">{it.readOnly ? t("connections.platformRead") : t("connections.platform")}</span>) : <span className="mode">{t("connections.skill")}</span>}</td>
-                <td><span className={`st ${it.status === "ok" ? "ok" : it.status === "error" ? "review" : "draft"}`} title={it.statusReason ?? ""}>{t(`admin.catalog.states.${it.status ?? "unchecked"}`, { defaultValue: it.status ?? "" })}</span></td>
+                <td><span className={`st ${it.status === "ok" ? "ok" : it.status === "error" ? "review" : "draft"}`} title={it.statusReason ?? ""}>{t(`admin.catalog.states.${it.status ?? "unchecked"}`, { defaultValue: it.status ?? "" })}</span>
+                  {(it.newTools?.length ?? 0) > 0 && <span className="ctools-dot" title={t("admin.catalog.newTools")} aria-label={t("admin.catalog.newTools")} />}</td>
                 <td><Switch on={it.published} onChange={(v) => publish.mutate({ id: it.id, published: v })} /></td>
                 <td style={{ whiteSpace: "nowrap" }}>
                   {it.type === "mcp" && <button className="btn sm" onClick={() => act.mutate({ id: it.id, action: "check" })}>{t("admin.catalog.check")}</button>}
@@ -65,8 +69,26 @@ export function CatalogAdmin() {
   );
 }
 
-function EditItem({ item, type, onClose }: { item: AdminCatalogItem | null; type: "mcp" | "skill"; onClose: () => void }) {
+/** "5 of 12 tools", or "12 tools" when the agent sees all of them (UI-05). */
+function toolsLabel(t: (k: string, o?: Record<string, unknown>) => string, it: AdminCatalogItem): string {
+  const seen = allowedCount(it.tools, it.allowedTools, it.readOnly);
+  if (seen === it.tools.length) return t("admin.catalog.tools", { count: it.tools.length });
+  return t("admin.catalog.toolsOf", { allowed: seen, count: it.tools.length });
+}
+
+function initialChoice(item: AdminCatalogItem | null): ToolChoice {
+  if (!item) return { allowed: [], fileArgs: [] };
+  const allowed = item.allowedTools ?? (item.readOnly ? readOnlyPreset(item.tools) : item.tools.map((tl) => tl.name));
+  return { allowed, fileArgs: item.fileArgs ?? [] };
+}
+
+function EditItem({ item: initial, type, onClose }: { item: AdminCatalogItem | null; type: "mcp" | "skill"; onClose: () => void }) {
   const { t } = useTranslation();
+  // the item as the server last returned it: "Save and check" and "Check" refresh it in the form
+  const [item, setItem] = useState<AdminCatalogItem | null>(initial);
+  const [tools, setTools] = useState<ToolsValue>(() => ({ choice: initialChoice(initial), readOnly: initial?.readOnly ?? true,
+    fileMax: bytesToMb(initial?.fileMaxBytes ?? DEFAULT_FILE_MAX_BYTES) }));
+  const { choice } = tools;
   const qc = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
   const [name, setName] = useState(item?.name ?? "");
@@ -86,15 +108,20 @@ function EditItem({ item, type, onClose }: { item: AdminCatalogItem | null; type
   const [scopes, setScopes] = useState(item?.personalAuth?.scopes?.join(" ") ?? "");
   const [audience, setAudience] = useState(item?.personalAuth?.audience ?? "");
   const [headers, setHeaders] = useState<{ k: string; v: string }[]>(Object.keys(item?.platformAuth ?? {}).map((k) => ({ k, v: "" })));
-  const [readOnly, setReadOnly] = useState(item?.readOnly ?? true);
   const [exposure, setExposure] = useState(item?.exposure ?? "deferred");
   const [inDev, setInDev] = useState(item?.inDevelopment ?? false);
-  const save = useMutation({
-    mutationFn: async () => {
+  const fileMaxBytes = mbToBytes(tools.fileMax);
+  const toSave = async () => {
       const body: Record<string, unknown> = { type, name, title, description, inDevelopment: inDev,
         source: srcKind === "url" ? { kind: "url", url } : srcKind === "git" ? { kind: "git", repo, path, ref } : { kind: "upload" } };
       if (type === "mcp") {
-        Object.assign(body, { mode, readOnly, exposure });
+        Object.assign(body, { mode, exposure });
+        if (item && item.tools.length > 0) {
+          Object.assign(body, { allowedTools: allowedOf(item.tools, choice.allowed), fileArgs: choice.fileArgs });
+          if (choice.fileArgs.length > 0 && fileMaxBytes !== null) body.fileMaxBytes = fileMaxBytes;
+        } else {
+          body.readOnly = tools.readOnly;
+        }
         if (mode === "personal") body.personalAuth = { kind: authKind, authorizeUrl, tokenUrl, clientId, clientSecret, scopes: scopes.split(/\s+/).filter(Boolean), audience };
         else body.platformAuth = Object.fromEntries(headers.filter((h) => h.k.trim()).map((h) => [h.k.trim(), h.v]));
       }
@@ -103,13 +130,27 @@ function EditItem({ item, type, onClose }: { item: AdminCatalogItem | null; type
       const f = fileRef.current?.files?.[0];
       if (f && srcKind === "upload") await request("POST", `/admin/api/v1/catalog/${saved.id}/upload`, f);
       return saved;
-    },
+  };
+  const save = useMutation({
+    mutationFn: toSave,
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin", "catalog"] }); onClose(); },
+  });
+  // "Check" and "Save and check" keep the form open with the tools of the check
+  const check = useMutation({
+    mutationFn: async (first: boolean) => {
+      const saved = first || !item ? await toSave() : item;
+      return api.post<AdminCatalogItem>(`/admin/api/v1/catalog/${saved.id}/check`);
+    },
+    onSuccess: (checked) => {
+      qc.invalidateQueries({ queryKey: ["admin", "catalog"] });
+      setItem(checked);
+      setTools((v) => ({ ...v, choice: initialChoice(checked), readOnly: checked.readOnly }));
+    },
   });
   return (
     <Modal wide title={item ? item.title || item.name : type === "mcp" ? t("admin.catalog.addMcp") : t("admin.catalog.addSkill")} onClose={onClose} footer={<>
       <button className="btn ghost" onClick={onClose}>{t("common.cancel")}</button>
-      <button className="btn primary" disabled={!name || save.isPending} onClick={() => save.mutate()}>{t("common.save")}</button>
+      <button className="btn primary" disabled={!name || save.isPending || (choice.fileArgs.length > 0 && fileMaxBytes === null)} onClick={() => save.mutate()}>{t("common.save")}</button>
     </>}>
       <div className="form-grid">
         <div className="field"><label htmlFor="ci-name">{t("admin.catalog.name")}</label><input id="ci-name" className="inp mono" disabled={!!item} value={name} onChange={(e) => setName(e.target.value)} placeholder="jira" /></div>
@@ -149,7 +190,7 @@ function EditItem({ item, type, onClose }: { item: AdminCatalogItem | null; type
             <>
               <div className="field"><label>{t("admin.catalog.authKind")}</label>
                 <div className="mini-seg" style={{ display: "inline-flex" }}>
-                  {["oauth", "token", "delegation"].map((k) => <button key={k} className={authKind === k ? "on" : ""} onClick={() => { setAuthKind(k); if (!item && k === "delegation") setReadOnly(false); }}>{t(`admin.catalog.auth.${k}`)}</button>)}
+                  {["oauth", "token", "delegation"].map((k) => <button key={k} className={authKind === k ? "on" : ""} onClick={() => { setAuthKind(k); if (!item && k === "delegation") setTools((v) => ({ ...v, readOnly: false })); }}>{t(`admin.catalog.auth.${k}`)}</button>)}
                 </div>
               </div>
               {authKind === "oauth" && (
@@ -178,7 +219,8 @@ function EditItem({ item, type, onClose }: { item: AdminCatalogItem | null; type
               <button className="btn ghost sm" onClick={() => setHeaders([...headers, { k: "", v: "" }])}><Icon name="plus" size={14} />{t("admin.catalog.addHeader")}</button>
             </div>
           )}
-          <div className="field"><Switch on={readOnly} onChange={setReadOnly} label={t("admin.catalog.readOnly")} /></div>
+          <ToolsBlock item={item} value={tools} onChange={setTools} saveError={save.error}
+            check={{ run: () => check.mutate(false), saveAndRun: () => check.mutate(true), pending: check.isPending, error: check.error }} />
           <div className="field"><label>{t("admin.catalog.exposure")}</label>
             <div className="mini-seg" style={{ display: "inline-flex" }}>
               {["deferred", "direct"].map((k) => <button key={k} className={exposure === k ? "on" : ""} onClick={() => setExposure(k)}>{t(`admin.catalog.exposures.${k}`)}</button>)}

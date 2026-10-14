@@ -40,4 +40,10 @@ export const SCREENS: Screen[] = [
   ...ADMIN.map((s) => ({ name: `admin-${s}`, path: `/admin/${s}` })),
   { name: "admin-clients-edit", path: "/admin/clients", act: click("Изменить") },
   { name: "admin-clients-delete", path: "/admin/clients", act: click("Удалить") },
+  // FTR.NAB.CMN-0006 design §3: the tools of a checked item with its file argument open, and a new item before a check
+  { name: "admin-catalog-tools", path: "/admin/catalog", act: async (page) => {
+    await click("Изменить")(page);
+    await page.getByRole("button", { name: /^Аргументы/ }).first().click();
+  } },
+  { name: "admin-catalog-new", path: "/admin/catalog", act: click("Добавить MCP") },
 ];

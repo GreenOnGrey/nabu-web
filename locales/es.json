@@ -449,7 +449,26 @@
       "exposures": {
         "deferred": "Bajo demanda",
         "direct": "Siempre"
-      }
+      },
+      "toolsBlock": "Herramientas",
+      "toolsAllowed": "{allowed} de {total}",
+      "toolsOf": "{allowed} de {count, plural, one {# herramienta} other {# herramientas}}",
+      "toolsHint": "El agente ve solo las herramientas marcadas. Las nuevas herramientas del servidor quedan desactivadas hasta que las marque.",
+      "toolChanges": "modifica datos",
+      "toolNew": "nueva",
+      "toolArgs": "Argumentos",
+      "fileArg": "Archivo del espacio",
+      "fileArgHint": "El agente pasa una ruta de su espacio; el servidor recibe un enlace temporal a una copia del archivo.",
+      "fileShort": "archivo",
+      "fileMax": "Límite de archivo, MB",
+      "fileMaxHint": "de 0,001 a 100",
+      "checkFirst": "Guarde y compruebe el elemento para elegir sus herramientas",
+      "saveAndCheck": "Guardar y comprobar",
+      "checkNeedsConnection": "Conecte el elemento en Conexiones para comprobarlo: el servidor solo responde con un acceso personal.",
+      "openConnections": "Abrir Conexiones",
+      "newTools": "Hay herramientas nuevas",
+      "toolsSearch": "Buscar herramienta",
+      "checkedAt": "comprobado {time}"
     },
     "service-agents": {
       "title": "Agentes de servicio",
@@ -829,7 +848,11 @@
     "invalid_topics": "Una nota tiene de uno a cinco temas.",
     "invalid_tag": "La etiqueta no es válida.",
     "invalid_channel": "El canal no es válido.",
-    "invalid_exclusion": "Una exclusión es una dirección o un identificador sin espacios, comillas ni paréntesis."
+    "invalid_exclusion": "Una exclusión es una dirección o un identificador sin espacios, comillas ni paréntesis.",
+    "catalog_tool_unknown": "La herramienta no está en la última comprobación del elemento. Compruébelo de nuevo.",
+    "catalog_file_arg_invalid": "Solo un argumento de texto de una herramienta permitida puede ser un archivo del espacio.",
+    "catalog_file_max_invalid": "El límite de archivo es de 0,001 a 100 MB.",
+    "catalog_check_needs_connection": "Conecte el elemento en Conexiones para comprobarlo: el servidor solo responde con un acceso personal."
   },
   "comm": {
     "lead": "Lo que el agente sabe de usted y de su correspondencia de trabajo",

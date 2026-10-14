@@ -449,7 +449,26 @@
       "exposures": {
         "deferred": "Bei Bedarf",
         "direct": "Immer"
-      }
+      },
+      "toolsBlock": "Werkzeuge",
+      "toolsAllowed": "{allowed} von {total}",
+      "toolsOf": "{allowed} von {count, plural, one {# Werkzeug} other {# Werkzeugen}}",
+      "toolsHint": "Der Agent sieht nur die markierten Werkzeuge. Neue Werkzeuge des Servers bleiben aus, bis Sie sie markieren.",
+      "toolChanges": "ändert Daten",
+      "toolNew": "neu",
+      "toolArgs": "Argumente",
+      "fileArg": "Datei im Bereich",
+      "fileArgHint": "Der Agent übergibt einen Pfad in seinem Bereich; der Server erhält einen temporären Link auf eine Kopie der Datei.",
+      "fileShort": "Datei",
+      "fileMax": "Dateilimit, MB",
+      "fileMaxHint": "0,001 bis 100",
+      "checkFirst": "Speichern und prüfen Sie den Eintrag, um seine Werkzeuge zu wählen",
+      "saveAndCheck": "Speichern und prüfen",
+      "checkNeedsConnection": "Verbinden Sie den Eintrag unter „Verbindungen“, um ihn zu prüfen: der Server antwortet nur mit persönlichem Zugang.",
+      "openConnections": "Verbindungen öffnen",
+      "newTools": "Neue Werkzeuge verfügbar",
+      "toolsSearch": "Werkzeug suchen",
+      "checkedAt": "geprüft {time}"
     },
     "service-agents": {
       "title": "Dienstagenten",
@@ -829,7 +848,11 @@
     "invalid_topics": "Eine Notiz hat ein bis fünf Themen.",
     "invalid_tag": "Das Tag ist ungültig.",
     "invalid_channel": "Der Kanal ist ungültig.",
-    "invalid_exclusion": "Ein Ausschluss ist eine Adresse oder Kennung ohne Leerzeichen, Anführungszeichen und Klammern."
+    "invalid_exclusion": "Ein Ausschluss ist eine Adresse oder Kennung ohne Leerzeichen, Anführungszeichen und Klammern.",
+    "catalog_tool_unknown": "Das Werkzeug fehlt in der letzten Prüfung des Eintrags. Prüfen Sie den Eintrag erneut.",
+    "catalog_file_arg_invalid": "Nur ein Text-Argument eines erlaubten Werkzeugs kann eine Datei im Bereich sein.",
+    "catalog_file_max_invalid": "Das Dateilimit liegt zwischen 0,001 und 100 MB.",
+    "catalog_check_needs_connection": "Verbinden Sie den Eintrag unter „Verbindungen“, um ihn zu prüfen: der Server antwortet nur mit persönlichem Zugang."
   },
   "comm": {
     "lead": "Was der Agent über Sie und Ihre Arbeitskorrespondenz weiß",

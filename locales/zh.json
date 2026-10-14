@@ -449,7 +449,26 @@
       "exposures": {
         "deferred": "按需",
         "direct": "始终"
-      }
+      },
+      "toolsBlock": "工具",
+      "toolsAllowed": "{allowed} / {total}",
+      "toolsOf": "{allowed} / {count} 个工具",
+      "toolsHint": "智能体只能看到已勾选的工具。服务器的新工具在您勾选之前保持关闭。",
+      "toolChanges": "会修改数据",
+      "toolNew": "新",
+      "toolArgs": "参数",
+      "fileArg": "空间文件",
+      "fileArgHint": "智能体传入其空间中的路径；服务器获得该文件副本的临时链接。",
+      "fileShort": "文件",
+      "fileMax": "文件上限（MB）",
+      "fileMaxHint": "0.001 至 100",
+      "checkFirst": "保存并检查此项以选择其工具",
+      "saveAndCheck": "保存并检查",
+      "checkNeedsConnection": "请在“连接”中连接此项后再检查：服务器只接受个人访问。",
+      "openConnections": "打开“连接”",
+      "newTools": "有新工具",
+      "toolsSearch": "查找工具",
+      "checkedAt": "检查于 {time}"
     },
     "service-agents": {
       "title": "服务智能体",
@@ -829,7 +848,11 @@
     "invalid_topics": "一条笔记有一到五个主题。",
     "invalid_tag": "标签无效。",
     "invalid_channel": "渠道无效。",
-    "invalid_exclusion": "排除项应为不含空格、引号和括号的地址或标识。"
+    "invalid_exclusion": "排除项应为不含空格、引号和括号的地址或标识。",
+    "catalog_tool_unknown": "此工具不在该项的最近一次检查结果中。请重新检查该项。",
+    "catalog_file_arg_invalid": "只有已允许工具的字符串参数才能设为空间文件。",
+    "catalog_file_max_invalid": "文件上限为 0.001 至 100 MB。",
+    "catalog_check_needs_connection": "请在“连接”中连接此项后再检查：服务器只接受个人访问。"
   },
   "comm": {
     "lead": "助手了解的关于您和您工作往来的信息",

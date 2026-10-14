@@ -449,7 +449,26 @@
       "exposures": {
         "deferred": "On demand",
         "direct": "Always"
-      }
+      },
+      "toolsBlock": "Tools",
+      "toolsAllowed": "{allowed} of {total}",
+      "toolsOf": "{allowed} of {count, plural, one {# tool} other {# tools}}",
+      "toolsHint": "The agent sees only the checked tools. New tools of the server stay off until you check them.",
+      "toolChanges": "changes data",
+      "toolNew": "new",
+      "toolArgs": "Arguments",
+      "fileArg": "Space file",
+      "fileArgHint": "The agent passes a path in its space; the server gets a temporary link to a copy of the file.",
+      "fileShort": "file",
+      "fileMax": "File limit, MB",
+      "fileMaxHint": "0.001 to 100",
+      "checkFirst": "Save and check the item to choose its tools",
+      "saveAndCheck": "Save and check",
+      "checkNeedsConnection": "Connect the item in Connections to check it: the server answers only with a personal access.",
+      "openConnections": "Open Connections",
+      "newTools": "New tools available",
+      "toolsSearch": "Find a tool",
+      "checkedAt": "checked {time}"
     },
     "service-agents": {
       "title": "Service agents",
@@ -829,7 +848,11 @@
     "invalid_topics": "A note has from one to five topics.",
     "invalid_tag": "The tag is not valid.",
     "invalid_channel": "The channel is not valid.",
-    "invalid_exclusion": "An exclusion is an address or an identifier without spaces, quotes and brackets."
+    "invalid_exclusion": "An exclusion is an address or an identifier without spaces, quotes and brackets.",
+    "catalog_tool_unknown": "The tool is not in the last check of the item. Check the item again.",
+    "catalog_file_arg_invalid": "Only a string argument of an allowed tool can be a space file.",
+    "catalog_file_max_invalid": "The file limit is 0.001 to 100 MB.",
+    "catalog_check_needs_connection": "Connect the item in Connections to check it: the server answers only with a personal access."
   },
   "comm": {
     "lead": "What the agent knows about you and your work correspondence",

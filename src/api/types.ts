@@ -530,6 +530,22 @@ export interface Harness {
   status: string;
 }
 
+/** A tool of an MCP item as its check reported it (FTR.NAB.CMN-0006 tech §3.2). */
+export interface CatalogTool {
+  name: string;
+  description?: string;
+  readOnly: boolean;
+  destructive?: boolean;
+  /** String arguments: the ones that can be files of the space. */
+  stringArgs?: string[];
+}
+
+/** A string argument of a tool that is a path in the user's space (R14). */
+export interface FileArg {
+  tool: string;
+  arg: string;
+}
+
 export interface AdminCatalogItem {
   id: string;
   type: "mcp" | "skill";
@@ -546,7 +562,14 @@ export interface AdminCatalogItem {
   inDevelopment: boolean;
   status: string | null;
   statusReason: string | null;
-  tools: { name: string; readOnly: boolean }[];
+  tools: CatalogTool[];
+  /** FTR.NAB.CMN-0006 R13, R14: null — the old rule of readOnly. */
+  allowedTools: string[] | null;
+  fileArgs: FileArg[];
+  fileMaxBytes: number;
+  newTools?: string[];
+  /** The last successful check. */
+  checkedAt: string | null;
   skills: string[];
   syncedAt: string | null;
   callbackUrl?: string;

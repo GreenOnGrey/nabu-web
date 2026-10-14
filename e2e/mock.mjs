@@ -64,6 +64,26 @@ const clients = [
     canArchive: false, canRestore: false, enabled: true, prevSecretExpiresAt: null, createdAt: "2026-01-12T09:00:00Z" },
 ];
 
+// The catalog of the administration (FTR.NAB.CMN-0006 design §3): a checked item
+// with allowed tools, a file argument and a new tool of the server; the form of
+// a new item shows the plate "Save and check".
+const tool = (name, readOnly, stringArgs, description) => ({ name, readOnly, destructive: !readOnly, stringArgs, description });
+const adminCatalog = [
+  { id: "a1", type: "mcp", name: "docling", title: "Документы", description: "Разбор PDF, DOCX и сканов.",
+    source: { kind: "url", url: "http://docling-mcp.mcp.svc:8080/mcp" }, mode: "platform", personalAuth: null,
+    platformAuth: { Authorization: "…3f9a" }, readOnly: false, exposure: "deferred", published: true, inDevelopment: false,
+    status: "ok", statusReason: null, skills: [], syncedAt: null, checkedAt: T("11:42", "14"),
+    tools: [tool("convert_document_into_docling_document", false, ["source"], "Convert a document from a URL or local path into a Docling document."),
+      tool("export_docling_document_to_markdown", true, ["document_key"], "Export a cached Docling document to Markdown."),
+      tool("get_overview_of_document_anchors", true, ["document_key"], "Overview of sections and items of a Docling document."),
+      tool("list_cached_documents", true, [], "Return the keys of all Docling documents currently held in the cache."),
+      tool("save_docling_document", false, ["document_key"], "Save a Docling document to disk."),
+      tool("get_page_thumbnail", true, ["document_key"], "Thumbnail of a page.")],
+    allowedTools: ["convert_document_into_docling_document", "export_docling_document_to_markdown", "get_overview_of_document_anchors"],
+    fileArgs: [{ tool: "convert_document_into_docling_document", arg: "source" }], fileMaxBytes: 20971520,
+    newTools: ["get_page_thumbnail"] },
+];
+
 function api(url, theme) {
   const p = url.pathname;
   if (p === "/api/v1/me") return me(theme);
@@ -82,6 +102,7 @@ function api(url, theme) {
   if (p === "/api/v1/channels") return { items: me().channels };
   if (p === "/api/v1/comm/state") return commState;
   if (p === "/admin/api/v1/clients") return { items: clients };
+  if (p === "/admin/api/v1/catalog") return { items: adminCatalog };
   if (p === "/admin/api/v1/users") return { items: url.searchParams.get("status") === "archived" ? [] : users };
   return { items: [], nextCursor: null };
 }
