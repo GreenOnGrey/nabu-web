@@ -10,7 +10,7 @@ import { intlLocale } from "../../lib/i18n";
 import { Empty, Icon, Modal, useToast } from "@green-on-grey/ui-kit";
 import { CommitmentRow } from "./Commitments";
 import { Graph, type Picked } from "./Graph";
-import { TagChip, noteWhen, sourceIcon, sourceName } from "./tags";
+import { TagChip, noteWhen, sourceIcon, sourceName, sourceTitle } from "./tags";
 
 export interface CommFilter {
   q: string;
@@ -80,7 +80,7 @@ export function CommTab({ state, filter, setFilter, view, setView, noteId, setNo
         {state.sources.length > 1 && (
           <select className="sel" value={filter.source} onChange={(e) => setFilter({ source: e.target.value })} aria-label={t("comm.sourceFilter")}>
             <option value="">{t("comm.sourceFilter")}</option>
-            {state.sources.map((s) => <option key={s.itemId + s.source} value={s.source}>{sourceName(t, s.source)}</option>)}
+            {state.sources.map((s) => <option key={s.itemId + s.source} value={s.source}>{sourceTitle(t, s)}</option>)}
           </select>
         )}
         <select className="sel" value={filter.period} onChange={(e) => setFilter({ period: e.target.value as CommFilter["period"] })} aria-label={t("comm.period.label")}>

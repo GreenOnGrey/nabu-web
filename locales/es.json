@@ -872,7 +872,8 @@
     "sources": {
       "gmail": "Gmail",
       "vkmail": "VK WorkMail",
-      "vkteams": "VK Teams"
+      "vkteams": "VK Teams",
+      "mail": "Correo"
     },
     "search": "Buscar en las notas",
     "retry": "Reintentar",

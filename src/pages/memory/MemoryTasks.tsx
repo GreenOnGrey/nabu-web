@@ -9,7 +9,7 @@ import { errorText } from "../../lib/errors";
 import { intlLocale } from "../../lib/i18n";
 import { dateTime } from "../../lib/format";
 import { Icon, Modal, Switch, useToast } from "@green-on-grey/ui-kit";
-import { sourceName } from "./tags";
+import { sourceTitle } from "./tags";
 
 const INTERVALS = ["15m", "1h", "4h", "1d"] as const;
 const CHANNELS = ["web", "telegram", "vkteams", "email"] as const;
@@ -157,7 +157,7 @@ function CollectSettingsForm({ state, value, disabled, onChange }: {
         <span className="stack">
           {state.sources.map((s) => (
             <Switch key={s.itemId + s.source} on={has(s.itemId, s.source)} disabled={disabled || !s.connected}
-              label={<>{sourceName(t, s.source)}{!s.connected && <span className="small muted"> · {t("comm.tasks.notConnected")}</span>}</>}
+              label={<>{sourceTitle(t, s)}{!s.connected && <span className="small muted"> · {t("comm.tasks.notConnected")}</span>}</>}
               onChange={(on) => onChange({ sources: on ? [...value.sources, { itemId: s.itemId, source: s.source }] : value.sources.filter((x) => !(x.itemId === s.itemId && x.source === s.source)) })} />
           ))}
         </span></div>
@@ -277,7 +277,7 @@ function CollectSettingsFormSources({ state, value, onChange }: { state: CommSta
       <span className="stack">
         {state.sources.map((s) => (
           <Switch key={s.itemId + s.source} on={has(s.itemId, s.source)} disabled={!s.connected}
-            label={<>{sourceName(t, s.source)}{!s.connected && <span className="small muted"> · {t("comm.tasks.notConnected")}</span>}</>}
+            label={<>{sourceTitle(t, s)}{!s.connected && <span className="small muted"> · {t("comm.tasks.notConnected")}</span>}</>}
             onChange={(on) => onChange({ sources: on ? [...value.sources, { itemId: s.itemId, source: s.source }] : value.sources.filter((x) => !(x.itemId === s.itemId && x.source === s.source)) })} />
         ))}
         {state.sources.length === 0 && <span className="small muted">{t("comm.tasks.collect.noSource")}</span>}

@@ -21,6 +21,10 @@ export function TagChip({ tag, onClick, onRemove, removeLabel }: {
 /** The name of a source: a known key is translated, another is shown as it is. */
 export const sourceName = (t: TFunction, key: string) => t(`comm.sources.${key}`, { defaultValue: key });
 
+/** A source in the lists of settings: a mailbox of any provider (source "mail",
+ * FTR.NAB.CMN-0006) is named by its catalog item, others by the source. */
+export const sourceTitle = (t: TFunction, s: { source: string; title?: string }) => (s.source === "mail" && s.title ? s.title : sourceName(t, s.source));
+
 export const sourceIcon = (key: string) => (key === "vkteams" ? "msg" : "mail") as "msg" | "mail";
 
 /** The date of a note: sources that give only the day show no time (tech §3.3). */
