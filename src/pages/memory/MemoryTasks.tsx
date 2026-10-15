@@ -156,7 +156,8 @@ function CollectSettingsForm({ state, value, disabled, onChange }: {
       <div className="kvrow top"><span className="muted">{t("comm.tasks.sources")}</span>
         <span className="stack">
           {state.sources.map((s) => (
-            <Switch key={s.itemId + s.source} on={has(s.itemId, s.source)} disabled={disabled || !s.connected}
+            // a source chosen and then disconnected can still be switched off, or the collection never goes on
+            <Switch key={s.itemId + s.source} on={has(s.itemId, s.source)} disabled={disabled || (!s.connected && !has(s.itemId, s.source))}
               label={<>{sourceTitle(t, s)}{!s.connected && <span className="small muted"> · {t("comm.tasks.notConnected")}</span>}</>}
               onChange={(on) => onChange({ sources: on ? [...value.sources, { itemId: s.itemId, source: s.source }] : value.sources.filter((x) => !(x.itemId === s.itemId && x.source === s.source)) })} />
           ))}
@@ -276,7 +277,7 @@ function CollectSettingsFormSources({ state, value, onChange }: { state: CommSta
     <div className="kvrow top"><span className="muted">{t("comm.tasks.sources")}</span>
       <span className="stack">
         {state.sources.map((s) => (
-          <Switch key={s.itemId + s.source} on={has(s.itemId, s.source)} disabled={!s.connected}
+          <Switch key={s.itemId + s.source} on={has(s.itemId, s.source)} disabled={!s.connected && !has(s.itemId, s.source)}
             label={<>{sourceTitle(t, s)}{!s.connected && <span className="small muted"> · {t("comm.tasks.notConnected")}</span>}</>}
             onChange={(on) => onChange({ sources: on ? [...value.sources, { itemId: s.itemId, source: s.source }] : value.sources.filter((x) => !(x.itemId === s.itemId && x.source === s.source)) })} />
         ))}
