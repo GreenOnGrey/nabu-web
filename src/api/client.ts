@@ -43,11 +43,14 @@ export async function request<T>(method: string, path: string, body?: Body, init
   }
   const text = await res.text();
   const data = text ? safeJSON(text) : undefined;
-  if (!res.ok) {
-    const err = (data as { error?: { code?: string; message?: string; details?: Record<string, unknown> } })?.error;
-    throw new ApiError(res.status, err?.code ?? `http_${res.status}`, err?.message ?? res.statusText, err?.details ?? {});
-  }
+  if (!res.ok) throw apiError(res, data);
   return data as T;
+}
+
+/** The error of an answer: the stable code of the API, or `http_<status>` when the answer has none. */
+function apiError(res: Response, data: unknown): ApiError {
+  const err = (data as { error?: { code?: string; message?: string; details?: Record<string, unknown> } })?.error;
+  return new ApiError(res.status, err?.code ?? `http_${res.status}`, err?.message ?? res.statusText, err?.details ?? {});
 }
 
 function safeJSON(text: string): unknown {
@@ -58,6 +61,21 @@ function safeJSON(text: string): unknown {
   }
 }
 
+/** The content of a file (an attachment for its preview); the session cookie goes with it. */
+async function blob(path: string): Promise<Blob> {
+  let res: Response;
+  try {
+    res = await fetch(apiUrl(path), { credentials: "include" });
+  } catch {
+    throw new ApiError(0, "network", "network error");
+  }
+  if (!res.ok) {
+    const text = await res.text();
+    throw apiError(res, text ? safeJSON(text) : undefined);
+  }
+  return res.blob();
+}
+
 export const api = {
   get: <T>(path: string) => request<T>("GET", path),
   post: <T>(path: string, body?: Body) => request<T>("POST", path, body ?? {}),
@@ -65,6 +83,7 @@ export const api = {
   patch: <T>(path: string, body?: Body) => request<T>("PATCH", path, body ?? {}),
   del: <T>(path: string, body?: Body) => request<T>("DELETE", path, body),
   upload: <T>(path: string, form: FormData) => request<T>("POST", path, form),
+  blob,
 };
 
 export function qs(params: Record<string, string | number | boolean | undefined | null>): string {

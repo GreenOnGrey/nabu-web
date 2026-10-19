@@ -30,6 +30,13 @@ const messages = {
     msg("m1", "user", "Какие требования ещё не покрыты тестами?", { createdAt: T("14:01") }),
     msg("m2", "assistant", "Без тестов остаются три требования:\n\n- **R17** — перечень изменений\n- **R23** — запрет переопределений\n- **R26** — отставание версии\n\n| Требование | Тест |\n|---|---|\n| R17 | `HMR-01` |\n| R23 | `CHK-01` |\n\n```\nnpm run lint\n```", {
       createdAt: T("14:02"), toolSteps: [step("s1", "memory_search", "memory_search — найдено 3 записи"), step("s2", "read", "read — spec.md", "done", "workspace")] }),
+    // FTR.NAB.CHAT-0001 R33, R34: files the agent sent — a thumbnail, tiles of the preview, a download tile
+    msg("m2f", "assistant", "Отчёт, таблица и график — во вложениях.", { createdAt: T("14:03"), attachments: [
+      { id: "fa1", fileName: "chart.png", mimeType: "image/png", size: 68 },
+      { id: "fa2", fileName: "release-notes.md", mimeType: "text/markdown", size: 120 },
+      { id: "fa3", fileName: "metrics.csv", mimeType: "text/csv", size: 90 },
+      { id: "fa4", fileName: "data.zip", mimeType: "application/zip", size: 1204000 },
+    ] }),
     msg("m3", "user", "Напомни завтра в 10 про ревью", { createdAt: T("14:10"), channel: "telegram", attachments: [{ id: "f1", fileName: "план.pdf", mimeType: "application/pdf", size: 1200 }] }),
     msg("m4", "assistant", "Готово: напомню завтра в 10:00.", { createdAt: T("14:10"), channel: "telegram",
       toolSteps: [1, 2, 3, 4, 5].map((n) => step(`t${n}`, "tasks_create", `tasks_create — шаг ${n}`, n === 4 ? "error" : "done")) }),
@@ -121,6 +128,13 @@ function api(url, theme) {
   return { items: [], nextCursor: null };
 }
 
+// the content of the attachments of the history (R34)
+const files_ = {
+  fa1: ["image/png", Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkqH9cDwAE0QH6ziMKDgAAAABJRU5ErkJggg==", "base64")],
+  fa2: ["text/markdown", Buffer.from("# Релиз 1.3\n\n- волна вместо микрофона\n- **предпросмотр** файлов\n")],
+  fa3: ["text/csv", Buffer.from("date,requests,errors\n2026-10-13,1204,0.8\n2026-10-14,1377,0.6\n2026-10-15,1512,1.1\n")],
+};
+
 const MIME = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".png": "image/png", ".jpg": "image/jpeg", ".ico": "image/x-icon", ".map": "application/json" };
 
 http.createServer((req, res) => {
@@ -134,6 +148,13 @@ http.createServer((req, res) => {
   }
   if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/admin/api/")) {
     if (req.method !== "GET") { res.writeHead(204); return res.end(); }
+    const att = /^\/api\/v1\/attachments\/([^/]+)$/.exec(url.pathname);
+    if (att) {
+      const f = files_[att[1]];
+      if (!f) { res.writeHead(404, { "content-type": "application/json" }); return res.end('{"error":{"code":"not_found","message":"attachment not found"}}'); }
+      res.writeHead(200, { "content-type": "application/octet-stream", "x-content-type-options": "nosniff" });
+      return res.end(f[1]);
+    }
     if (url.pathname === "/api/v1/me" && cookie("mock-auth") === "0") { res.writeHead(401, { "content-type": "application/json" }); return res.end('{"error":{"code":"unauthenticated","message":"sign in"}}'); }
     res.writeHead(200, { "content-type": "application/json" });
     return res.end(JSON.stringify(api(url, cookie("mock-theme"))));

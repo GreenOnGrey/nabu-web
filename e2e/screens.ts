@@ -28,6 +28,15 @@ export const SCREENS: Screen[] = [
   { name: "chat-agent-menu", path: "/", act: click("Агент") },
   { name: "chat-new-topic", path: "/", only: "desktop", act: click("Новая тема") },
   { name: "chat-conversations", path: "/", only: "phone", act: click("Разговоры") },
+  // FTR.NAB.CHAT-0001 R34: the preview of a file the agent sent
+  { name: "chat-file-markdown", path: "/", act: async (page) => {
+    await page.getByRole("button", { name: "Открыть release-notes.md" }).click();
+    await page.getByRole("dialog").getByRole("heading", { name: "Релиз 1.3" }).waitFor();
+  } },
+  { name: "chat-file-table", path: "/", act: async (page) => {
+    await page.getByRole("button", { name: "Открыть metrics.csv" }).click();
+    await page.getByRole("dialog").locator("table").waitFor();
+  } },
   { name: "chat-steps-open", path: "/", act: async (page) => { await page.getByRole("button", { name: /ещё \d+ шаг/ }).click(); } },
   { name: "profile-menu", path: "/", act: click("Профиль") },
   { name: "sections", path: "/", only: "phone", act: click("Разделы") },

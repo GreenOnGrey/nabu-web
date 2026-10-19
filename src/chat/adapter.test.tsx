@@ -29,7 +29,7 @@ describe("the adapter of the chat (CHAT-21)", () => {
     const m = msg({ attachments: [{ id: "f1", fileName: "plan.pdf", mimeType: "application/pdf", size: 1 }] });
     const out = toChatMessage(t, m, { conversationId: "main", messageId: "m1", state: "queued", position: 2 });
     expect(out).toMatchObject({ id: "m1", role: "user", text: "Hi", wait: { state: "queued", position: 2 } });
-    expect(out.attachments).toEqual([{ id: "f1", fileName: "plan.pdf", href: "/api/v1/attachments/f1" }]);
+    expect(out.attachments).toEqual([{ id: "f1", fileName: "plan.pdf", mimeType: "application/pdf", size: 1, href: "/api/v1/attachments/f1" }]);
     expect(out.mark).toBeUndefined();
     expect(toChatMessage(t, m, { conversationId: "main", messageId: "other", state: "starting" }).wait).toBeUndefined();
     expect(toChatMessage(t, m, { conversationId: "main", messageId: "m1", state: "starting" }).wait).toEqual({ state: "starting" });
@@ -54,8 +54,9 @@ describe("the adapter of the chat (CHAT-21)", () => {
     expect(out.steps).toEqual([{ id: "s1", text: "github: done", title: "search — done", status: "error" }]);
     expect(out.error?.transient).toBe(true);
     expect(toChatMessage(t, msg({ role: "assistant", status: "failed", errorClass: "auth" }), null).error?.transient).toBe(false);
-    // attachments of an answer are not drawn, as before
-    expect(toChatMessage(t, msg({ role: "assistant" }), null).attachments).toBeUndefined();
+    // FTR.NAB.CHAT-0001 ATT-01: the files the agent sent are drawn under the answer with their type for the preview
+    const sent = msg({ role: "assistant", attachments: [{ id: "f2", fileName: "chart.png", mimeType: "image/png", size: 2048 }] });
+    expect(toChatMessage(t, sent, null).attachments).toEqual([{ id: "f2", fileName: "chart.png", mimeType: "image/png", size: 2048, href: "/api/v1/attachments/f2" }]);
   });
 
   it("lists conversations by group, a mail topic with its icon", () => {

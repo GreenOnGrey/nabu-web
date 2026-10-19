@@ -3,7 +3,7 @@ import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tansta
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { Icon, useToast, type IconName } from "@green-on-grey/ui-kit";
-import { tokens, type ChatCommand, type ChatConfirmation, type ChatConversation, type ChatMark, type ChatMessage, type ChatProps,
+import { tokens, type ChatAttachment, type ChatCommand, type ChatConfirmation, type ChatConversation, type ChatMark, type ChatMessage, type ChatProps,
   type ChatUpload } from "@green-on-grey/ui-kit/chat";
 import { apiUrl } from "../api/base";
 import { api } from "../api/client";
@@ -78,7 +78,7 @@ export function toChatMessage(t: TFunction, m: Message, wait: AgentWait | null, 
     const mail = m.context?.email;
     return {
       ...base, role: "user", text: m.text, mark: userMark(t, m),
-      attachments: m.attachments.map((a) => ({ id: a.id, fileName: a.fileName, href: apiUrl(`/api/v1/attachments/${a.id}`) })),
+      attachments: chatAttachments(m),
       wait: wait?.messageId === m.id ? (wait.state === "queued" ? { state: "queued", position: wait.position ?? 0 } : { state: "starting" }) : undefined,
       content: mail && (
         <div className="mailcard">
@@ -100,9 +100,21 @@ export function toChatMessage(t: TFunction, m: Message, wait: AgentWait | null, 
     steps: (m.toolSteps ?? []).map((s) => ({ id: s.id, text: stepText(t, s), title: s.summary, status: s.status })),
     // FTR.NAB.CMN-0003 tech §3.5: the digest of commitments is drawn instead of the text
     content: digest && m.card ? <DigestCardView card={m.card} /> : undefined,
+    // FTR.NAB.CHAT-0001 R33: the files the agent sent
+    attachments: chatAttachments(m),
     error: m.status === "failed" && m.errorClass ? { text: llmErrorText(t, m.errorClass), transient: transientLLMError(m.errorClass) } : undefined,
   };
 }
+
+/** The files of a message with their type and size: the kit chooses the preview by them (R34). */
+function chatAttachments(m: Message): ChatAttachment[] {
+  return (m.attachments ?? []).map((a) => ({ id: a.id, fileName: a.fileName, mimeType: a.mimeType, size: a.size, href: apiUrl(attachmentPath(a.id)) }));
+}
+
+const attachmentPath = (id: string) => `/api/v1/attachments/${id}`;
+
+/** Loads a file of a message for the preview with the session of the user (FTR.NAB.CHAT-0001 R34). */
+export const loadAttachment = (a: ChatAttachment) => api.blob(attachmentPath(a.id));
 
 /** A conversation of the API as a row of the list of the kit. */
 export function toChatConversation(t: TFunction, c: Conversation, locale: string): ChatConversation {
@@ -222,7 +234,7 @@ function useCommands(conv: Conversation) {
  * window of the model of the agent: the size of an empty context. */
 export function useConversation(conv: Conversation, modelWindow = 0): Pick<ChatProps,
   "messages" | "loading" | "hasOlder" | "loadingOlder" | "busy" | "confirmations" | "upload"
-  | "onSend" | "onLoadOlder" | "onRetry" | "onConfirm" | "onUpload" | "onTranscribe"
+  | "onSend" | "onLoadOlder" | "onRetry" | "onConfirm" | "onUpload" | "onTranscribe" | "loadAttachment"
   | "commands" | "onCommand" | "context" | "onCompact" | "onReset" | "voiceMaxSeconds" | "onPendingChange"> & {
   unarchive: () => void;
   /** Images are attached to the message being written (R11). */
@@ -385,6 +397,7 @@ export function useConversation(conv: Conversation, modelWindow = 0): Pick<ChatP
         return null;
       }
     },
+    loadAttachment,
     // the voice input exists where the deployment has a recognizer; a failure is a toast of the kit
     // with «Retry» on the same recording (design §3.1)
     onTranscribe: config.voice ? async (recording) => {

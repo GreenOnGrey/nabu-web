@@ -377,7 +377,7 @@ function EditModels({ conn, onClose }: { conn: ModelConnection; onClose: () => v
   });
   const toggle = (id: string) => setPicked((cur) => { const next = new Set(cur); if (!next.delete(id)) next.add(id); return next; });
   return (
-    <Modal title={`${t("admin.models.editModels")} — ${conn.name}`} onClose={onClose} footer={<>
+    <Modal wide title={`${t("admin.models.editModels")} — ${conn.name}`} onClose={onClose} footer={<>
       <button className="btn ghost" onClick={onClose}>{t("common.cancel")}</button>
       <button className="btn primary" disabled={!ids.length || save.isPending} onClick={() => save.mutate()}>{t("common.save")}</button>
     </>}>
