@@ -146,7 +146,9 @@
       "workspace_not_connected": "El espacio de trabajo no se conectó.",
       "limit_exceeded": "La ejecución superó sus límites.",
       "no_capacity": "No hay capacidad libre para el agente.",
-      "no_models_granted": "No tiene ningún modelo disponible: consulte a un administrador."
+      "no_models_granted": "No tiene ningún modelo disponible: consulte a un administrador.",
+      "skill_unavailable": "La habilidad no está disponible en esta conversación: elíjala de nuevo en la lista.",
+      "context_too_short": "El contexto ya es corto."
     }
   },
   "tasks": {

@@ -252,7 +252,7 @@ function Members({ group }: { group: UserGroup }) {
   const [q, setQ] = useState("");
   const [find, setFind] = useState("");
   const key = ["admin", "group-members", group.id, q];
-  const members = useQuery({ queryKey: key, queryFn: () => api.get<{ items: GroupMember[] }>(`/admin/api/v1/groups/${group.id}/members?q=${encodeURIComponent(q)}`) });
+  const members = useQuery({ queryKey: key, queryFn: () => api.get<{ items: GroupMember[] }>(`/admin/api/v1/groups/${group.id}/members?limit=200&q=${encodeURIComponent(q)}`) });
   const users = useQuery({
     queryKey: ["admin", "users", "find", find], enabled: !group.builtin && find.trim().length >= 2,
     queryFn: () => api.get<{ items: AdminUser[] }>(`/admin/api/v1/users?q=${encodeURIComponent(find)}&limit=10`),

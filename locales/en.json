@@ -146,7 +146,9 @@
       "workspace_not_connected": "The workspace did not connect.",
       "limit_exceeded": "The run exceeded its limits.",
       "no_capacity": "No free capacity for the agent.",
-      "no_models_granted": "No model is available to you — ask an administrator."
+      "no_models_granted": "No model is available to you — ask an administrator.",
+      "skill_unavailable": "The skill is not available in this conversation — pick it again from the list.",
+      "context_too_short": "The context is already short."
     }
   },
   "tasks": {

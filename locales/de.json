@@ -146,7 +146,9 @@
       "workspace_not_connected": "Der Arbeitsbereich hat sich nicht verbunden.",
       "limit_exceeded": "Der Lauf hat seine Limits überschritten.",
       "no_capacity": "Keine freie Kapazität für den Agenten.",
-      "no_models_granted": "Ihnen ist kein Modell freigegeben — wenden Sie sich an einen Administrator."
+      "no_models_granted": "Ihnen ist kein Modell freigegeben — wenden Sie sich an einen Administrator.",
+      "skill_unavailable": "Der Skill ist in diesem Gespräch nicht verfügbar — wählen Sie ihn erneut aus der Liste.",
+      "context_too_short": "Der Kontext ist bereits kurz."
     }
   },
   "tasks": {

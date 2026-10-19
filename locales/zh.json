@@ -146,7 +146,9 @@
       "workspace_not_connected": "工作空间未连接。",
       "limit_exceeded": "运行超出了限制。",
       "no_capacity": "代理没有空闲容量。",
-      "no_models_granted": "您没有可用的模型——请联系管理员。"
+      "no_models_granted": "您没有可用的模型——请联系管理员。",
+      "skill_unavailable": "此对话中该技能不可用——请从列表中重新选择。",
+      "context_too_short": "上下文已经很短。"
     }
   },
   "tasks": {
