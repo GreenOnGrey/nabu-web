@@ -231,6 +231,16 @@ table.comm-t td:nth-child(1),table.comm-t td:nth-child(2){display:inline-block;w
 .mcap.err{background:var(--red-soft);color:var(--red)}
 .mcap.warn{background:var(--amber-soft);color:var(--amber)}
 .models-t{margin:6px 0}
+/* the table of a connection's card: a long id with aliases breaks anywhere; on a phone the cells of a model stand
+   one under another — the model, its capabilities, its price, the result of the check */
+.models-t .mt-id{overflow-wrap:anywhere}
+@media (max-width:900px){
+  .models-t:not(.models-edit),.models-t:not(.models-edit) tbody{display:block}
+  .models-t:not(.models-edit) tr{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;padding:8px 0;border-bottom:1px solid var(--border)}
+  .models-t:not(.models-edit) td{display:block;padding:0;border:0}
+  .models-t:not(.models-edit) td.mt-model{flex:1 1 100%;min-width:0}
+  .models-t:not(.models-edit) td:empty{display:none}
+}
 .caps-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 18px;padding:4px 0 8px}
 .caps-grid .src{font-size:11px;color:var(--muted);margin-top:2px}
 /* design §3.4: the table of models in the narrow dialog — the model, its price, the unfolding */

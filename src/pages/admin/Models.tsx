@@ -120,7 +120,7 @@ function ModelRows({ conn, check, onSwitchOff }: { conn: ModelConnection; check?
           const r = result(m.id);
           return (
             <tr key={m.id}>
-              <td><b>{m.name || m.id}</b><div className="mono small muted">{m.id}{m.aliases?.length ? ` · ${m.aliases.join(", ")}` : ""}</div></td>
+              <td className="mt-model"><b>{m.name || m.id}</b><div className="mono small muted mt-id">{m.id}{m.aliases?.length ? ` · ${m.aliases.join(", ")}` : ""}</div></td>
               <td><ModelCaps m={m} /></td>
               <td className="small muted">{price(m)}</td>
               <td className="small">
