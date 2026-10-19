@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Icon, Loading, Menu } from "@green-on-grey/ui-kit";
+import { Icon, Loading } from "@green-on-grey/ui-kit";
 import { AgentButton, Chat, ChatLayout, ConversationList } from "@green-on-grey/ui-kit/chat";
 import { ApiError } from "../api/client";
 import { useAgent } from "../api/queries";
@@ -51,17 +51,11 @@ function ConversationView({ conv, onMenu }: { conv: Conversation; onMenu: () => 
   const { data: agent } = useAgent();
   const patchAgent = useAgentPatch();
   const [agentMenu, setAgentMenu] = useState(false);
-  const [convMenu, setConvMenu] = useState(false);
   const closeAgentMenu = useCallback(() => setAgentMenu(false), []);
-  const closeConvMenu = useCallback(() => setConvMenu(false), []);
-  const { unarchive, pendingImages, busyTurn, ...chat } = useConversation(conv, agent?.model?.caps.contextWindow);
+  const { unarchive, pendingImages, ...chat } = useConversation(conv, agent?.model?.caps.contextWindow);
   // FTR.NAB.CHAT-0001 R11: the model does not see images — say so and offer one that does
   const imagesUnseen = unseenImages(agent, pendingImages);
   const seeingModel = imagesUnseen?.seeing;
-  const run = (press: (() => void) | undefined) => {
-    setConvMenu(false);
-    press?.();
-  };
   return (
     <Chat {...chat} agentName={agent?.name ?? "Nabu"} emptyHint={t("chat.emptyHint")}
       aboveComposer={imagesUnseen ? (
@@ -99,21 +93,6 @@ function ConversationView({ conv, onMenu }: { conv: Conversation; onMenu: () => 
             </div>
             <span className="spacer" />
             <span className="small muted hide-m">{conv.kind === "main" ? t("chat.mainHint") : <>{conv.source === "email" && <Icon name="mail" size={13} />} {conv.title}</>}</span>
-            {conv.archivedAt === null && (
-              <span style={{ position: "relative" }}>
-                <button className="iconbtn" aria-label={t("chat.convMenu")} aria-expanded={convMenu} onClick={() => setConvMenu((v) => !v)}><Icon name="dots" /></button>
-                {convMenu && (
-                  <Menu onClose={closeConvMenu} label={t("chat.convMenu")} className="conv-menu">
-                    <button className="action" disabled={busyTurn} title={busyTurn ? t("chat.waitTurn") : undefined} onClick={() => run(chat.onReset)}>
-                      <Icon name="undo" size={14} />{t("chat.cmd.new")}
-                    </button>
-                    <button className="action" disabled={busyTurn} title={busyTurn ? t("chat.waitTurn") : undefined} onClick={() => run(chat.onCompact)}>
-                      <Icon name="compress" size={14} />{t("chat.cmd.compact")}
-                    </button>
-                  </Menu>
-                )}
-              </span>
-            )}
           </div>
           {agentMenu && agent && <AgentMenu agent={agent} onClose={closeAgentMenu} />}
         </>

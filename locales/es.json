@@ -127,8 +127,6 @@
     "compactFailed": "El contexto no se compactó",
     "imageNotSeen": "{model} no ve imágenes: el agente recibirá un archivo en el espacio",
     "switchTo": "Cambiar a {model}",
-    "convMenu": "Menú de la conversación",
-    "waitTurn": "Espere la respuesta",
     "resetFailed": "No se pudo restablecer el contexto"
   },
   "llm": {

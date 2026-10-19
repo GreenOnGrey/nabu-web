@@ -127,8 +127,6 @@
     "compactFailed": "上下文未压缩",
     "imageNotSeen": "{model} 无法查看图片：代理将在空间中获得文件",
     "switchTo": "切换到 {model}",
-    "convMenu": "对话菜单",
-    "waitTurn": "请等待回答",
     "resetFailed": "无法重置上下文"
   },
   "llm": {

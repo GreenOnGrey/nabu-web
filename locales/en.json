@@ -127,8 +127,6 @@
     "compactFailed": "The context was not compacted",
     "imageNotSeen": "{model} cannot see images: the agent gets a file in the space",
     "switchTo": "Switch to {model}",
-    "convMenu": "Conversation menu",
-    "waitTurn": "Wait for the answer",
     "resetFailed": "Could not reset the context"
   },
   "llm": {

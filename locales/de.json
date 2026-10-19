@@ -127,8 +127,6 @@
     "compactFailed": "Der Kontext wurde nicht komprimiert",
     "imageNotSeen": "{model} sieht keine Bilder: der Agent erhält eine Datei im Arbeitsbereich",
     "switchTo": "Zu {model} wechseln",
-    "convMenu": "Gesprächsmenü",
-    "waitTurn": "Warten Sie auf die Antwort",
     "resetFailed": "Der Kontext konnte nicht zurückgesetzt werden"
   },
   "llm": {

@@ -239,8 +239,6 @@ export function useConversation(conv: Conversation, modelWindow = 0): Pick<ChatP
   unarchive: () => void;
   /** Images are attached to the message being written (R11). */
   pendingImages: boolean;
-  /** A turn is being written: the commands wait for it. */
-  busyTurn: boolean;
 } {
   const { t, i18n } = useTranslation();
   const { config } = useSession();
@@ -354,7 +352,7 @@ export function useConversation(conv: Conversation, modelWindow = 0): Pick<ChatP
   });
 
   return {
-    messages, confirmations, busy, busyTurn: busy || streaming,
+    messages, confirmations, busy,
     ...commands, pendingImages, onPendingChange, context,
     voiceMaxSeconds: config.voiceMaxSeconds || 300,
     loading: history.isLoading,

@@ -224,7 +224,6 @@ table.comm-t td:nth-child(1),table.comm-t td:nth-child(2){display:inline-block;w
 /* FTR.NAB.CHAT-0001 R11: the model does not see the attached images */
 .img-warn{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 10px 0;padding:8px 10px;border-radius:var(--r-m);background:var(--amber-soft);color:var(--amber);font-size:13px}
 .img-warn .push{margin-left:auto}
-.conv-menu{position:absolute;right:0;top:calc(100% + 4px);z-index:20;min-width:240px}
 /* FTR.NAB.CHAT-0001 design §3.4: the models of a connection and their capabilities */
 .caps{display:inline-flex;gap:4px;flex-wrap:wrap}
 .mcap{display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:1px 7px;border-radius:999px;background:var(--surface-2);color:var(--text-2);white-space:nowrap}
