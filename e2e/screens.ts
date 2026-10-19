@@ -40,10 +40,22 @@ export const SCREENS: Screen[] = [
   { name: "chat-steps-open", path: "/", act: async (page) => { await page.getByRole("button", { name: /ещё \d+ шаг/ }).click(); } },
   { name: "profile-menu", path: "/", act: click("Профиль") },
   { name: "sections", path: "/", only: "phone", act: click("Разделы") },
+  // FTR.NAB.CMN-0005 design §4: in the administration the burger holds its sections
+  { name: "admin-sections", path: "/admin/audit", only: "phone", act: click("Разделы") },
   { name: "memory", path: "/memory" },
   { name: "memory-add", path: "/memory", act: async (page) => { await page.locator(".btn.primary.sm").first().click(); } },
   { name: "tasks", path: "/tasks" },
   { name: "space", path: "/space" },
+  // FTR.NAB.CHAT-0001 R34: a file of the space opens in the preview
+  { name: "space-preview", path: "/space", act: async (page) => {
+    // ATT-21: the button stands before «Download»; a file without a preview has none
+    const row = page.getByRole("row", { name: /notes\/план\.md/ });
+    const buttons = await row.locator(".file-actions > *").evaluateAll((els) => els.map((e) => e.getAttribute("aria-label") ?? e.textContent?.trim()));
+    if (buttons[0] !== "Просмотреть notes/план.md" || buttons[1] !== "Скачать") throw new Error(`ATT-21: the actions are ${buttons.join(", ")}`);
+    if (await page.getByRole("button", { name: "Просмотреть backup/archive.zip" }).count()) throw new Error("ATT-21: an archive has a preview");
+    await page.getByRole("button", { name: "Просмотреть notes/план.md" }).click();
+    await page.getByRole("dialog").getByRole("heading", { name: "План" }).waitFor();
+  } },
   { name: "connections", path: "/connections" },
   { name: "admin", path: "/admin" },
   ...ADMIN.map((s) => ({ name: `admin-${s}`, path: `/admin/${s}` })),

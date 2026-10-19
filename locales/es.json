@@ -243,7 +243,8 @@
     "byUser": "por usted",
     "empty": "Aún no hay archivos",
     "emptyHint": "Aquí aparecen los archivos que crea el agente y los que usted sube.",
-    "linked": "El archivo del correo:"
+    "linked": "El archivo del correo:",
+    "preview": "Vista previa de {name}"
   },
   "connections": {
     "title": "Conexiones",

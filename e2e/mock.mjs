@@ -58,7 +58,8 @@ const tasks = [{ id: "k1", title: "Утренняя сводка", instruction: 
 const memories = [{ id: "y1", text: "Предпочитает краткие ответы.", source: "agent", pinned: true, createdAt: T("09:00", "02"), updatedAt: T("09:00", "02") },
   { id: "y2", text: "Работает в часовом поясе Москвы.", source: "user", pinned: false, createdAt: T("09:00", "03"), updatedAt: T("09:00", "03") }];
 const space = { state: "running", usedBytes: 1200000, quotaBytes: 100000000, files: 2, lastActivityAt: T("13:00"), enabled: true };
-const files = [{ path: "notes/план.md", size: 2048, sha256: "ab12", modifiedAt: T("13:00"), modifiedBy: "agent" }, { path: "счёт.pdf", size: 120000, sha256: "cd34", modifiedAt: T("08:40"), modifiedBy: "user" }];
+const files = [{ path: "notes/план.md", size: 2048, sha256: "ab12", modifiedAt: T("13:00"), modifiedBy: "agent" }, { path: "счёт.pdf", size: 120000, sha256: "cd34", modifiedAt: T("08:40"), modifiedBy: "user" },
+  { path: "backup/archive.zip", size: 1204000, sha256: "ef56", modifiedAt: T("08:00"), modifiedBy: "agent" }];
 const catalog = [{ id: "i1", type: "mcp", name: "github", title: "GitHub", description: "Задачи и запросы на изменение.", mode: "personal", authKind: "oauth", readOnly: false, status: "available", connected: true, connectedAt: T("09:00", "02"), inDevelopment: false },
   { id: "i2", type: "skill", name: "summary", title: "Сводка", description: "Краткое изложение длинных текстов.", mode: "platform", readOnly: true, status: "available", connected: false, connectedAt: null, inDevelopment: false }];
 const users = [{ id: "u1", email: "ada@example.com", name: "Ада Лавлейс", isAdmin: true, status: "active", lastSeenAt: T("14:00"), createdAt: T("09:00", "01"), channels: ["telegram"] },
@@ -154,6 +155,10 @@ http.createServer((req, res) => {
       if (!f) { res.writeHead(404, { "content-type": "application/json" }); return res.end('{"error":{"code":"not_found","message":"attachment not found"}}'); }
       res.writeHead(200, { "content-type": "application/octet-stream", "x-content-type-options": "nosniff" });
       return res.end(f[1]);
+    }
+    if (url.pathname === "/api/v1/space/files/content") {
+      res.writeHead(200, { "content-type": "application/octet-stream", "x-content-type-options": "nosniff" });
+      return res.end(url.searchParams.get("path") === "notes/план.md" ? "# План\n\n- ревью спецификации\n- **релиз** в пятницу\n" : "");
     }
     if (url.pathname === "/api/v1/me" && cookie("mock-auth") === "0") { res.writeHead(401, { "content-type": "application/json" }); return res.end('{"error":{"code":"unauthenticated","message":"sign in"}}'); }
     res.writeHead(200, { "content-type": "application/json" });

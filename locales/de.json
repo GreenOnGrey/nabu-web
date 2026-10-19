@@ -243,7 +243,8 @@
     "byUser": "von Ihnen",
     "empty": "Noch keine Dateien",
     "emptyHint": "Hier erscheinen Dateien, die der Agent erstellt oder die Sie hochladen.",
-    "linked": "Die Datei aus der E-Mail:"
+    "linked": "Die Datei aus der E-Mail:",
+    "preview": "Vorschau: {name}"
   },
   "connections": {
     "title": "Verbindungen",

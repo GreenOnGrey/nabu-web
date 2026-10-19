@@ -243,7 +243,8 @@
     "byUser": "由你",
     "empty": "暂无文件",
     "emptyHint": "智能体创建的文件和你上传的文件会显示在这里。",
-    "linked": "邮件中的文件："
+    "linked": "邮件中的文件：",
+    "preview": "预览 {name}"
   },
   "connections": {
     "title": "连接",

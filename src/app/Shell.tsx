@@ -1,6 +1,8 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Avatar, TopBar, type LinkComponent } from "@green-on-grey/ui-kit";
+import { AdminNav } from "../pages/admin/nav";
+import { isAdminPath } from "../pages/admin/paths";
 import { ProfileMenu } from "./ProfileMenu";
 import { useSession } from "./session";
 
@@ -20,6 +22,9 @@ const RouterLink: LinkComponent = ({ href, ...rest }) => <Link to={href} {...res
 
 const profileMenu = (close: () => void) => <ProfileMenu onClose={close} />;
 
+// FTR.NAB.CMN-0005 design §4: in the administration the burger of a phone holds its sections
+const adminNav = (close: () => void) => <AdminNav onPick={close} />;
+
 export function Shell() {
   const { t } = useTranslation();
   const { me } = useSession();
@@ -28,7 +33,8 @@ export function Shell() {
     <div className="app">
       <TopBar logo="/logo.jpg" name="Nabu" Link={RouterLink} profileMenu={profileMenu}
         sections={SECTIONS.map((s) => ({ key: s.key, label: t(`nav.${s.key}`), href: s.to, active: s.match(location.pathname) }))}
-        avatar={<Avatar name={me.name || me.email} url={me.avatarUrl} />} />
+        avatar={<Avatar name={me.name || me.email} url={me.avatarUrl} />}
+        menu={me.isAdmin && isAdminPath(location.pathname) ? { label: t("admin.title"), render: adminNav } : undefined} />
       <div className="nbody">
         <Outlet />
       </div>

@@ -243,7 +243,8 @@
     "byUser": "by you",
     "empty": "No files yet",
     "emptyHint": "Files the agent creates and files you upload appear here.",
-    "linked": "The file from the letter:"
+    "linked": "The file from the letter:",
+    "preview": "Preview {name}"
   },
   "connections": {
     "title": "Connections",

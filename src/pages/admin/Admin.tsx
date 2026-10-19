@@ -1,7 +1,8 @@
-import { Navigate, NavLink, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useSession } from "../../app/session";
-import { Empty, Icon } from "@green-on-grey/ui-kit";
+import { Empty } from "@green-on-grey/ui-kit";
+import { AdminNav } from "./nav";
 import { adminPath } from "./paths";
 import { UsersAdmin } from "./Users";
 import { GroupsAdmin } from "./Groups";
@@ -17,21 +18,6 @@ import { AgentPodsAdmin } from "./AgentPods";
 import { SettingsAdmin } from "./Settings";
 import { CommAdmin } from "./Comm";
 
-const SECTIONS = [
-  { path: "users", icon: "users" },
-  { path: "groups", icon: "lock" },
-  { path: "channels", icon: "msg" },
-  { path: "agent-pods", icon: "bolt" },
-  { path: "group-agents", icon: "grid" },
-  { path: "service-agents", icon: "spark" },
-  { path: "models", icon: "cpu" },
-  { path: "catalog", icon: "plug" },
-  { path: "comm", icon: "brain" },
-  { path: "clients", icon: "server" },
-  { path: "usage", icon: "chart" },
-  { path: "audit", icon: "shield" },
-  { path: "settings", icon: "gear" },
-] as const;
 
 /** The administration panel (R33–R34, design §2): for platform administrators only. */
 export function AdminPage() {
@@ -42,12 +28,8 @@ export function AdminPage() {
   }
   return (
     <div className="admin nb-adm">
-      <nav className="side" aria-label={t("admin.title")}>
-        <div className="lab">{t("admin.title")}</div>
-        {SECTIONS.map((s) => (
-          <NavLink key={s.path} to={adminPath(s.path)}><Icon name={s.icon} />{t(`admin.${s.path}.title`)}</NavLink>
-        ))}
-      </nav>
+      {/* on a phone the sections are behind the burger of the top bar (Shell) */}
+      <AdminNav inBurger />
       <main className="main nb-adm-main">
         <Routes>
           <Route index element={<Navigate to={adminPath("users")} replace />} />
