@@ -16,7 +16,7 @@ const click = (name: string) => async (page: Page) => {
   await page.getByRole("button", { name, exact: true }).first().click();
 };
 
-const ADMIN = ["users", "channels", "group-agents", "agent-pods", "models", "harness", "catalog", "service-agents", "comm", "clients", "usage", "audit", "settings"];
+const ADMIN = ["users", "channels", "group-agents", "agent-pods", "models", "groups", "catalog", "service-agents", "comm", "clients", "usage", "audit", "settings"];
 
 export const SCREENS: Screen[] = [
   { name: "login", path: "/login", visitor: true },
@@ -46,4 +46,6 @@ export const SCREENS: Screen[] = [
     await page.getByRole("button", { name: /^Аргументы/ }).first().click();
   } },
   { name: "admin-catalog-new", path: "/admin/catalog", act: click("Добавить MCP") },
+  // FTR.NAB.CMN-0007 design §3.2: the card of an ordinary group
+  { name: "admin-groups-card", path: "/admin/groups", act: async (page) => { await page.getByText("Продажи", { exact: true }).click(); } },
 ];

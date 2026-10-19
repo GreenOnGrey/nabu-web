@@ -4,35 +4,31 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { adminPath } from "./paths";
 import { Icon, Modal, Switch, useToast } from "@green-on-grey/ui-kit";
-import { tokens } from "@green-on-grey/ui-kit/chat";
-import { api } from "../../api/client";
-import type { CapsPatch, CheckResult, Choice, ConnectionType, ModelConnection, ModelDef, ModelRef, PersonalModels } from "../../api/types";
+import { api, ApiError } from "../../api/client";
+import { adminKeys, useModelConnections } from "../../api/queries";
+import type { CapsPatch, CheckResult, Choice, ConnectionType, ModelConnection, ModelConnectionList, ModelDef, ModelRef, PersonalModels } from "../../api/types";
 import { errorText } from "../../lib/errors";
+import { dateTime } from "../../lib/format";
+import { intlLocale } from "../../lib/i18n";
 import { llmErrorText } from "../../lib/llm";
-
-interface ConnList {
-  items: ModelConnection[];
-  types: { type: ConnectionType; baseUrl?: string; models?: ModelDef[]; scopes?: string[]; defaultScope?: string; endpoints?: Record<string, string> }[];
-}
+import { choiceKey, modelIds, usableModel } from "../../lib/models";
+import { ModelCaps } from "./ModelCaps";
 
 const TYPES: ConnectionType[] = ["deepseek", "gigachat", "zai", "openai_compatible"];
-
-/** A model a personal agent can run on (FTR.NAB.CHAT-0001 R8). */
-const usable = (m: ModelDef) => m.tools !== false && !m.embeddings && !m.gone;
 
 /** Model connections (R19, R21; FTR.NAB.CHAT-0001 R7–R15, design §3.4): the
  * type, the key, the models with their capabilities, the check with probes,
  * the refresh of the list; the default and available models of personal agents. */
 export function ModelsAdmin() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const qc = useQueryClient();
   const toast = useToast();
   const [adding, setAdding] = useState(false);
   const [keyFor, setKeyFor] = useState<ModelConnection | null>(null);
   const [modelsFor, setModelsFor] = useState<ModelConnection | null>(null);
   const [checks, setChecks] = useState<Record<string, CheckResult>>({});
-  const conns = useQuery({ queryKey: ["admin", "connections"], queryFn: () => api.get<ConnList>("/admin/api/v1/model-connections") });
-  const inv = () => qc.invalidateQueries({ queryKey: ["admin", "connections"] });
+  const conns = useModelConnections();
+  const inv = () => qc.invalidateQueries({ queryKey: adminKeys.connections });
   const fail = (e: unknown) => toast({ kind: "error", title: errorText(t, e) });
   const check = useMutation({
     mutationFn: (id: string) => api.post<CheckResult>(`/admin/api/v1/model-connections/${id}/check`),
@@ -81,7 +77,7 @@ export function ModelsAdmin() {
           <div className="small t2">
             {c.baseUrl} · {t("admin.models.key")} …{c.keyLast4}
             {c.options.scope && <> · {c.options.scope}</>}
-            {c.refreshedAt && <> · {t("admin.models.refreshedAt", { when: new Date(c.refreshedAt).toLocaleString() })}</>}
+            {c.refreshedAt && <> · {t("admin.models.refreshedAt", { when: dateTime(c.refreshedAt, intlLocale(i18n.language)) })}</>}
           </div>
           <ModelRows conn={c} check={checks[c.id]} onSwitchOff={(m, cap) => switchOff(c, m, cap)} />
           {c.discovered.length > 0 && (
@@ -111,22 +107,6 @@ export function ModelsAdmin() {
   );
 }
 
-/** The capabilities of a model as chips (R8). */
-function Caps({ m }: { m: ModelDef }) {
-  const { t, i18n } = useTranslation();
-  return (
-    <span className="caps">
-      {m.embeddings ? <span className="mcap">{t("models.cap.embeddings")}</span> : <>
-        {m.input?.includes("image") && <span className="mcap"><Icon name="image" size={11} />{t("models.cap.image")}</span>}
-        {m.reasoning && <span className="mcap"><Icon name="brain" size={11} />{t("models.cap.reasoning")}</span>}
-        {m.tools === false && <span className="mcap err">{t("models.cap.noTools")}</span>}
-      </>}
-      <span className="mcap">{tokens(m.contextWindow, i18n.language)}</span>
-      {m.gone && <span className="mcap warn">{t("admin.models.gone")}</span>}
-    </span>
-  );
-}
-
 const price = (m: ModelDef) => (m.cost && (m.cost.input || m.cost.output) ? `${m.cost.input} / ${m.cost.output}` : "—");
 
 /** The models of a connection with the results of the last check. */
@@ -141,11 +121,11 @@ function ModelRows({ conn, check, onSwitchOff }: { conn: ModelConnection; check?
           return (
             <tr key={m.id}>
               <td><b>{m.name || m.id}</b><div className="mono small muted">{m.id}{m.aliases?.length ? ` · ${m.aliases.join(", ")}` : ""}</div></td>
-              <td><Caps m={m} /></td>
+              <td><ModelCaps m={m} /></td>
               <td className="small muted">{price(m)}</td>
               <td className="small">
-                {r && (r.ok ? <span className="ok-t">✓ {r.embeddings ? t("admin.models.embeddingsModel") : `${r.latencyMs ?? ""} ms`}</span>
-                  : <span className="err-t">✗ {llmErrorText(t, r.errorClass ?? "bad_request")}</span>)}
+                {r && (r.ok ? <span className="ok-t"><Icon name="check" size={13} /> {r.embeddings ? t("admin.models.embeddingsModel") : t("admin.models.latency", { ms: r.latencyMs ?? 0 })}</span>
+                  : <span className="err-t"><Icon name="alert" size={13} /> {llmErrorText(t, r.errorClass ?? "bad_request")}</span>)}
                 {r?.caps && Object.entries(r.caps).filter(([, v]) => v !== "skipped").map(([cap, v]) => (
                   <div key={cap}>
                     {t(`admin.models.probe.${cap}`)}: {v === "confirmed" ? <span className="ok-t">{t("admin.models.confirmed")}</span>
@@ -174,67 +154,78 @@ function ModelTable({ models, picked, edits, onToggle, onEdit }: {
   const [open, setOpen] = useState<string | null>(null);
   const [q, setQ] = useState("");
   const shown = models.filter((m) => !q || (m.name ?? m.id).toLowerCase().includes(q.toLowerCase()) || m.id.toLowerCase().includes(q.toLowerCase()));
-  const src = (m: ModelDef, f: string) => {
-    const e = edits[m.id];
-    const manual = e && (f in e) && !(e.reset ?? []).includes(f);
-    return t(`models.src.${manual ? "manual" : (m.sources?.[f] ?? "default")}`);
+  // design §3.4: a field the administrator changed is «manual» with «Reset»
+  const manual = (m: ModelDef, f: keyof CapsPatch) => {
+    const e = edits[m.id] ?? {};
+    if (f in e) return true;
+    return (m.overrides ?? []).includes(f) && !(e.reset ?? []).includes(f);
   };
+  const reset = (m: ModelDef, f: keyof CapsPatch) => {
+    const rest: CapsPatch = { ...edits[m.id] };
+    delete rest[f];
+    onEdit(m.id, (m.overrides ?? []).includes(f) ? { ...rest, reset: [...new Set([...(rest.reset ?? []), f])] } : rest);
+  };
+  const src = (m: ModelDef, f: keyof CapsPatch) => (
+    <div className="src">
+      {t(`models.src.${manual(m, f) ? "manual" : (m.sources?.[f] ?? "default")}`)}
+      {manual(m, f) && <> · <button className="textbtn" onClick={() => reset(m, f)}>{t("admin.models.resetField")}</button></>}
+    </div>
+  );
   return (
     <>
-      {models.length > 8 && <input className="inp" style={{ marginBottom: 8 }} placeholder={t("common.search")} value={q} onChange={(e) => setQ(e.target.value)} />}
-      <table className="t models-t">
+      {models.length > 8 && <input className="inp" style={{ marginBottom: 8 }} placeholder={t("common.search")} aria-label={t("common.search")} value={q} onChange={(e) => setQ(e.target.value)} />}
+      <table className="t models-t models-edit">
         <tbody>
           {shown.map((m) => {
             const e = edits[m.id] ?? {};
-            const disabled = !usable(m) && !m.embeddings && !picked.has(m.id);
+            const disabled = !usableModel(m) && !m.embeddings && !picked.has(m.id);
             return (
               <Fragment key={m.id}>
                 <tr>
-                  <td style={{ width: 28 }}><input type="checkbox" checked={picked.has(m.id)} disabled={disabled} onChange={() => onToggle(m.id)} aria-label={m.id} /></td>
-                  <td><b>{m.name || m.id}</b><div className="mono small muted">{m.id}</div></td>
-                  <td><Caps m={m} /></td>
-                  <td className="small muted">{price(m)}</td>
-                  <td><button className="textbtn" aria-expanded={open === m.id} onClick={() => setOpen(open === m.id ? null : m.id)}>{open === m.id ? "▴" : "▾"}</button></td>
+                  <td className="mt-tick"><input type="checkbox" checked={picked.has(m.id)} disabled={disabled} onChange={() => onToggle(m.id)} aria-label={m.id} /></td>
+                  {/* the name, the id and the capabilities in one cell: the dialog is narrow */}
+                  <td className="mt-model"><b>{m.name || m.id}</b><div className="mono small muted mt-id" title={m.id}>{m.id}</div><ModelCaps m={m} /></td>
+                  <td className="small muted mt-price">{price(m)}</td>
+                  <td className="mt-fold"><button className="textbtn" aria-expanded={open === m.id} aria-label={t(open === m.id ? "admin.models.fold" : "admin.models.unfold", { model: m.name || m.id })}
+                    onClick={() => setOpen(open === m.id ? null : m.id)}>{open === m.id ? "▴" : "▾"}</button></td>
                 </tr>
                 {open === m.id && (
                   <tr className="xp">
                     <td />
-                    <td colSpan={4}>
+                    <td colSpan={3}>
                       <div className="caps-grid">
                         {(["image", "tools", "reasoning"] as const).map((f) => {
                           const cur = f === "image" ? m.input?.includes("image") : f === "tools" ? m.tools !== false : m.reasoning;
                           const v = e[f] ?? cur;
                           return (
                             <div key={f}>
-                              <div className="small muted">{t(`admin.models.cap.${f}`)}</div>
-                              <Switch on={!!v} onChange={(x) => onEdit(m.id, { ...e, [f]: x })} label={t(`admin.models.cap.${f}`)} />
-                              <div className="src">{src(m, f)}</div>
+                              {/* the caption is the label of the switch: it is not repeated beside it */}
+                              <label className="cap-sw"><span className="small muted">{t(`admin.models.cap.${f}`)}</span>
+                                <Switch on={!!v} onChange={(x) => onEdit(m.id, { ...e, [f]: x })} /></label>
+                              {src(m, f)}
                             </div>
                           );
                         })}
                         {(["contextWindow", "maxTokens"] as const).map((f) => (
                           <div key={f}>
-                            <div className="small muted">{t(`admin.models.cap.${f}`)}</div>
-                            <input className="inp" type="number" min={0} style={{ width: 120 }} value={e[f] ?? m[f]}
+                            <div className="small muted cap-lab">{t(`admin.models.cap.${f}`)}</div>
+                            <input className="inp cap-num" type="number" min={0} value={e[f] ?? m[f]} aria-label={t(`admin.models.cap.${f}`)}
                               onChange={(ev) => onEdit(m.id, { ...e, [f]: Number(ev.target.value) })} />
-                            <div className="src">{src(m, f)}</div>
+                            {src(m, f)}
                           </div>
                         ))}
                         <div>
-                          <div className="small muted">{t("admin.models.cap.cost")}</div>
-                          <div className="row" style={{ gap: 4, flexWrap: "nowrap" }}>
+                          <div className="small muted cap-lab">{t("admin.models.cap.cost")}</div>
+                          <div className="caps-cost">
                             {(["input", "output"] as const).map((k) => (
-                              <input key={k} className="inp" type="number" min={0} step="0.001" style={{ width: 80 }} aria-label={`${t("admin.models.cap.cost")} ${k}`}
+                              <input key={k} className="inp cap-num" type="number" min={0} step="0.001" aria-label={t(`admin.models.cap.cost_${k}`)}
                                 value={(e.cost ?? m.cost)?.[k] ?? 0}
                                 onChange={(ev) => onEdit(m.id, { ...e, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, ...(e.cost ?? m.cost), [k]: Number(ev.target.value) } })} />
                             ))}
                           </div>
-                          <div className="src">{src(m, "cost")}</div>
+                          {src(m, "cost")}
                         </div>
                       </div>
-                      {(m.overrides?.length ?? 0) > 0 && (
-                        <button className="textbtn small" onClick={() => onEdit(m.id, { reset: m.overrides })}>{t("admin.models.resetEdits")}</button>
-                      )}
                     </td>
                   </tr>
                 )}
@@ -251,7 +242,7 @@ function refsOf(ids: string[], edits: Record<string, CapsPatch>): ModelRef[] {
   return ids.map((id) => (edits[id] && Object.keys(edits[id]).length ? { id, overrides: edits[id] } : { id }));
 }
 
-function AddConnection({ types, onClose }: { types: ConnList["types"]; onClose: () => void }) {
+function AddConnection({ types, onClose }: { types: ModelConnectionList["types"]; onClose: () => void }) {
   const { t } = useTranslation();
   const qc = useQueryClient();
   const [type, setType] = useState<ConnectionType>("deepseek");
@@ -265,12 +256,12 @@ function AddConnection({ types, onClose }: { types: ConnList["types"]; onClose: 
   const [edits, setEdits] = useState<Record<string, CapsPatch>>({});
   const preset = types.find((x) => x.type === type);
   const options = type === "gigachat" ? { scope } : type === "zai" ? { endpoint } : {};
-  const ids = [...picked, ...manual.split(/[\s,]+/).filter(Boolean)];
+  const ids = modelIds(picked, manual);
   const body = () => ({ type, name, baseUrl: type === "openai_compatible" ? baseUrl : baseUrl || preset?.baseUrl || "", apiKey, options,
-    models: refsOf([...new Set(ids)], edits) });
+    models: refsOf(ids, edits) });
   const discover = useMutation({
     mutationFn: () => api.post<{ listed: boolean; models: ModelDef[] }>("/admin/api/v1/model-connections/discover", body()),
-    onSuccess: (d) => setPicked(new Set(d.models.filter(usable).map((m) => m.id))),
+    onSuccess: (d) => setPicked(new Set(d.models.filter(usableModel).map((m) => m.id))),
   });
   // R7: the presets load their models once the key is typed
   const auto = type !== "openai_compatible" && apiKey.length >= 8;
@@ -285,9 +276,11 @@ function AddConnection({ types, onClose }: { types: ConnList["types"]; onClose: 
   const draft = useMutation({ mutationFn: () => api.post<CheckResult>("/admin/api/v1/model-connections/check", body()) });
   const create = useMutation({
     mutationFn: () => api.post("/admin/api/v1/model-connections", body()),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin", "connections"] }); onClose(); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: adminKeys.connections }); onClose(); },
   });
   const toggle = (id: string) => setPicked((cur) => { const next = new Set(cur); if (!next.delete(id)) next.add(id); return next; });
+  // design §3.4: a key the provider refused is a red line under the field
+  const keyRefused = (discover.error ?? draft.error) instanceof ApiError && ((discover.error ?? draft.error) as ApiError).code === "invalid_key";
   const choose = (x: ConnectionType) => { setType(x); setPicked(new Set()); setEdits({}); discover.reset(); };
   return (
     <Modal title={t("admin.models.add")} onClose={onClose} footer={<>
@@ -306,7 +299,9 @@ function AddConnection({ types, onClose }: { types: ConnList["types"]; onClose: 
         <div className="field"><label htmlFor="c-name">{t("admin.models.name")}</label>
           <input id="c-name" className="inp" value={name} onChange={(e) => setName(e.target.value)} placeholder={t(`admin.models.types.${type}`)} /></div>
         <div className="field"><label htmlFor="c-key">{t(type === "gigachat" ? "admin.models.authKey" : "admin.models.key")}</label>
-          <input id="c-key" type="password" autoComplete="off" className="inp" value={apiKey} onChange={(e) => setApiKey(e.target.value)} /></div>
+          <input id="c-key" type="password" autoComplete="off" className="inp" value={apiKey} onChange={(e) => setApiKey(e.target.value)}
+            aria-invalid={keyRefused} aria-describedby={keyRefused ? "c-key-err" : undefined} />
+          {keyRefused && <div id="c-key-err" className="err-text">{errorText(t, discover.error ?? draft.error)}</div>}</div>
         {type === "gigachat" && (
           <div className="field"><label htmlFor="c-scope">{t("admin.models.scope")}</label>
             <select id="c-scope" className="inp" value={scope} onChange={(e) => setScope(e.target.value)}>
@@ -332,7 +327,7 @@ function AddConnection({ types, onClose }: { types: ConnList["types"]; onClose: 
             <button className="btn sm" disabled={!apiKey || !baseUrl || discover.isPending} onClick={() => discover.mutate()}><Icon name="download" size={14} />{t("admin.models.load")}</button>
           )}
         </div>
-        {discover.isPending && <div className="small muted">{t("common.loading")}</div>}
+        {discover.isPending && <div className="skeleton-rows" aria-hidden="true"><i /><i /><i /></div>}
         {discover.data && !discover.data.listed && <div className="hintbox small">{t("admin.models.noList")}</div>}
         {discover.data && <ModelTable models={discover.data.models} picked={picked} edits={edits} onToggle={toggle}
           onEdit={(id, p) => setEdits((x) => ({ ...x, [id]: p }))} />}
@@ -340,9 +335,9 @@ function AddConnection({ types, onClose }: { types: ConnList["types"]; onClose: 
         <div className="hint">{t("admin.models.newHint")}</div>
       </div>
       {draft.data && draft.data.results.map((r) => (
-        <div key={r.model} className="small">{r.ok ? <span className="ok-t">✓</span> : <span className="err-t">✗</span>} <span className="mono">{r.model}</span> {r.ok ? (r.embeddings ? t("admin.models.embeddingsModel") : "") : llmErrorText(t, r.errorClass ?? "bad_request")}</div>
+        <div key={r.model} className="small">{r.ok ? <span className="ok-t"><Icon name="check" size={13} /></span> : <span className="err-t"><Icon name="alert" size={13} /></span>} <span className="mono">{r.model}</span> {r.ok ? (r.embeddings ? t("admin.models.embeddingsModel") : "") : llmErrorText(t, r.errorClass ?? "bad_request")}</div>
       ))}
-      {(discover.error || draft.error || create.error) && <div className="err-text">{errorText(t, discover.error ?? draft.error ?? create.error)}</div>}
+      {!keyRefused && (discover.error || draft.error || create.error) && <div className="err-text">{errorText(t, discover.error ?? draft.error ?? create.error)}</div>}
     </Modal>
   );
 }
@@ -353,7 +348,7 @@ function ReplaceKey({ conn, onClose }: { conn: ModelConnection; onClose: () => v
   const [key, setKey] = useState("");
   const save = useMutation({
     mutationFn: () => api.put(`/admin/api/v1/model-connections/${conn.id}/key`, { apiKey: key }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin", "connections"] }); onClose(); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: adminKeys.connections }); onClose(); },
   });
   return (
     <Modal title={t("admin.models.replaceKey")} onClose={onClose} footer={<>
@@ -375,7 +370,7 @@ function EditModels({ conn, onClose }: { conn: ModelConnection; onClose: () => v
   const [edits, setEdits] = useState<Record<string, CapsPatch>>({});
   const [manual, setManual] = useState("");
   const all: ModelDef[] = [...conn.models, ...conn.discovered.map((n): ModelDef => ({ id: n.id, name: n.name, contextWindow: 0, maxTokens: 0, reasoning: false }))];
-  const ids = [...all.filter((m) => picked.has(m.id)).map((m) => m.id), ...manual.split(/[\s,]+/).filter(Boolean)];
+  const ids = modelIds(all.filter((m) => picked.has(m.id)).map((m) => m.id), manual);
   const save = useMutation({
     mutationFn: () => api.patch(`/admin/api/v1/model-connections/${conn.id}`, { models: refsOf(ids, edits) }),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin"] }); onClose(); },
@@ -406,8 +401,8 @@ function PersonalModelsBlock({ conns }: { conns: ModelConnection[] }) {
     onSuccess: (v) => qc.setQueryData(["admin", "personal-models"], v),
     onError: (e) => toast({ kind: "error", title: errorText(t, e) }),
   });
-  const all: Choice[] = conns.flatMap((c) => c.models.filter(usable).map((m) => ({ connectionId: c.id, model: m.id })));
-  const label = (c: Choice) => `${conns.find((x) => x.id === c.connectionId)?.name ?? "?"} · ${c.model}`;
+  const all: Choice[] = conns.flatMap((c) => c.models.filter(usableModel).map((m) => ({ connectionId: c.id, model: m.id })));
+  const label = (c: Choice) => `${conns.find((x) => x.id === c.connectionId)?.name ?? c.connectionId} · ${c.model}`;
   if (!pm.data) return null;
   const cur = pm.data;
   const defModel = conns.find((c) => c.id === cur.default?.connectionId)?.models.find((m) => m.id === cur.default?.model);
@@ -419,13 +414,13 @@ function PersonalModelsBlock({ conns }: { conns: ModelConnection[] }) {
       <div className="form-grid">
         <div className="field">
           <label htmlFor="pm-def">{t("admin.models.default")}</label>
-          <select id="pm-def" className="inp" value={cur.default ? `${cur.default.connectionId}|${cur.default.model}` : ""}
+          <select id="pm-def" className="inp" value={cur.default ? choiceKey(cur.default) : ""}
             onChange={(e) => {
-              const [connectionId, model] = e.target.value.split("|");
-              save.mutate({ ...cur, default: e.target.value ? { connectionId, model, thinking: "off" } : null });
+              const pickedModel = all.find((c) => choiceKey(c) === e.target.value);
+              save.mutate({ ...cur, default: pickedModel ? { ...pickedModel, thinking: "off" } : null });
             }}>
             <option value="">—</option>
-            {all.map((c) => <option key={`${c.connectionId}|${c.model}`} value={`${c.connectionId}|${c.model}`}>{label(c)}</option>)}
+            {all.map((c) => <option key={choiceKey(c)} value={choiceKey(c)}>{label(c)}</option>)}
           </select>
         </div>
         <div className="field">
@@ -438,7 +433,7 @@ function PersonalModelsBlock({ conns }: { conns: ModelConnection[] }) {
       </div>
       {/* FTR.NAB.CMN-0007 R2: the models users may choose are granted to groups */}
       <div className="lab small muted" style={{ marginBottom: 6 }}>{t("admin.models.available")}</div>
-      <div className="chips">{cur.available.map((c) => <span key={`${c.connectionId}|${c.model}`} className="chip">{label(c)}</span>)}</div>
+      <div className="chips">{cur.available.map((c) => <span key={choiceKey(c)} className="chip">{label(c)}</span>)}</div>
       <div className="hint">{t("admin.models.availableByGroups")} <Link to={adminPath("groups")}>{t("admin.channels.configureInGroups")}</Link></div>
     </div>
   );

@@ -128,7 +128,8 @@
     "imageNotSeen": "{model} cannot see images: the agent gets a file in the space",
     "switchTo": "Switch to {model}",
     "convMenu": "Conversation menu",
-    "waitTurn": "Wait for the answer"
+    "waitTurn": "Wait for the answer",
+    "resetFailed": "Could not reset the context"
   },
   "llm": {
     "retry": "Retry",
@@ -449,21 +450,15 @@
         "reasoning": "Reasoning",
         "contextWindow": "Context window",
         "maxTokens": "Longest answer",
-        "cost": "Price in / out per 1M"
+        "cost": "Price in / out per 1M",
+        "cost_input": "Price of input",
+        "cost_output": "Price of output"
       },
-      "resetEdits": "Reset the manual edits",
-      "availableByGroups": "The models users may choose are granted to groups."
-    },
-    "harness": {
-      "title": "Harness",
-      "lead": "Environments agents run in. This release has Pi.",
-      "name": "Harness",
-      "version": "Version",
-      "state": "State",
-      "states": {
-        "ok": "Working",
-        "error": "Error"
-      }
+      "availableByGroups": "The models users may choose are granted to groups.",
+      "latency": "{ms, number} ms",
+      "resetField": "Reset",
+      "unfold": "Capabilities of {model}",
+      "fold": "Hide the capabilities of {model}"
     },
     "catalog": {
       "title": "Catalog",
@@ -640,9 +635,7 @@
       "channel": "Channel",
       "state": "Connection",
       "enabled": "Enabled",
-      "allUsers": "For all users",
       "groups": "Groups",
-      "users": "Users",
       "always": "always",
       "client": "service client",
       "statuses": {
@@ -679,7 +672,9 @@
       "rules": "The bot answers by mail only when it is the only recipient: one address in To and an empty Cc. Other letters are answered in the topic of the web application. Actions that change data wait for the confirmation of the user.",
       "rejected": "Rejected recently",
       "access": "Access",
-      "configureInGroups": "Configure in groups"
+      "configureInGroups": "Configure in groups",
+      "accessBy": "Access: {groups}",
+      "onlyAdmins": "administrators only"
     },
     "group-agents": {
       "title": "Group agents",
@@ -720,7 +715,10 @@
       "voiceOff": "Not configured",
       "voiceHint": "The stand option NABU_WHISPER deploys the recognizer.",
       "harness": "Agent harness {name}",
-      "version": "Version"
+      "version": "Version",
+      "harnessNames": {
+        "pi": "Pi"
+      }
     },
     "agent-pods": {
       "title": "Agents",
@@ -858,7 +856,14 @@
       "mcpRevoke": "{count} members lose access to “{item}”. Their connections are deleted — they will have to connect again.",
       "addMember": "Find a user by name or email",
       "add": "Add",
-      "remove": "Remove"
+      "remove": "Remove",
+      "unsavedTitle": "Unsaved changes",
+      "unsavedText": "The changes of the group are not saved. Leave without saving?",
+      "stay": "Stay",
+      "discard": "Leave without saving",
+      "connectionOff": "The connection is switched off",
+      "addChosen": "{count, plural, one {Add # user} other {Add # users}}",
+      "moreMembers": "Show more"
     },
     "access": {
       "title": "Access",
@@ -869,10 +874,12 @@
       "default": "default",
       "defaultFrom": {
         "user": "the choice of the user",
-        "group": "the default of a group",
+        "group": "the default model of the group {group}",
         "global": "the global default",
         "first": "the first model by name"
-      }
+      },
+      "admin": "administrator",
+      "deletedGroup": "a deleted group"
     }
   },
   "errors": {
@@ -910,7 +917,7 @@
     "sync_failed": "Synchronization failed.",
     "invalid_source": "Invalid source.",
     "invalid_model": "Invalid model.",
-    "invalid_key": "The key is required.",
+    "invalid_key": "The key is missing or the provider refused it.",
     "invalid_url": "Invalid URL.",
     "invalid_type": "Invalid type.",
     "invalid_name": "Invalid name.",
@@ -988,7 +995,7 @@
     "invalid_scope": "Unknown scope of GigaChat.",
     "invalid_endpoint": "The endpoint is general or Coding Plan.",
     "gigachat_unavailable": "GigaChat is not available in this deployment.",
-    "transcription_too_long": "The recording is longer than 5 minutes.",
+    "transcription_too_long": "The recording is longer than {maxSeconds, number} s.",
     "no_models_granted": "No model is available to you — ask an administrator.",
     "group_name_taken": "A group with this name exists.",
     "group_builtin": "A built-in group cannot be deleted, renamed or have its members changed.",

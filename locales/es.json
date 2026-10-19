@@ -128,7 +128,8 @@
     "imageNotSeen": "{model} no ve imágenes: el agente recibirá un archivo en el espacio",
     "switchTo": "Cambiar a {model}",
     "convMenu": "Menú de la conversación",
-    "waitTurn": "Espere la respuesta"
+    "waitTurn": "Espere la respuesta",
+    "resetFailed": "No se pudo restablecer el contexto"
   },
   "llm": {
     "retry": "Reintentar",
@@ -449,21 +450,15 @@
         "reasoning": "Razonamiento",
         "contextWindow": "Ventana de contexto",
         "maxTokens": "Respuesta máxima",
-        "cost": "Precio entrada / salida por 1 M"
+        "cost": "Precio entrada / salida por 1 M",
+        "cost_input": "Precio de entrada",
+        "cost_output": "Precio de salida"
       },
-      "resetEdits": "Restablecer los cambios manuales",
-      "availableByGroups": "Los modelos que pueden elegir los usuarios se conceden a grupos."
-    },
-    "harness": {
-      "title": "Harness",
-      "lead": "Entornos en los que se ejecutan los agentes. Esta versión incluye Pi.",
-      "name": "Harness",
-      "version": "Versión",
-      "state": "Estado",
-      "states": {
-        "ok": "Funciona",
-        "error": "Error"
-      }
+      "availableByGroups": "Los modelos que pueden elegir los usuarios se conceden a grupos.",
+      "latency": "{ms, number} ms",
+      "resetField": "Restablecer",
+      "unfold": "Capacidades de {model}",
+      "fold": "Ocultar las capacidades de {model}"
     },
     "catalog": {
       "title": "Catálogo",
@@ -640,9 +635,7 @@
       "channel": "Canal",
       "state": "Conexión",
       "enabled": "Activado",
-      "allUsers": "Para todos",
       "groups": "Grupos",
-      "users": "Usuarios",
       "always": "siempre",
       "client": "cliente de servicio",
       "statuses": {
@@ -679,7 +672,9 @@
       "rules": "El bot responde por correo solo si es el único destinatario: una dirección en Para y Cc vacío. Los demás correos se responden en el tema de la aplicación web. Las acciones que modifican datos esperan la confirmación del usuario.",
       "rejected": "Rechazados recientemente",
       "access": "Acceso",
-      "configureInGroups": "Configurar en grupos"
+      "configureInGroups": "Configurar en grupos",
+      "accessBy": "Acceso: {groups}",
+      "onlyAdmins": "solo administradores"
     },
     "group-agents": {
       "title": "Agentes de grupo",
@@ -720,7 +715,10 @@
       "voiceOff": "No configurado",
       "voiceHint": "La opción NABU_WHISPER del entorno despliega el reconocedor.",
       "harness": "Harness del agente {name}",
-      "version": "Versión"
+      "version": "Versión",
+      "harnessNames": {
+        "pi": "Pi"
+      }
     },
     "agent-pods": {
       "title": "Agentes",
@@ -858,7 +856,14 @@
       "mcpRevoke": "{count} miembros perderán el acceso a «{item}». Sus conexiones se eliminarán: tendrán que conectarse de nuevo.",
       "addMember": "Buscar un usuario por nombre o correo",
       "add": "Añadir",
-      "remove": "Quitar"
+      "remove": "Quitar",
+      "unsavedTitle": "Cambios sin guardar",
+      "unsavedText": "Los cambios del grupo no se han guardado. ¿Salir sin guardar?",
+      "stay": "Quedarse",
+      "discard": "Salir sin guardar",
+      "connectionOff": "La conexión está desactivada",
+      "addChosen": "{count, plural, one {Añadir # usuario} other {Añadir # usuarios}}",
+      "moreMembers": "Mostrar más"
     },
     "access": {
       "title": "Acceso",
@@ -869,10 +874,12 @@
       "default": "predeterminado",
       "defaultFrom": {
         "user": "elección del usuario",
-        "group": "predeterminado de un grupo",
+        "group": "el modelo predeterminado del grupo {group}",
         "global": "predeterminado global",
         "first": "primer modelo por nombre"
-      }
+      },
+      "admin": "administrador",
+      "deletedGroup": "un grupo eliminado"
     }
   },
   "errors": {
@@ -910,7 +917,7 @@
     "sync_failed": "La sincronización falló.",
     "invalid_source": "Origen no válido.",
     "invalid_model": "Modelo no válido.",
-    "invalid_key": "Se requiere la clave.",
+    "invalid_key": "Falta la clave o el proveedor la rechazó.",
     "invalid_url": "URL no válida.",
     "invalid_type": "Tipo no válido.",
     "invalid_name": "Nombre no válido.",
@@ -988,7 +995,7 @@
     "invalid_scope": "Ámbito de GigaChat desconocido.",
     "invalid_endpoint": "El endpoint es general o Coding Plan.",
     "gigachat_unavailable": "GigaChat no está disponible en esta instalación.",
-    "transcription_too_long": "La grabación supera los 5 minutos.",
+    "transcription_too_long": "La grabación dura más de {maxSeconds, number} s.",
     "no_models_granted": "No tiene ningún modelo disponible: consulte a un administrador.",
     "group_name_taken": "Ya existe un grupo con este nombre.",
     "group_builtin": "Un grupo integrado no se puede eliminar, renombrar ni cambiar sus miembros.",

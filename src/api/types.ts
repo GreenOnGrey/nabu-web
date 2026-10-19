@@ -11,6 +11,8 @@ export interface PublicConfig {
   defaultLanguage: string;
   uploadMaxBytes: number;
   voice: boolean;
+  /** The limit of a recording (FTR.NAB.CHAT-0001 R20); 0 or missing — 300. */
+  voiceMaxSeconds?: number;
   spaces: boolean;
   channels: Record<string, boolean>;
   version: string;
@@ -81,15 +83,10 @@ export interface Skill {
 }
 
 /** An event of a conversation (FTR.NAB.CHAT-0001 R1, R2, R16). */
-export interface ChatEventData {
-  kind: "reset" | "compact" | "model";
-  auto?: boolean;
-  tokensBefore?: number;
-  tokensAfter?: number;
-  summary?: string;
-  model?: string;
-  name?: string;
-}
+export type ChatEventData =
+  | { kind: "reset" }
+  | { kind: "compact"; auto?: boolean; tokensBefore: number; tokensAfter: number; summary?: string }
+  | { kind: "model"; connectionId?: string; model: string; name?: string };
 
 export interface List<T> {
   items: T[];
@@ -563,6 +560,12 @@ export interface CapsPatch {
 export type ModelRef = { id: string; overrides?: CapsPatch };
 
 export type ConnectionType = "deepseek" | "gigachat" | "zai" | "openai_compatible";
+
+/** GET /admin/api/v1/model-connections: the connections and the presets of the types. */
+export interface ModelConnectionList {
+  items: ModelConnection[];
+  types: { type: ConnectionType; baseUrl?: string; models?: ModelDef[]; scopes?: string[]; defaultScope?: string; endpoints?: Record<string, string> }[];
+}
 
 export interface ModelConnection {
   id: string;

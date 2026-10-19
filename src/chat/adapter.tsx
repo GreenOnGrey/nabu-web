@@ -8,7 +8,7 @@ import { tokens, type ChatCommand, type ChatConfirmation, type ChatConversation,
 import { apiUrl } from "../api/base";
 import { api } from "../api/client";
 import { keys } from "../api/queries";
-import type { AgentWait, Confirmation, ContextFill, Conversation, List, Message, Skill, ToolStep } from "../api/types";
+import type { Agent, AgentWait, Confirmation, ContextFill, Conversation, List, Message, Skill, Tone, ToolStep } from "../api/types";
 import { useSession } from "../app/session";
 import { errorText } from "../lib/errors";
 import { relativeTime } from "../lib/format";
@@ -50,7 +50,7 @@ export function eventText(t: TFunction, m: Message, lng: string): ChatMessage["e
     case "reset":
       return { icon: "undo", text: t("chat.event.reset") };
     case "compact": {
-      const text = t("chat.event.compacted", { before: tokens(ev.tokensBefore ?? 0, lng), after: tokens(ev.tokensAfter ?? 0, lng) });
+      const text = t("chat.event.compacted", { before: tokens(ev.tokensBefore, lng), after: tokens(ev.tokensAfter, lng) });
       return { icon: "compress", text: ev.auto ? `${text} · ${t("chat.event.auto")}` : text, details: ev.summary || undefined };
     }
     case "model":
@@ -143,17 +143,91 @@ export function useConversations() {
   return { all, rows, main: active.data?.items.find((c) => c.kind === "main"), create };
 }
 
+/** The changes of the agent of the user (R31; FTR.NAB.CHAT-0001 R16): the name and the
+ * tone at once, the model as the server answers; a refusal is told and undone. */
+export function useAgentPatch() {
+  const { t } = useTranslation();
+  const qc = useQueryClient();
+  const toast = useToast();
+  return useMutation({
+    mutationFn: (p: { name?: string; tone?: Tone; model?: { connectionId: string; model: string } | null }) => api.patch<Agent>("/api/v1/agent", p),
+    onMutate: (p) => qc.setQueryData<Agent>(keys.agent, (old) => (old && (p.name || p.tone) ? { ...old, ...(p.name ? { name: p.name } : {}), ...(p.tone ? { tone: p.tone } : {}) } : old)),
+    onSuccess: (a) => qc.setQueryData(keys.agent, a),
+    onError: (e) => {
+      toast({ kind: "error", title: errorText(t, e) });
+      qc.invalidateQueries({ queryKey: keys.agent });
+    },
+  });
+}
+
+/** The fill the meter shows (R3): without a session (new or just reset) — 0 of the
+ * window of the model; nothing when no window is known. */
+export function contextOf(fill: ContextFill | undefined, modelWindow: number): ContextFill | undefined {
+  const window = fill?.window || modelWindow;
+  return fill && window > 0 ? { tokens: fill.tokens, window } : undefined;
+}
+
+/** R11: images are attached and the model of the agent does not see them — the warning
+ * and a model that does, if the user may choose one. */
+export function unseenImages(agent: Agent | undefined, pendingImages: boolean): { seeing?: Agent["availableModels"][number] } | null {
+  if (!pendingImages || !agent?.model || agent.model.caps.image) return null;
+  return { seeing: agent.availableModels.find((m) => m.caps.image) };
+}
+
+/** FTR.NAB.CHAT-0001 R3: the fill of the context of the conversation. */
+function useContextFill(conv: Conversation, modelWindow: number): ContextFill | undefined {
+  const qc = useQueryClient();
+  const key = ["conversation-context", conv.id];
+  const fill = useQuery({
+    queryKey: key,
+    queryFn: async () => (await api.get<{ context: ContextFill }>(`/api/v1/conversations/${conv.id}`)).context,
+  });
+  useEvent("conversation.context", (d: ContextFill & { conversationId: string }) => {
+    if (d.conversationId === conv.id) qc.setQueryData(key, { tokens: d.tokens, window: d.window });
+  });
+  return contextOf(fill.data, modelWindow);
+}
+
+/** R4: the commands of the conversation and the skills of the user. A failed command is
+ * told by a toast; a failure in the agent comes as chat.error. */
+function useCommands(conv: Conversation) {
+  const { t } = useTranslation();
+  const toast = useToast();
+  const skills = useQuery({ queryKey: ["skills"], queryFn: () => api.get<{ items: Skill[] }>("/api/v1/skills"), staleTime: 60_000 });
+  const commands: ChatCommand[] = useMemo(() => [
+    { kind: "command", name: "new", description: t("chat.cmd.new") },
+    { kind: "command", name: "compact", description: t("chat.cmd.compact"), takesText: true },
+    ...(skills.data?.items ?? []).map((s): ChatCommand => ({ kind: "skill", name: s.name, description: s.description, source: s.itemTitle })),
+  ], [skills.data, t]);
+  const run = async (name: string, text: string) => {
+    try {
+      if (name === "new") await api.post(`/api/v1/conversations/${conv.id}/context:reset`);
+      else if (name === "compact") await api.post(`/api/v1/conversations/${conv.id}/context:compact`, { instructions: text });
+    } catch (e) {
+      toast({ kind: "error", title: errorText(t, e) });
+      throw e;
+    }
+  };
+  useEvent("chat.error", (d: { conversationId: string; command?: string; errorClass: string }) => {
+    if (d.conversationId !== conv.id || !d.command) return;
+    toast({ kind: "error", title: t(d.command === "reset" ? "chat.resetFailed" : "chat.compactFailed"), text: llmErrorText(t, d.errorClass) });
+  });
+  /** A command of a button: its failure is already told. */
+  const press = (name: string) => () => void run(name, "").catch(() => undefined);
+  return { commands, onCommand: run, onCompact: press("compact"), onReset: press("new") };
+}
+
 /** One conversation: its history, the events of the turn and the actions of the user —
- * what the `Chat` of the kit needs, apart from the look. */
-export function useConversation(conv: Conversation): Pick<ChatProps,
+ * what the `Chat` of the kit needs, apart from the look. `modelWindow` is the context
+ * window of the model of the agent: the size of an empty context. */
+export function useConversation(conv: Conversation, modelWindow = 0): Pick<ChatProps,
   "messages" | "loading" | "hasOlder" | "loadingOlder" | "busy" | "confirmations" | "upload"
   | "onSend" | "onLoadOlder" | "onRetry" | "onConfirm" | "onUpload" | "onTranscribe"
   | "commands" | "onCommand" | "context" | "onCompact" | "onReset" | "voiceMaxSeconds" | "onPendingChange"> & {
   unarchive: () => void;
   /** Images are attached to the message being written (R11). */
   pendingImages: boolean;
-  /** Runs a command of the conversation: the menu of the conversation uses it too. */
-  command: (name: string, text: string) => Promise<void>;
+  /** A turn is being written: the commands wait for it. */
   busyTurn: boolean;
 } {
   const { t, i18n } = useTranslation();
@@ -254,34 +328,8 @@ export function useConversation(conv: Conversation): Pick<ChatProps,
   const lng = i18n.language;
   const messages = useMemo(() => raw.map((m) => toChatMessage(t, m, wait, lng)), [raw, wait, t, lng]);
 
-  // FTR.NAB.CHAT-0001 R3: the fill of the context of the conversation
-  const ctxKey = ["conversation-context", conv.id];
-  const ctx = useQuery({
-    queryKey: ctxKey,
-    queryFn: async () => (await api.get<{ context: ContextFill }>(`/api/v1/conversations/${conv.id}`)).context,
-  });
-  useEvent("conversation.context", (d: ContextFill & { conversationId: string }) => {
-    if (d.conversationId === conv.id) qc.setQueryData(ctxKey, { tokens: d.tokens, window: d.window });
-  });
-  // R4: the commands of the conversation and the skills of the user
-  const skills = useQuery({ queryKey: ["skills"], queryFn: () => api.get<{ items: Skill[] }>("/api/v1/skills"), staleTime: 60_000 });
-  const commands: ChatCommand[] = useMemo(() => [
-    { kind: "command", name: "new", description: t("chat.cmd.new") },
-    { kind: "command", name: "compact", description: t("chat.cmd.compact"), takesText: true },
-    ...(skills.data?.items ?? []).map((s): ChatCommand => ({ kind: "skill", name: s.name, description: s.description, source: s.itemTitle })),
-  ], [skills.data, t]);
-  const command = async (name: string, text: string) => {
-    try {
-      if (name === "new") await api.post(`/api/v1/conversations/${conv.id}/context:reset`);
-      else if (name === "compact") await api.post(`/api/v1/conversations/${conv.id}/context:compact`, { instructions: text });
-    } catch (e) {
-      fail(e);
-      throw e;
-    }
-  };
-  useEvent("chat.error", (d: { conversationId: string; command?: string; errorClass: string }) => {
-    if (d.conversationId === conv.id && d.command) toast({ kind: "error", title: t("chat.compactFailed"), text: llmErrorText(t, d.errorClass) });
-  });
+  const context = useContextFill(conv, modelWindow);
+  const commands = useCommands(conv);
   // R11: which of the attached files are images
   const [imageIds, setImageIds] = useState<Set<string>>(new Set());
   const [pendingImages, setPendingImages] = useState(false);
@@ -295,11 +343,8 @@ export function useConversation(conv: Conversation): Pick<ChatProps,
 
   return {
     messages, confirmations, busy, busyTurn: busy || streaming,
-    commands, command, onCommand: command, pendingImages, onPendingChange,
-    context: ctx.data && ctx.data.window > 0 ? ctx.data : undefined,
-    onCompact: () => void command("compact", "").catch(() => undefined),
-    onReset: () => void command("new", "").catch(() => undefined),
-    voiceMaxSeconds: 300,
+    ...commands, pendingImages, onPendingChange, context,
+    voiceMaxSeconds: config.voiceMaxSeconds || 300,
     loading: history.isLoading,
     hasOlder: history.hasNextPage,
     loadingOlder: history.isFetchingNextPage,
@@ -340,15 +385,15 @@ export function useConversation(conv: Conversation): Pick<ChatProps,
         return null;
       }
     },
-    // the voice input exists where the deployment has a recognizer
+    // the voice input exists where the deployment has a recognizer; a failure is a toast of the kit
+    // with «Retry» on the same recording (design §3.1)
     onTranscribe: config.voice ? async (recording) => {
       const form = new FormData();
       form.append("file", recording, "voice.webm");
       try {
         return (await api.upload<{ text: string }>("/api/v1/transcribe", form)).text ?? "";
       } catch (e) {
-        fail(e);
-        return null;
+        throw new Error(errorText(t, e), { cause: e });
       }
     } : undefined,
   };

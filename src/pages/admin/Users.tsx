@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { api, qs } from "../../api/client";
-import type { AdminUser, ArchiveResult, EffectiveAccess, RestoreRequest, UserCard, UserGroup } from "../../api/types";
+import { adminKeys, useAdminGroups } from "../../api/queries";
+import type { AdminUser, ArchiveResult, EffectiveAccess, RestoreRequest, UserCard } from "../../api/types";
 import { useSession } from "../../app/session";
 import { errorText } from "../../lib/errors";
 import { intlLocale } from "../../lib/i18n";
@@ -13,6 +14,7 @@ import { Avatar, Icon, Modal, Switch, useToast } from "@green-on-grey/ui-kit";
 import { adminPath } from "./paths";
 import { channelLabel } from "./Channels";
 import { groupName } from "./groupName";
+import { sameChoice } from "../../lib/models";
 
 const FILTERS = ["active", "archived", "purge"] as const;
 type Filter = (typeof FILTERS)[number];
@@ -273,23 +275,30 @@ function UserAccess({ id }: { id: string }) {
   const toast = useToast();
   const key = ["admin", "user-access", id];
   const acc = useQuery({ queryKey: key, queryFn: () => api.get<EffectiveAccess>(`/admin/api/v1/users/${id}/access`) });
-  const groups = useQuery({ queryKey: ["admin", "groups"], queryFn: () => api.get<{ items: UserGroup[] }>("/admin/api/v1/groups") });
+  const groups = useAdminGroups();
   const set = useMutation({
     mutationFn: (ids: string[]) => api.put<EffectiveAccess>(`/admin/api/v1/users/${id}/groups`, { groupIds: ids }),
-    onSuccess: (a) => { qc.setQueryData(key, a); qc.invalidateQueries({ queryKey: ["admin", "groups"] }); },
+    onSuccess: (a) => { qc.setQueryData(key, a); qc.invalidateQueries({ queryKey: adminKeys.groups }); },
     onError: (e) => toast({ kind: "error", title: errorText(t, e) }),
   });
   const a = acc.data;
   if (!a) return null;
   const all = groups.data?.items ?? [];
+  const groupOf = (gid: string) => all.find((x) => x.id === gid) ?? a.groups.find((x) => x.id === gid);
   const nameOf = (gid: string) => {
-    const g = all.find((x) => x.id === gid) ?? a.groups.find((x) => x.id === gid);
-    return g ? groupName(t, g) : "?";
+    const g = groupOf(gid);
+    return g ? groupName(t, g) : t("admin.access.deletedGroup");
   };
-  const via = (ids: string[]) => t("admin.access.via", { groups: ids.map(nameOf).join(", ") });
-  const mine = a.groups.filter((g) => !g.builtin).map((g) => g.id);
-  const free = all.filter((g) => !g.builtin && !mine.includes(g.id));
-  const isDefault = (c: { connectionId: string; model: string }) => a.defaultModel?.connectionId === c.connectionId && a.defaultModel?.model === c.model;
+  // design §3.3: what the role of administrator gives reads «administrator»
+  const via = (ids: string[]) => {
+    const granting = ids.filter((g) => groupOf(g)?.builtin !== "admins");
+    const parts = [...(granting.length ? [t("admin.access.via", { groups: granting.map(nameOf).join(", ") })] : []), ...(granting.length < ids.length ? [t("admin.access.admin")] : [])];
+    return parts.join(", ");
+  };
+  const ownGroupIds = a.groups.filter((g) => !g.builtin).map((g) => g.id);
+  const otherGroups = all.filter((g) => !g.builtin && !ownGroupIds.includes(g.id));
+  const def = a.defaultModel;
+  const defaultFrom = def ? t(`admin.access.defaultFrom.${def.source}`, { group: def.groupId ? nameOf(def.groupId) : "" }) : "";
   return (
     <>
       <h3 className="sec">{t("admin.access.title")}</h3>
@@ -298,14 +307,14 @@ function UserAccess({ id }: { id: string }) {
           <span key={g.id} className="chip"><Icon name="lock" size={12} />{groupName(t, g)}</span>
         ) : (
           <span key={g.id} className="chip on">{g.name}
-            <button className="iconbtn" style={{ width: 18, height: 18 }} aria-label={t("common.remove")} onClick={() => set.mutate(mine.filter((x) => x !== g.id))}><Icon name="x" size={12} /></button>
+            <button className="iconbtn" style={{ width: 18, height: 18 }} aria-label={t("common.remove")} onClick={() => set.mutate(ownGroupIds.filter((x) => x !== g.id))}><Icon name="x" size={12} /></button>
           </span>
         ))}
-        {free.length > 0 && (
+        {otherGroups.length > 0 && (
           <select className="inp" style={{ width: "auto" }} value="" aria-label={t("admin.access.addToGroup")}
-            onChange={(e) => { if (e.target.value) set.mutate([...mine, e.target.value]); }}>
+            onChange={(e) => { if (e.target.value) set.mutate([...ownGroupIds, e.target.value]); }}>
             <option value="">{t("admin.access.addToGroup")}</option>
-            {free.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
+            {otherGroups.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
           </select>
         )}
       </div>
@@ -315,7 +324,7 @@ function UserAccess({ id }: { id: string }) {
           {a.models.length === 0 && <div className="small err-t">{t("admin.access.noModels")}</div>}
           {a.models.map((m) => (
             <div key={m.connectionId + m.model} className="acc-row">
-              <span>{m.name} {isDefault(m) && <span className="pchip" title={t(`admin.access.defaultFrom.${a.defaultModel!.source}`)}>{t("admin.access.default")}</span>}</span>
+              <span>{m.name} {sameChoice(def, m) && <span className="pchip" title={defaultFrom}>{t("admin.access.default")}</span>}</span>
               <span className="small muted">{via(m.via)}</span>
             </div>
           ))}

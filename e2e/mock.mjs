@@ -16,8 +16,9 @@ const me = (theme = "light") => ({ id: "u1", email: "ada@example.com", name: "А
   channels: [{ kind: "telegram", available: true, reason: "all_users", binding: { account: "@ada", boundAt: T("09:00", "01") } }, { kind: "email", available: true, reason: "always", address: "ada@nabu.example" }] });
 const config = { authProvider: "github", providerLabel: "GitHub", allowedOrg: "GreenOnGrey", languages: ["en", "ru", "de", "es", "zh"], defaultLanguage: "en",
   uploadMaxBytes: 20000000, voice: true, spaces: true, channels: { telegram: true, email: true }, version: "1.0.0" };
-const model = { connectionId: "c1", model: "sonnet", name: "sonnet-5", connection: "Anthropic" };
-const agent = { name: "Набу", tone: "business", model, availableModels: [model] };
+const model = { connectionId: "c1", model: "sonnet", name: "sonnet-5", connection: "Anthropic", caps: { image: true, tools: true, reasoning: true, contextWindow: 200000 } };
+const flash = { connectionId: "c2", model: "deepseek-v4.1-flash", name: "DeepSeek V4.1 Flash", connection: "DeepSeek", caps: { image: true, tools: true, reasoning: false, contextWindow: 128000 } };
+const agent = { name: "Набу", tone: "business", model, defaultModel: model, chosen: false, availableModels: [model, flash], context: { tokens: 42000, window: 200000 } };
 const conv = (id, kind, title, extra = {}) => ({ id, kind, title, lastMessageAt: T("14:12"), archivedAt: null, createdAt: T("09:00", "01"), source: "chat", unreadCount: 0, writesRequireConfirmation: false, ...extra });
 const conversations = [conv("main", "main", null), conv("t1", "topic", "Релиз 1.4", { lastMessageAt: T("10:00") }),
   conv("t2", "topic", "Счёт от поставщика", { source: "email", unreadCount: 2, writesRequireConfirmation: true, lastMessageAt: T("08:30") })];
@@ -84,6 +85,15 @@ const adminCatalog = [
     newTools: ["get_page_thumbnail"] },
 ];
 
+// FTR.NAB.CMN-0007 design §3.1–3.2: the built-in groups and an ordinary one with its members.
+const grants = { models: [{ connectionId: "c1", model: "sonnet" }], defaultModel: { connectionId: "c1", model: "sonnet" }, channels: ["telegram"], catalogItems: ["a1"] };
+const userGroups = [
+  { id: "g-admins", name: "Administrators", description: null, builtin: "admins", position: -1, memberCount: 1, grants: null, allEnabled: true },
+  { id: "g-sales", name: "Продажи", description: "Отдел продаж", builtin: null, position: 1, memberCount: 2, grants, allEnabled: false },
+  { id: "g-all", name: "All users", description: null, builtin: "all", position: 2147483647, memberCount: 3, grants: { ...grants, channels: [] }, allEnabled: false },
+];
+const members = [{ id: "u1", email: "ada@example.com", name: "Ада Лавлейс" }, { id: "u2", email: "alan@example.com", name: "Алан Тьюринг" }];
+
 function api(url, theme) {
   const p = url.pathname;
   if (p === "/api/v1/me") return me(theme);
@@ -103,6 +113,10 @@ function api(url, theme) {
   if (p === "/api/v1/comm/state") return commState;
   if (p === "/admin/api/v1/clients") return { items: clients };
   if (p === "/admin/api/v1/catalog") return { items: adminCatalog };
+  if (p === "/admin/api/v1/groups") return { items: userGroups };
+  if (/^\/admin\/api\/v1\/groups\/[^/]+\/members$/.test(p)) return { items: members, nextCursor: null };
+  if (p === "/admin/api/v1/harnesses") return { items: [{ name: "pi", version: "1.3.0", status: "ok" }] };
+  if (p === "/admin/api/v1/voice") return { configured: true, ok: true, url: "http://whisper.nabu.svc:9000" };
   if (p === "/admin/api/v1/users") return { items: url.searchParams.get("status") === "archived" ? [] : users };
   return { items: [], nextCursor: null };
 }

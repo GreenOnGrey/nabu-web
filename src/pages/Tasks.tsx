@@ -40,7 +40,7 @@ export function TasksPage() {
       {tasks.data?.items.length === 0 && <Empty icon="clock" title={t("tasks.empty")}>{t("tasks.emptyHint")}</Empty>}
       {(tasks.data?.items.length ?? 0) > 0 && (
         <div style={{ overflowX: "auto" }}>
-          <table className="t">
+          <table className="t tasks-t">
             <thead><tr>
               <th>{t("tasks.cols.task")}</th><th>{t("tasks.cols.schedule")}</th><th>{t("tasks.cols.next")}</th>
               <th>{t("tasks.cols.last")}</th><th>{t("tasks.cols.channel")}</th><th />
@@ -78,8 +78,7 @@ function TaskRow({ task, lng, open, onToggle, onCancel, onResume, onPause }: {
   return (
     <>
       <tr>
-        {/* the kit keeps the first column on one line; a long instruction wraps here */}
-        <td style={{ whiteSpace: "normal", minWidth: 240 }}>
+        <td className="task-cell">
           <button className="linkbtn" onClick={onToggle} aria-expanded={open} style={{ border: 0, background: "none", padding: 0, textAlign: "left", color: "inherit", cursor: "pointer" }}>
             <b>{memory ? t(`tasks.memory.${task.kind}`) : task.title}</b>
           </button>

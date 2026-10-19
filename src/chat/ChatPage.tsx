@@ -1,16 +1,12 @@
 import { useCallback, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Icon, Loading, Menu, useToast } from "@green-on-grey/ui-kit";
+import { Icon, Loading, Menu } from "@green-on-grey/ui-kit";
 import { AgentButton, Chat, ChatLayout, ConversationList } from "@green-on-grey/ui-kit/chat";
 import { ApiError } from "../api/client";
-import { api } from "../api/client";
-import { keys, useAgent } from "../api/queries";
-import type { Agent } from "../api/types";
-import { errorText } from "../lib/errors";
-import { useQueryClient } from "@tanstack/react-query";
+import { useAgent } from "../api/queries";
 import type { Conversation } from "../api/types";
-import { useConversation, useConversations } from "./adapter";
+import { unseenImages, useAgentPatch, useConversation, useConversations } from "./adapter";
 import { AgentMenu } from "./AgentMenu";
 import { CommitmentsPanel } from "./CommitmentsPanel";
 import { TONE_ICONS } from "./tones";
@@ -52,36 +48,32 @@ export function ChatPage() {
 
 function ConversationView({ conv, onMenu }: { conv: Conversation; onMenu: () => void }) {
   const { t } = useTranslation();
-  const agent = useAgent();
-  const qc = useQueryClient();
-  const toast = useToast();
+  const { data: agent } = useAgent();
+  const patchAgent = useAgentPatch();
   const [agentMenu, setAgentMenu] = useState(false);
   const [convMenu, setConvMenu] = useState(false);
   const closeAgentMenu = useCallback(() => setAgentMenu(false), []);
   const closeConvMenu = useCallback(() => setConvMenu(false), []);
-  const { unarchive, pendingImages, command, busyTurn, ...chat } = useConversation(conv);
-  const a = agent.data;
+  const { unarchive, pendingImages, busyTurn, ...chat } = useConversation(conv, agent?.model?.caps.contextWindow);
   // FTR.NAB.CHAT-0001 R11: the model does not see images — say so and offer one that does
-  const blind = pendingImages && a?.model && !a.model.caps.image;
-  const seeing = blind ? a?.availableModels.find((m) => m.caps.image) : undefined;
-  const switchTo = async (m: Agent["availableModels"][number]) => {
-    try {
-      qc.setQueryData(keys.agent, await api.patch<Agent>("/api/v1/agent", { model: { connectionId: m.connectionId, model: m.model } }));
-    } catch (e) {
-      toast({ kind: "error", title: errorText(t, e) });
-    }
-  };
-  const run = (name: string) => {
+  const imagesUnseen = unseenImages(agent, pendingImages);
+  const seeingModel = imagesUnseen?.seeing;
+  const run = (press: (() => void) | undefined) => {
     setConvMenu(false);
-    void command(name, "").catch(() => undefined);
+    press?.();
   };
   return (
-    <Chat {...chat} agentName={a?.name ?? "Nabu"} emptyHint={t("chat.emptyHint")}
-      aboveComposer={blind ? (
+    <Chat {...chat} agentName={agent?.name ?? "Nabu"} emptyHint={t("chat.emptyHint")}
+      aboveComposer={imagesUnseen ? (
         <div className="img-warn" role="status">
           <Icon name="image" size={14} />
-          <span>{t("chat.imageNotSeen", { model: a?.model?.name })}</span>
-          {seeing && <button className="btn ghost sm push" onClick={() => void switchTo(seeing)}>{t("chat.switchTo", { model: seeing.name })}</button>}
+          <span>{t("chat.imageNotSeen", { model: agent?.model?.name })}</span>
+          {seeingModel && (
+            <button className="btn ghost sm push" disabled={patchAgent.isPending}
+              onClick={() => patchAgent.mutate({ model: { connectionId: seeingModel.connectionId, model: seeingModel.model } })}>
+              {t("chat.switchTo", { model: seeingModel.name })}
+            </button>
+          )}
         </div>
       ) : undefined}
       readOnly={conv.archivedAt !== null && (
@@ -94,15 +86,15 @@ function ConversationView({ conv, onMenu }: { conv: Conversation; onMenu: () => 
         <>
           <div className="hd">
             <button className="iconbtn show-m" onClick={onMenu} aria-label={t("chat.conversations")}><Icon name="msg2" /></button>
-            {a && (
-              <AgentButton icon={TONE_ICONS[a.tone] ?? "tBusiness"} label={t("agent.menu")} title={t(`tones.${a.tone}`)}
+            {agent && (
+              <AgentButton icon={TONE_ICONS[agent.tone] ?? "tBusiness"} label={t("agent.menu")} title={t(`tones.${agent.tone}`)}
                 expanded={agentMenu} onClick={() => setAgentMenu((v) => !v)} />
             )}
             <div style={{ minWidth: 0 }}>
-              <b>{a?.name ?? "…"}</b>
+              <b>{agent?.name ?? "…"}</b>
               <div className="small muted" style={{ display: "flex", alignItems: "center", gap: 4 }}>
                 <Icon name="cpu" size={12} />
-                {a?.model ? <span className="mono" title={a.model.connection}>{a.model.name}</span> : <span>{t("chat.noModel")}</span>}
+                {agent?.model ? <span className="mono" title={agent.model.connection}>{agent.model.name}</span> : <span>{t("chat.noModel")}</span>}
               </div>
             </div>
             <span className="spacer" />
@@ -112,10 +104,10 @@ function ConversationView({ conv, onMenu }: { conv: Conversation; onMenu: () => 
                 <button className="iconbtn" aria-label={t("chat.convMenu")} aria-expanded={convMenu} onClick={() => setConvMenu((v) => !v)}><Icon name="dots" /></button>
                 {convMenu && (
                   <Menu onClose={closeConvMenu} label={t("chat.convMenu")} className="conv-menu">
-                    <button className="action" disabled={busyTurn} title={busyTurn ? t("chat.waitTurn") : undefined} onClick={() => run("new")}>
+                    <button className="action" disabled={busyTurn} title={busyTurn ? t("chat.waitTurn") : undefined} onClick={() => run(chat.onReset)}>
                       <Icon name="undo" size={14} />{t("chat.cmd.new")}
                     </button>
-                    <button className="action" disabled={busyTurn} title={busyTurn ? t("chat.waitTurn") : undefined} onClick={() => run("compact")}>
+                    <button className="action" disabled={busyTurn} title={busyTurn ? t("chat.waitTurn") : undefined} onClick={() => run(chat.onCompact)}>
                       <Icon name="compress" size={14} />{t("chat.cmd.compact")}
                     </button>
                   </Menu>
@@ -123,7 +115,7 @@ function ConversationView({ conv, onMenu }: { conv: Conversation; onMenu: () => 
               </span>
             )}
           </div>
-          {agentMenu && a && <AgentMenu agent={a} onClose={closeAgentMenu} />}
+          {agentMenu && agent && <AgentMenu agent={agent} onClose={closeAgentMenu} />}
         </>
       )} />
   );

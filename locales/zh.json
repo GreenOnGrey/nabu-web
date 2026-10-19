@@ -128,7 +128,8 @@
     "imageNotSeen": "{model} 无法查看图片：代理将在空间中获得文件",
     "switchTo": "切换到 {model}",
     "convMenu": "对话菜单",
-    "waitTurn": "请等待回答"
+    "waitTurn": "请等待回答",
+    "resetFailed": "无法重置上下文"
   },
   "llm": {
     "retry": "重试",
@@ -449,21 +450,15 @@
         "reasoning": "推理",
         "contextWindow": "上下文窗口",
         "maxTokens": "最长回答",
-        "cost": "每百万输入/输出价格"
+        "cost": "每百万输入/输出价格",
+        "cost_input": "输入价格",
+        "cost_output": "输出价格"
       },
-      "resetEdits": "重置手动修改",
-      "availableByGroups": "用户可选的模型授予群组。"
-    },
-    "harness": {
-      "title": "Harness",
-      "lead": "智能体的运行环境。此版本包含 Pi。",
-      "name": "Harness",
-      "version": "版本",
-      "state": "状态",
-      "states": {
-        "ok": "运行中",
-        "error": "错误"
-      }
+      "availableByGroups": "用户可选的模型授予群组。",
+      "latency": "{ms, number} 毫秒",
+      "resetField": "重置",
+      "unfold": "{model} 的能力",
+      "fold": "隐藏 {model} 的能力"
     },
     "catalog": {
       "title": "目录",
@@ -640,9 +635,7 @@
       "channel": "渠道",
       "state": "连接",
       "enabled": "已启用",
-      "allUsers": "对所有人开放",
       "groups": "群组",
-      "users": "用户",
       "always": "始终",
       "client": "服务客户端",
       "statuses": {
@@ -679,7 +672,9 @@
       "rules": "仅当机器人是唯一收件人（收件人只有一个地址且抄送为空）时才邮件回复。其他邮件在网页应用的主题中回复。修改数据的操作需等待用户确认。",
       "rejected": "最近被拒绝",
       "access": "访问权限",
-      "configureInGroups": "在群组中配置"
+      "configureInGroups": "在群组中配置",
+      "accessBy": "访问：{groups}",
+      "onlyAdmins": "仅管理员"
     },
     "group-agents": {
       "title": "群组代理",
@@ -720,7 +715,10 @@
       "voiceOff": "未配置",
       "voiceHint": "环境选项 NABU_WHISPER 会部署识别器。",
       "harness": "代理框架 {name}",
-      "version": "版本"
+      "version": "版本",
+      "harnessNames": {
+        "pi": "Pi"
+      }
     },
     "agent-pods": {
       "title": "代理",
@@ -858,7 +856,14 @@
       "mcpRevoke": "{count} 名成员将失去对“{item}”的访问。其连接将被删除——需要重新连接。",
       "addMember": "按姓名或邮箱查找用户",
       "add": "添加",
-      "remove": "移除"
+      "remove": "移除",
+      "unsavedTitle": "未保存的更改",
+      "unsavedText": "该组的更改尚未保存。不保存就离开吗？",
+      "stay": "留下",
+      "discard": "不保存离开",
+      "connectionOff": "该连接已关闭",
+      "addChosen": "{count, plural, other {添加 # 位用户}}",
+      "moreMembers": "显示更多"
     },
     "access": {
       "title": "访问权限",
@@ -869,10 +874,12 @@
       "default": "默认",
       "defaultFrom": {
         "user": "用户的选择",
-        "group": "群组默认",
+        "group": "组 {group} 的默认模型",
         "global": "全局默认",
         "first": "按名称排序的第一个模型"
-      }
+      },
+      "admin": "管理员",
+      "deletedGroup": "已删除的组"
     }
   },
   "errors": {
@@ -910,7 +917,7 @@
     "sync_failed": "同步失败。",
     "invalid_source": "来源无效。",
     "invalid_model": "模型无效。",
-    "invalid_key": "需要密钥。",
+    "invalid_key": "缺少密钥或提供方拒绝了该密钥。",
     "invalid_url": "URL 无效。",
     "invalid_type": "类型无效。",
     "invalid_name": "名称无效。",
@@ -988,7 +995,7 @@
     "invalid_scope": "未知的 GigaChat 范围。",
     "invalid_endpoint": "端点为通用或 Coding Plan。",
     "gigachat_unavailable": "此部署中不可用 GigaChat。",
-    "transcription_too_long": "录音超过 5 分钟。",
+    "transcription_too_long": "录音超过 {maxSeconds, number} 秒。",
     "no_models_granted": "您没有可用的模型——请联系管理员。",
     "group_name_taken": "同名群组已存在。",
     "group_builtin": "内置群组无法删除、重命名或修改成员。",

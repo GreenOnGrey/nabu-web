@@ -5,7 +5,8 @@ import { groupName } from "./groupName";
 import { adminPath } from "./paths";
 import { Link } from "react-router-dom";
 import { api } from "../../api/client";
-import type { UserGroup, AdminChannel, EmailLogEntry, EmailSettings, List } from "../../api/types";
+import { adminKeys, useAdminChannels, useAdminGroups } from "../../api/queries";
+import type { AdminChannel, EmailLogEntry, EmailSettings, List } from "../../api/types";
 import { errorText } from "../../lib/errors";
 import { intlLocale } from "../../lib/i18n";
 import { dateTime } from "../../lib/format";
@@ -43,9 +44,9 @@ export function ChannelsAdmin() {
   const qc = useQueryClient();
   const toast = useToast();
   const [editing, setEditing] = useState<AdminChannel | null>(null);
-  const list = useQuery({ queryKey: ["admin", "channels"], queryFn: () => api.get<{ items: AdminChannel[] }>("/admin/api/v1/channels") });
-  const userGroups = useQuery({ queryKey: ["admin", "groups"], queryFn: () => api.get<{ items: UserGroup[] }>("/admin/api/v1/groups") });
-  const inv = () => qc.invalidateQueries({ queryKey: ["admin", "channels"] });
+  const list = useAdminChannels();
+  const userGroups = useAdminGroups();
+  const inv = () => qc.invalidateQueries({ queryKey: adminKeys.channels });
   const patch = useMutation({
     mutationFn: ({ kind, ...p }: { kind: string; enabled?: boolean; allUsers?: boolean; groupsEnabled?: boolean }) => api.patch(`/admin/api/v1/channels/${kind}`, p),
     onSuccess: inv,
@@ -76,7 +77,8 @@ export function ChannelsAdmin() {
                   <td><Switch on={c.enabled} disabled={c.locked} onChange={(v) => patch.mutate({ kind: c.kind, enabled: v })} /></td>
                   {/* FTR.NAB.CMN-0007 design §3.4: the access of a channel is granted to groups */}
                   <td className="small">{c.locked ? <span className="muted">{t("admin.channels.everybody")}</span> : <>
-                    {(userGroups.data?.items ?? []).filter((g) => g.allEnabled || g.grants?.channels.includes(c.kind)).map((g) => groupName(t, g)).join(", ")}
+                    {/* the groups that grant it; «Administrators» have every enabled channel and are not listed */}
+                    {t("admin.channels.accessBy", { groups: (userGroups.data?.items ?? []).filter((g) => g.grants?.channels.includes(c.kind)).map((g) => groupName(t, g)).join(", ") || t("admin.channels.onlyAdmins") })}
                     {" · "}<Link to={adminPath("groups")}>{t("admin.channels.configureInGroups")}</Link></>}</td>
                   <td>{groups ? <Switch on={c.groupsEnabled} onChange={(v) => patch.mutate({ kind: c.kind, groupsEnabled: v })} /> : <span className="muted">—</span>}</td>
                   <td>{!c.locked && !c.product && <button className="btn sm" onClick={() => setEditing(c)}>{t("admin.channels.configure")}</button>}</td>
@@ -121,7 +123,7 @@ function ChannelCard({ channel, onClose }: { channel: AdminChannel; onClose: () 
   };
   const save = useMutation({
     mutationFn: () => api.patch<AdminChannel>(`/admin/api/v1/channels/${kind}`, body()),
-    onSuccess: (c) => { setCur(c); setSecret(""); qc.invalidateQueries({ queryKey: ["admin", "channels"] }); toast({ kind: "ok", title: t("common.saved") }); },
+    onSuccess: (c) => { setCur(c); setSecret(""); qc.invalidateQueries({ queryKey: adminKeys.channels }); toast({ kind: "ok", title: t("common.saved") }); },
   });
   const check = useMutation({
     // a typed secret is saved first: the check works with the stored one

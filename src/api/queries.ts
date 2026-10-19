@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "./client";
-import type { Agent, Me, PublicConfig } from "./types";
+import type { AdminCatalogItem, AdminChannel, Agent, Me, ModelConnectionList, PublicConfig, UserGroup } from "./types";
 
 // Query keys shared by pages and the SSE invalidation in App.
 export const keys = {
@@ -31,3 +31,23 @@ export const useConfig = () =>
 export const useMe = () => useQuery({ queryKey: keys.me, queryFn: () => api.get<Me>("/api/v1/me"), retry: false });
 
 export const useAgent = () => useQuery({ queryKey: keys.agent, queryFn: () => api.get<Agent>("/api/v1/agent") });
+
+// The lists of the administration shared by its pages (FTR.NAB.CMN-0007).
+export const adminKeys = {
+  groups: ["admin", "groups"] as const,
+  catalog: ["admin", "catalog"] as const,
+  connections: ["admin", "connections"] as const,
+  channels: ["admin", "channels"] as const,
+};
+
+export const useAdminGroups = () =>
+  useQuery({ queryKey: adminKeys.groups, queryFn: () => api.get<{ items: UserGroup[] }>("/admin/api/v1/groups") });
+
+export const useAdminCatalog = () =>
+  useQuery({ queryKey: adminKeys.catalog, queryFn: () => api.get<{ items: AdminCatalogItem[] }>("/admin/api/v1/catalog") });
+
+export const useModelConnections = () =>
+  useQuery({ queryKey: adminKeys.connections, queryFn: () => api.get<ModelConnectionList>("/admin/api/v1/model-connections") });
+
+export const useAdminChannels = () =>
+  useQuery({ queryKey: adminKeys.channels, queryFn: () => api.get<{ items: AdminChannel[] }>("/admin/api/v1/channels") });

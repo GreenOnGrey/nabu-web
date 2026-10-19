@@ -87,8 +87,7 @@ export function SpacePage() {
                   <td>{bytes(f.size, lng)}</td>
                   <td>{dateTime(f.modifiedAt, lng)} · {f.modifiedBy === "agent" ? t("space.byAgent") : t("space.byUser")}</td>
                   <td>
-                    {/* .iconbtn is a block of the kit: a row keeps it next to the download */}
-                    <div className="row" style={{ gap: 4, flexWrap: "nowrap", justifyContent: "flex-end" }}>
+                    <div className="file-actions">
                       <a className="btn sm" href={apiUrl(`/api/v1/space/files/content?path=${encodeURIComponent(f.path)}`)}><Icon name="download" size={14} />{t("space.download")}</a>
                       <button className="iconbtn" aria-label={t("common.delete")} onClick={() => del.mutate(f.path)}><Icon name="trash" size={16} /></button>
                     </div>

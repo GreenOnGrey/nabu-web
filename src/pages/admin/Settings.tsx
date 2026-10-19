@@ -7,7 +7,13 @@ import { errorText } from "../../lib/errors";
 import { Icon, Modal, useToast } from "@green-on-grey/ui-kit";
 
 interface Archive { retentionDays: number; willPurge?: number }
-interface Voice { configured: boolean; ok: boolean; url?: string; error?: string }
+export interface Voice { configured: boolean; ok: boolean; url?: string; error?: string }
+
+/** The state of the recognizer in its line (FTR.NAB.CHAT-0001 R22, design §3.5). */
+export function voiceState(v: Voice): { key: string; tone: "ok" | "review" | "none" } {
+  if (v.ok) return { key: "admin.settings.voiceOk", tone: "ok" };
+  return v.configured ? { key: "admin.settings.voiceDown", tone: "review" } : { key: "admin.settings.voiceOff", tone: "none" };
+}
 
 /** Settings (FTR.NAB.CMN-0002 R20, design §3.4): the retention of archived
  * accounts; before saving the number of accounts the next purge deletes is shown. */
@@ -18,9 +24,9 @@ export function SettingsAdmin() {
   const cur = useQuery({ queryKey: ["admin", "settings", "archive"], queryFn: () => api.get<Archive>("/admin/api/v1/settings/archive") });
   const [edited, setDays] = useState<string | null>(null);
   const [confirm, setConfirm] = useState<Archive | null>(null);
-  // FTR.NAB.CHAT-0001 R22: the recognizer of speech
   // the version of the agent harness (the former section Harness)
   const harness = useQuery({ queryKey: ["admin", "harnesses"], queryFn: () => api.get<{ items: Harness[] }>("/admin/api/v1/harnesses") });
+  // FTR.NAB.CHAT-0001 R22: the recognizer of speech
   const voice = useQuery({ queryKey: ["admin", "voice"], queryFn: () => api.get<Voice>("/admin/api/v1/voice") });
   const days = edited ?? (cur.data ? String(cur.data.retentionDays) : "");
   const n = Number(days);
@@ -52,18 +58,14 @@ export function SettingsAdmin() {
       </div>
       {harness.data?.items.map((h) => (
         <div key={h.name} className="svc" style={{ maxWidth: 560, marginTop: 14 }}>
-          <div className="h"><Icon name="box" /><b>{t("admin.settings.harness", { name: h.name === "pi" ? "Pi" : h.name })}</b>
-            <span className={`st ${h.status === "ok" ? "ok" : "review"}`}>{t(`admin.harness.states.${h.status}`, { defaultValue: h.status })}</span>
-          </div>
+          <div className="h"><Icon name="box" /><b>{t("admin.settings.harness", { name: t(`admin.settings.harnessNames.${h.name}`, { defaultValue: h.name }) })}</b></div>
           <div className="small t2">{t("admin.settings.version")} <span className="mono">{h.version}</span></div>
         </div>
       ))}
       {voice.data && (
         <div className="svc" style={{ maxWidth: 560, marginTop: 14 }}>
           <div className="h"><Icon name="mic" /><b>{t("admin.settings.voice")}</b>
-            <span className={`st ${voice.data.ok ? "ok" : voice.data.configured ? "review" : "none"}`}>
-              {t(voice.data.ok ? "admin.settings.voiceOk" : voice.data.configured ? "admin.settings.voiceDown" : "admin.settings.voiceOff")}
-            </span>
+            <span className={`st ${voiceState(voice.data).tone}`}>{t(voiceState(voice.data).key)}</span>
           </div>
           <div className="small t2">{voice.data.url ?? t("admin.settings.voiceHint")}{voice.data.error && <> · {voice.data.error}</>}</div>
         </div>

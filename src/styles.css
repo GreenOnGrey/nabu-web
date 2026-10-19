@@ -15,6 +15,10 @@
 .runs{border-top:1px solid var(--border);margin-top:10px;padding-top:10px}
 .runs .r{display:grid;grid-template-columns:160px 110px 1fr auto;gap:10px;padding:6px 0;font-size:13px;align-items:center}
 .task-sched{display:flex;align-items:center;gap:6px}
+/* the kit keeps the first column of a table on one line; the instruction of a task wraps */
+table.tasks-t td.task-cell{white-space:normal;min-width:240px}
+/* .iconbtn is a block of the kit: the row keeps it next to the download */
+.file-actions{display:flex;gap:4px;flex-wrap:nowrap;justify-content:flex-end}
 .task-text{display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:520px}
 .statebadge{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500}
 .statebadge::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--muted)}
@@ -229,6 +233,18 @@ table.comm-t td:nth-child(1),table.comm-t td:nth-child(2){display:inline-block;w
 .models-t{margin:6px 0}
 .caps-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 18px;padding:4px 0 8px}
 .caps-grid .src{font-size:11px;color:var(--muted);margin-top:2px}
+/* design §3.4: the table of models in the narrow dialog — the model, its price, the unfolding */
+.models-edit .mt-tick{width:28px}
+.models-edit .mt-model{min-width:0}
+.models-edit .mt-model .caps{margin-top:4px}
+.models-edit .mt-id{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:320px}
+.models-edit .mt-price{white-space:nowrap;text-align:right}
+.models-edit .mt-fold{width:28px}
+.cap-sw{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.cap-lab{min-height:2.6em;display:flex;align-items:flex-end;margin-bottom:6px}
+.caps-cost{display:flex;gap:4px;min-width:0}
+/* a number field shrinks with its column instead of its own width of an input */
+.cap-num{min-width:0;flex:1 1 0}
 .model-new{display:flex;flex-direction:column;gap:4px;margin:4px 0}
 .type-tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 .type-tile{border:1px solid var(--border);border-radius:var(--r-m);padding:9px;background:var(--surface);color:var(--text);font-size:14px}
@@ -243,6 +259,9 @@ table.comm-t td:nth-child(1),table.comm-t td:nth-child(2){display:inline-block;w
 .grp-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:14px}
 .grp-row .grp-name{flex:1;min-width:0}
 .grp-row.off{color:var(--muted)}
+.grp-order{white-space:nowrap}
+.grp-search{margin-bottom:8px}
+.grp-sec.off{opacity:.7}
 .sm-ic{width:22px;height:22px;font-size:10px}
 .access-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .acc-row{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px solid var(--border);font-size:14px}
