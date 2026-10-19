@@ -18,7 +18,8 @@
     "done": "Done",
     "more": "Show more",
     "saved": "Saved",
-    "close": "Close"
+    "close": "Close",
+    "search": "Search"
   },
   "login": {
     "logoAlt": "Nabu logo",
@@ -58,7 +59,11 @@
   "agent": {
     "menu": "Agent",
     "tone": "Tone",
-    "everywhere": "The change applies in every channel and connected service."
+    "everywhere": "The change applies in every channel and connected service.",
+    "model": "Model",
+    "modelDefault": "Default",
+    "modelCompactWarn": "The context will be compacted before the next answer",
+    "noModels": "No models granted — ask an administrator"
   },
   "channels": {
     "web": "Website",
@@ -107,7 +112,23 @@
       "empty": "No open commitments",
       "all": "All commitments",
       "count": "{count, plural, one {# commitment} other {# commitments}}"
-    }
+    },
+    "event": {
+      "reset": "Context reset",
+      "compacted": "Context compacted: {before} → {after} tokens",
+      "auto": "automatically",
+      "model": "Model: {name}"
+    },
+    "voiceMark": "voice",
+    "cmd": {
+      "new": "Start with a clean context",
+      "compact": "Compact the context"
+    },
+    "compactFailed": "The context was not compacted",
+    "imageNotSeen": "{model} cannot see images: the agent gets a file in the space",
+    "switchTo": "Switch to {model}",
+    "convMenu": "Conversation menu",
+    "waitTurn": "Wait for the answer"
   },
   "llm": {
     "retry": "Retry",
@@ -124,7 +145,8 @@
       "user_blocked": "Access to the agent is closed for your account.",
       "workspace_not_connected": "The workspace did not connect.",
       "limit_exceeded": "The run exceeded its limits.",
-      "no_capacity": "No free capacity for the agent."
+      "no_capacity": "No free capacity for the agent.",
+      "no_models_granted": "No model is available to you — ask an administrator."
     }
   },
   "tasks": {
@@ -342,8 +364,11 @@
         "always": "always",
         "all_users": "for all users",
         "user": "enabled for the user",
-        "disabled": "not available"
-      }
+        "disabled": "not available",
+        "group": "granted to a group"
+      },
+      "available": "available",
+      "notAvailable": "not available"
     },
     "models": {
       "title": "Model connections",
@@ -352,7 +377,9 @@
       "type": "Type",
       "types": {
         "deepseek": "DeepSeek",
-        "openai_compatible": "OpenAI-compatible"
+        "openai_compatible": "OpenAI-compatible",
+        "gigachat": "GigaChat",
+        "zai": "Z.AI"
       },
       "name": "Name",
       "baseUrl": "Base URL",
@@ -384,7 +411,46 @@
         "high": "High",
         "xhigh": "Extra high",
         "max": "Max"
-      }
+      },
+      "authKey": "Authorization key",
+      "scope": "Scope",
+      "scopes": {
+        "GIGACHAT_API_PERS": "Individual (PERS)",
+        "GIGACHAT_API_B2B": "Business, prepaid (B2B)",
+        "GIGACHAT_API_CORP": "Business, postpaid (CORP)"
+      },
+      "endpoint": "Endpoint",
+      "endpoints": {
+        "general": "General",
+        "coding": "GLM Coding Plan"
+      },
+      "load": "Load models",
+      "refresh": "Refresh models",
+      "refreshedAt": "refreshed {when}",
+      "noList": "The provider does not list models. Known models of this type are shown.",
+      "addManually": "Add by id: model-a, model-b",
+      "newHint": "New models of the provider are not added by themselves: the card of the connection marks them «new».",
+      "picked": "{picked} of {total}",
+      "new": "new",
+      "newCount": "{count, plural, one {# new} other {# new}}",
+      "addModel": "Add",
+      "gone": "gone from the provider",
+      "confirmed": "confirmed",
+      "switchOff": "Switch off",
+      "probe": {
+        "image": "Images",
+        "tools": "Tools"
+      },
+      "cap": {
+        "image": "Images",
+        "tools": "Tools",
+        "reasoning": "Reasoning",
+        "contextWindow": "Context window",
+        "maxTokens": "Longest answer",
+        "cost": "Price in / out per 1M"
+      },
+      "resetEdits": "Reset the manual edits",
+      "availableByGroups": "The models users may choose are granted to groups."
     },
     "harness": {
       "title": "Harness",
@@ -609,7 +675,9 @@
       "secretSet": "Set. Enter a new value to replace it",
       "secretHint": "The secret is stored encrypted and never shown again.",
       "rules": "The bot answers by mail only when it is the only recipient: one address in To and an empty Cc. Other letters are answered in the topic of the web application. Actions that change data wait for the confirmation of the user.",
-      "rejected": "Rejected recently"
+      "rejected": "Rejected recently",
+      "access": "Access",
+      "configureInGroups": "Configure in groups"
     },
     "group-agents": {
       "title": "Group agents",
@@ -643,7 +711,14 @@
       "retentionHint": "After this time an archived account and its data are deleted for good. The same time is kept for the data of a group agent removed from its group.",
       "confirmTitle": "Retention of the archive",
       "confirmText": "The new retention of {days} days applies to all archived accounts.",
-      "willPurge": "{count, plural, =0 {No account is deleted by the next purge.} one {The next purge deletes # account.} other {The next purge deletes # accounts.}}"
+      "willPurge": "{count, plural, =0 {No account is deleted by the next purge.} one {The next purge deletes # account.} other {The next purge deletes # accounts.}}",
+      "voice": "Speech recognition",
+      "voiceOk": "Connected",
+      "voiceDown": "Not available",
+      "voiceOff": "Not configured",
+      "voiceHint": "The stand option NABU_WHISPER deploys the recognizer.",
+      "harness": "Agent harness {name}",
+      "version": "Version"
     },
     "agent-pods": {
       "title": "Agents",
@@ -748,6 +823,54 @@
       "embeddingsHint": "An embeddings model of a connection. After a change the vectors are recounted in the background.",
       "wordsOnly": "The search works by words only: choose an embeddings model.",
       "noVectors": "The database has no vector extension: the search works by words only."
+    },
+    "groups": {
+      "title": "Groups",
+      "create": "Create a group",
+      "all": "All users",
+      "admins": "Administrators",
+      "byRole": "by role · {count}",
+      "everyone": "Every user",
+      "adminsHint": "Members are the users with the administrator role",
+      "adminsAll": "Administrators have everything enabled on the platform",
+      "allEnabled": "all enabled",
+      "priority": "The default model comes from the group higher in the list. A user has everything granted to their groups.",
+      "onlyBuiltin": "Create a group to grant resources to some of the users",
+      "group": "Group",
+      "members": "Members",
+      "memberCount": "{count, plural, one {# member} other {# members}}",
+      "models": "Models",
+      "channels": "Channels",
+      "mcp": "MCP",
+      "skills": "Skills",
+      "name": "Name",
+      "description": "Description",
+      "up": "Higher",
+      "down": "Lower",
+      "defaultModel": "default of the group",
+      "channelOff": "The channel is off in the instance",
+      "itemUnpublished": "The item is not published",
+      "delete": "Delete the group",
+      "deleteText": "Delete the group “{name}”? {count} members lose the access it grants.",
+      "mcpRevokeTitle": "Connections will be deleted",
+      "mcpRevoke": "{count} members lose access to “{item}”. Their connections are deleted — they will have to connect again.",
+      "addMember": "Find a user by name or email",
+      "add": "Add",
+      "remove": "Remove"
+    },
+    "access": {
+      "title": "Access",
+      "addToGroup": "Add to a group",
+      "via": "via {groups}",
+      "noModels": "No model is available to the user: the agent will not answer",
+      "onlyWeb": "Website only",
+      "default": "default",
+      "defaultFrom": {
+        "user": "the choice of the user",
+        "group": "the default of a group",
+        "global": "the global default",
+        "first": "the first model by name"
+      }
     }
   },
   "errors": {
@@ -852,7 +975,30 @@
     "catalog_tool_unknown": "The tool is not in the last check of the item. Check the item again.",
     "catalog_file_arg_invalid": "Only a string argument of an allowed tool can be a space file.",
     "catalog_file_max_invalid": "The file limit is 0.001 to 100 MB.",
-    "catalog_check_needs_connection": "Connect the item in Connections to check it: the server answers only with a personal access."
+    "catalog_check_needs_connection": "Connect the item in Connections to check it: the server answers only with a personal access.",
+    "context_busy": "Wait for the answer or stop it.",
+    "context_too_short": "The context is already short.",
+    "invalid_instructions": "The instructions are longer than 500 characters.",
+    "skill_unavailable": "The skill is not available.",
+    "model_not_granted": "The model is not granted to you.",
+    "model_no_tools": "The model cannot call tools.",
+    "models_list_failed": "Could not get the list of models: {reason}",
+    "invalid_scope": "Unknown scope of GigaChat.",
+    "invalid_endpoint": "The endpoint is general or Coding Plan.",
+    "gigachat_unavailable": "GigaChat is not available in this deployment.",
+    "transcription_too_long": "The recording is longer than 5 minutes.",
+    "no_models_granted": "No model is available to you — ask an administrator.",
+    "group_name_taken": "A group with this name exists.",
+    "group_builtin": "A built-in group cannot be deleted, renamed or have its members changed.",
+    "invalid_order": "Name every group once.",
+    "invalid_grant": "The grant is not possible.",
+    "invalid_group": "Unknown or built-in group.",
+    "invalid_users": "From 1 to 500 users.",
+    "use_groups": "Access is granted to groups in Administration → Groups.",
+    "last_admin": "The last administrator cannot lose the role.",
+    "access_denied_item": "No access to the item — ask an administrator.",
+    "use_groups_models": "The available models are granted to groups.",
+    "confirm_required": "Confirm the action."
   },
   "comm": {
     "lead": "What the agent knows about you and your work correspondence",
@@ -1075,5 +1221,21 @@
       "deleteAllTitle": "Delete everything collected?",
       "deleteAllText": "Notes ({notes}), commitments ({commitments}), people and topics are deleted and the memory tasks are switched off. The facts of the memory stay."
     }
+  },
+  "models": {
+    "cap": {
+      "image": "images",
+      "reasoning": "reasoning",
+      "noTools": "no tools",
+      "embeddings": "embeddings"
+    },
+    "src": {
+      "provider": "provider",
+      "catalog": "directory",
+      "probe": "probe",
+      "manual": "manual",
+      "default": "default"
+    },
+    "unconfirmed": "not confirmed"
   }
 }

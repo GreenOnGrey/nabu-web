@@ -18,7 +18,8 @@
     "done": "完成",
     "more": "显示更多",
     "saved": "已保存",
-    "close": "关闭"
+    "close": "关闭",
+    "search": "搜索"
   },
   "login": {
     "logoAlt": "Nabu 标志",
@@ -58,7 +59,11 @@
   "agent": {
     "menu": "智能体",
     "tone": "语气",
-    "everywhere": "更改在所有渠道和已连接的服务中生效。"
+    "everywhere": "更改在所有渠道和已连接的服务中生效。",
+    "model": "模型",
+    "modelDefault": "默认",
+    "modelCompactWarn": "下次回答前将压缩上下文",
+    "noModels": "没有可用的模型——请联系管理员"
   },
   "channels": {
     "web": "网站",
@@ -107,7 +112,23 @@
       "empty": "没有未完成的约定",
       "all": "全部约定",
       "count": "{count, plural, other {# 项约定}}"
-    }
+    },
+    "event": {
+      "reset": "上下文已重置",
+      "compacted": "上下文已压缩：{before} → {after} 个令牌",
+      "auto": "自动",
+      "model": "模型：{name}"
+    },
+    "voiceMark": "语音",
+    "cmd": {
+      "new": "以空白上下文开始",
+      "compact": "压缩上下文"
+    },
+    "compactFailed": "上下文未压缩",
+    "imageNotSeen": "{model} 无法查看图片：代理将在空间中获得文件",
+    "switchTo": "切换到 {model}",
+    "convMenu": "对话菜单",
+    "waitTurn": "请等待回答"
   },
   "llm": {
     "retry": "重试",
@@ -124,7 +145,8 @@
       "user_blocked": "您的账号已被禁止访问智能体。",
       "workspace_not_connected": "工作空间未连接。",
       "limit_exceeded": "运行超出了限制。",
-      "no_capacity": "代理没有空闲容量。"
+      "no_capacity": "代理没有空闲容量。",
+      "no_models_granted": "您没有可用的模型——请联系管理员。"
     }
   },
   "tasks": {
@@ -342,8 +364,11 @@
         "always": "始终",
         "all_users": "对所有人",
         "user": "已为该用户启用",
-        "disabled": "不可用"
-      }
+        "disabled": "不可用",
+        "group": "已授予群组"
+      },
+      "available": "可用",
+      "notAvailable": "不可用"
     },
     "models": {
       "title": "模型连接",
@@ -352,7 +377,9 @@
       "type": "类型",
       "types": {
         "deepseek": "DeepSeek",
-        "openai_compatible": "兼容 OpenAI"
+        "openai_compatible": "OpenAI 兼容",
+        "gigachat": "GigaChat",
+        "zai": "Z.AI"
       },
       "name": "名称",
       "baseUrl": "基础 URL",
@@ -384,7 +411,46 @@
         "high": "高",
         "xhigh": "很高",
         "max": "最高"
-      }
+      },
+      "authKey": "授权密钥",
+      "scope": "范围",
+      "scopes": {
+        "GIGACHAT_API_PERS": "个人（PERS）",
+        "GIGACHAT_API_B2B": "企业预付（B2B）",
+        "GIGACHAT_API_CORP": "企业后付（CORP）"
+      },
+      "endpoint": "端点",
+      "endpoints": {
+        "general": "通用",
+        "coding": "GLM Coding Plan"
+      },
+      "load": "加载模型",
+      "refresh": "刷新模型",
+      "refreshedAt": "更新于 {when}",
+      "noList": "提供方未列出模型。显示此类型的已知模型。",
+      "addManually": "手动添加：model-a, model-b",
+      "newHint": "提供方的新模型不会自动添加：连接卡片会标记为“新”。",
+      "picked": "{picked} / {total}",
+      "new": "新",
+      "newCount": "{count} 个新模型",
+      "addModel": "添加",
+      "gone": "提供方已移除",
+      "confirmed": "已确认",
+      "switchOff": "关闭",
+      "probe": {
+        "image": "图片",
+        "tools": "工具"
+      },
+      "cap": {
+        "image": "图片",
+        "tools": "工具",
+        "reasoning": "推理",
+        "contextWindow": "上下文窗口",
+        "maxTokens": "最长回答",
+        "cost": "每百万输入/输出价格"
+      },
+      "resetEdits": "重置手动修改",
+      "availableByGroups": "用户可选的模型授予群组。"
     },
     "harness": {
       "title": "Harness",
@@ -609,7 +675,9 @@
       "secretSet": "已设置。输入新值以替换",
       "secretHint": "密钥加密存储，不会再次显示。",
       "rules": "仅当机器人是唯一收件人（收件人只有一个地址且抄送为空）时才邮件回复。其他邮件在网页应用的主题中回复。修改数据的操作需等待用户确认。",
-      "rejected": "最近被拒绝"
+      "rejected": "最近被拒绝",
+      "access": "访问权限",
+      "configureInGroups": "在群组中配置"
     },
     "group-agents": {
       "title": "群组代理",
@@ -643,7 +711,14 @@
       "retentionHint": "超过此期限后，归档账户及其数据将被永久删除。被移出群组的群组代理数据也保留同样的时间。",
       "confirmTitle": "归档保留期",
       "confirmText": "新的保留期 {days} 天适用于所有归档账户。",
-      "willPurge": "{count, plural, =0 {下次清理不会删除任何账户。} other {下次清理将删除 # 个账户。}}"
+      "willPurge": "{count, plural, =0 {下次清理不会删除任何账户。} other {下次清理将删除 # 个账户。}}",
+      "voice": "语音识别",
+      "voiceOk": "已连接",
+      "voiceDown": "不可用",
+      "voiceOff": "未配置",
+      "voiceHint": "环境选项 NABU_WHISPER 会部署识别器。",
+      "harness": "代理框架 {name}",
+      "version": "版本"
     },
     "agent-pods": {
       "title": "代理",
@@ -748,6 +823,54 @@
       "embeddingsHint": "某个连接的嵌入模型。更换后向量会在后台重新计算。",
       "wordsOnly": "目前仅按词搜索：请选择嵌入模型。",
       "noVectors": "数据库没有 vector 扩展：仅按词搜索。"
+    },
+    "groups": {
+      "title": "群组",
+      "create": "创建群组",
+      "all": "所有用户",
+      "admins": "管理员",
+      "byRole": "按角色 · {count}",
+      "everyone": "每个用户",
+      "adminsHint": "成员为具有管理员角色的用户",
+      "adminsAll": "管理员拥有平台上启用的全部资源",
+      "allEnabled": "全部已启用",
+      "priority": "默认模型取自列表中靠前的群组。用户拥有其群组被授予的全部内容。",
+      "onlyBuiltin": "创建群组以向部分用户授予资源",
+      "group": "群组",
+      "members": "成员",
+      "memberCount": "{count} 名成员",
+      "models": "模型",
+      "channels": "渠道",
+      "mcp": "MCP",
+      "skills": "技能",
+      "name": "名称",
+      "description": "描述",
+      "up": "上移",
+      "down": "下移",
+      "defaultModel": "群组默认",
+      "channelOff": "该渠道在实例中已关闭",
+      "itemUnpublished": "该项未发布",
+      "delete": "删除群组",
+      "deleteText": "删除群组“{name}”？{count} 名成员将失去该群组授予的访问权限。",
+      "mcpRevokeTitle": "连接将被删除",
+      "mcpRevoke": "{count} 名成员将失去对“{item}”的访问。其连接将被删除——需要重新连接。",
+      "addMember": "按姓名或邮箱查找用户",
+      "add": "添加",
+      "remove": "移除"
+    },
+    "access": {
+      "title": "访问权限",
+      "addToGroup": "添加到群组",
+      "via": "通过 {groups}",
+      "noModels": "该用户没有可用模型：代理不会回答",
+      "onlyWeb": "仅网站",
+      "default": "默认",
+      "defaultFrom": {
+        "user": "用户的选择",
+        "group": "群组默认",
+        "global": "全局默认",
+        "first": "按名称排序的第一个模型"
+      }
     }
   },
   "errors": {
@@ -852,7 +975,30 @@
     "catalog_tool_unknown": "此工具不在该项的最近一次检查结果中。请重新检查该项。",
     "catalog_file_arg_invalid": "只有已允许工具的字符串参数才能设为空间文件。",
     "catalog_file_max_invalid": "文件上限为 0.001 至 100 MB。",
-    "catalog_check_needs_connection": "请在“连接”中连接此项后再检查：服务器只接受个人访问。"
+    "catalog_check_needs_connection": "请在“连接”中连接此项后再检查：服务器只接受个人访问。",
+    "context_busy": "请等待回答或停止它。",
+    "context_too_short": "上下文已经很短。",
+    "invalid_instructions": "说明超过 500 个字符。",
+    "skill_unavailable": "该技能不可用。",
+    "model_not_granted": "您无权使用该模型。",
+    "model_no_tools": "该模型无法调用工具。",
+    "models_list_failed": "无法获取模型列表：{reason}",
+    "invalid_scope": "未知的 GigaChat 范围。",
+    "invalid_endpoint": "端点为通用或 Coding Plan。",
+    "gigachat_unavailable": "此部署中不可用 GigaChat。",
+    "transcription_too_long": "录音超过 5 分钟。",
+    "no_models_granted": "您没有可用的模型——请联系管理员。",
+    "group_name_taken": "同名群组已存在。",
+    "group_builtin": "内置群组无法删除、重命名或修改成员。",
+    "invalid_order": "每个群组只列一次。",
+    "invalid_grant": "无法进行此授权。",
+    "invalid_group": "未知或内置群组。",
+    "invalid_users": "1 至 500 名用户。",
+    "use_groups": "访问权限在“管理 → 群组”中授予群组。",
+    "last_admin": "最后一位管理员不能失去该角色。",
+    "access_denied_item": "无权访问该项——请联系管理员。",
+    "use_groups_models": "可用模型授予群组。",
+    "confirm_required": "请确认操作。"
   },
   "comm": {
     "lead": "助手了解的关于您和您工作往来的信息",
@@ -1075,5 +1221,21 @@
       "deleteAllTitle": "删除全部已收集的内容？",
       "deleteAllText": "将删除笔记（{notes}）、约定（{commitments}）、人员和主题，并关闭记忆任务。记忆中的事实会保留。"
     }
+  },
+  "models": {
+    "cap": {
+      "image": "图片",
+      "reasoning": "推理",
+      "noTools": "无工具",
+      "embeddings": "嵌入"
+    },
+    "src": {
+      "provider": "提供方",
+      "catalog": "目录",
+      "probe": "探测",
+      "manual": "手动",
+      "default": "默认"
+    },
+    "unconfirmed": "未确认"
   }
 }

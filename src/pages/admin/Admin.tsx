@@ -4,8 +4,8 @@ import { useSession } from "../../app/session";
 import { Empty, Icon } from "@green-on-grey/ui-kit";
 import { adminPath } from "./paths";
 import { UsersAdmin } from "./Users";
+import { GroupsAdmin } from "./Groups";
 import { ModelsAdmin } from "./Models";
-import { HarnessAdmin } from "./Harness";
 import { CatalogAdmin } from "./Catalog";
 import { ServiceAgentsAdmin } from "./ServiceAgents";
 import { ClientsAdmin } from "./Clients";
@@ -19,13 +19,13 @@ import { CommAdmin } from "./Comm";
 
 const SECTIONS = [
   { path: "users", icon: "users" },
+  { path: "groups", icon: "lock" },
   { path: "channels", icon: "msg" },
-  { path: "group-agents", icon: "grid" },
   { path: "agent-pods", icon: "bolt" },
-  { path: "models", icon: "cpu" },
-  { path: "harness", icon: "box" },
-  { path: "catalog", icon: "plug" },
+  { path: "group-agents", icon: "grid" },
   { path: "service-agents", icon: "spark" },
+  { path: "models", icon: "cpu" },
+  { path: "catalog", icon: "plug" },
   { path: "comm", icon: "brain" },
   { path: "clients", icon: "server" },
   { path: "usage", icon: "chart" },
@@ -52,8 +52,8 @@ export function AdminPage() {
         <Routes>
           <Route index element={<Navigate to={adminPath("users")} replace />} />
           <Route path="users" element={<UsersAdmin />} />
+          <Route path="groups" element={<GroupsAdmin />} />
           <Route path="models" element={<ModelsAdmin />} />
-          <Route path="harness" element={<HarnessAdmin />} />
           <Route path="catalog" element={<CatalogAdmin />} />
           <Route path="service-agents" element={<ServiceAgentsAdmin />} />
           <Route path="clients" element={<ClientsAdmin />} />

@@ -18,7 +18,8 @@
     "done": "Fertig",
     "more": "Mehr anzeigen",
     "saved": "Gespeichert",
-    "close": "Schließen"
+    "close": "Schließen",
+    "search": "Suche"
   },
   "login": {
     "logoAlt": "Nabu-Logo",
@@ -58,7 +59,11 @@
   "agent": {
     "menu": "Agent",
     "tone": "Ton",
-    "everywhere": "Die Änderung gilt in allen Kanälen und verbundenen Diensten."
+    "everywhere": "Die Änderung gilt in allen Kanälen und verbundenen Diensten.",
+    "model": "Modell",
+    "modelDefault": "Standard",
+    "modelCompactWarn": "Der Kontext wird vor der nächsten Antwort komprimiert",
+    "noModels": "Keine Modelle freigegeben — wenden Sie sich an einen Administrator"
   },
   "channels": {
     "web": "Website",
@@ -107,7 +112,23 @@
       "empty": "Keine offenen Vereinbarungen",
       "all": "Alle Vereinbarungen",
       "count": "{count, plural, one {# Vereinbarung} other {# Vereinbarungen}}"
-    }
+    },
+    "event": {
+      "reset": "Kontext zurückgesetzt",
+      "compacted": "Kontext komprimiert: {before} → {after} Tokens",
+      "auto": "automatisch",
+      "model": "Modell: {name}"
+    },
+    "voiceMark": "Sprachnachricht",
+    "cmd": {
+      "new": "Mit leerem Kontext beginnen",
+      "compact": "Kontext komprimieren"
+    },
+    "compactFailed": "Der Kontext wurde nicht komprimiert",
+    "imageNotSeen": "{model} sieht keine Bilder: der Agent erhält eine Datei im Arbeitsbereich",
+    "switchTo": "Zu {model} wechseln",
+    "convMenu": "Gesprächsmenü",
+    "waitTurn": "Warten Sie auf die Antwort"
   },
   "llm": {
     "retry": "Wiederholen",
@@ -124,7 +145,8 @@
       "user_blocked": "Der Zugang zum Agenten ist für Ihr Konto gesperrt.",
       "workspace_not_connected": "Der Arbeitsbereich hat sich nicht verbunden.",
       "limit_exceeded": "Der Lauf hat seine Limits überschritten.",
-      "no_capacity": "Keine freie Kapazität für den Agenten."
+      "no_capacity": "Keine freie Kapazität für den Agenten.",
+      "no_models_granted": "Ihnen ist kein Modell freigegeben — wenden Sie sich an einen Administrator."
     }
   },
   "tasks": {
@@ -342,8 +364,11 @@
         "always": "immer",
         "all_users": "für alle",
         "user": "für den Nutzer aktiviert",
-        "disabled": "nicht verfügbar"
-      }
+        "disabled": "nicht verfügbar",
+        "group": "einer Gruppe gewährt"
+      },
+      "available": "verfügbar",
+      "notAvailable": "nicht verfügbar"
     },
     "models": {
       "title": "Modellverbindungen",
@@ -352,7 +377,9 @@
       "type": "Typ",
       "types": {
         "deepseek": "DeepSeek",
-        "openai_compatible": "OpenAI-kompatibel"
+        "openai_compatible": "OpenAI-kompatibel",
+        "gigachat": "GigaChat",
+        "zai": "Z.AI"
       },
       "name": "Name",
       "baseUrl": "Basis-URL",
@@ -384,7 +411,46 @@
         "high": "Hoch",
         "xhigh": "Sehr hoch",
         "max": "Maximal"
-      }
+      },
+      "authKey": "Autorisierungsschlüssel",
+      "scope": "Bereich",
+      "scopes": {
+        "GIGACHAT_API_PERS": "Privatperson (PERS)",
+        "GIGACHAT_API_B2B": "Unternehmen, Vorauszahlung (B2B)",
+        "GIGACHAT_API_CORP": "Unternehmen, Nachzahlung (CORP)"
+      },
+      "endpoint": "Endpunkt",
+      "endpoints": {
+        "general": "Allgemein",
+        "coding": "GLM Coding Plan"
+      },
+      "load": "Modelle laden",
+      "refresh": "Modelle aktualisieren",
+      "refreshedAt": "aktualisiert {when}",
+      "noList": "Der Anbieter listet keine Modelle. Bekannte Modelle dieses Typs werden angezeigt.",
+      "addManually": "Manuell hinzufügen: model-a, model-b",
+      "newHint": "Neue Modelle des Anbieters werden nicht automatisch hinzugefügt: die Karte markiert sie als „neu“.",
+      "picked": "{picked} von {total}",
+      "new": "neu",
+      "newCount": "{count, plural, one {# neu} other {# neu}}",
+      "addModel": "Hinzufügen",
+      "gone": "beim Anbieter entfernt",
+      "confirmed": "bestätigt",
+      "switchOff": "Ausschalten",
+      "probe": {
+        "image": "Bilder",
+        "tools": "Werkzeuge"
+      },
+      "cap": {
+        "image": "Bilder",
+        "tools": "Werkzeuge",
+        "reasoning": "Reasoning",
+        "contextWindow": "Kontextfenster",
+        "maxTokens": "Längste Antwort",
+        "cost": "Preis ein/aus pro 1 Mio."
+      },
+      "resetEdits": "Manuelle Änderungen zurücksetzen",
+      "availableByGroups": "Die wählbaren Modelle werden Gruppen gewährt."
     },
     "harness": {
       "title": "Harness",
@@ -609,7 +675,9 @@
       "secretSet": "Gesetzt. Neuen Wert eingeben, um ihn zu ersetzen",
       "secretHint": "Das Geheimnis wird verschlüsselt gespeichert und nicht wieder angezeigt.",
       "rules": "Der Bot antwortet per E-Mail nur als einziger Empfänger: eine Adresse in An und leeres Cc. Andere E-Mails werden im Thema der Web-App beantwortet. Ändernde Aktionen warten auf die Bestätigung des Nutzers.",
-      "rejected": "Kürzlich abgelehnt"
+      "rejected": "Kürzlich abgelehnt",
+      "access": "Zugriff",
+      "configureInGroups": "In Gruppen einrichten"
     },
     "group-agents": {
       "title": "Gruppenagenten",
@@ -643,7 +711,14 @@
       "retentionHint": "Nach dieser Zeit werden ein archiviertes Konto und seine Daten endgültig gelöscht. Ebenso lange bleiben Daten eines aus der Gruppe entfernten Gruppenagenten.",
       "confirmTitle": "Aufbewahrung des Archivs",
       "confirmText": "Die neue Aufbewahrung von {days} Tagen gilt für alle archivierten Konten.",
-      "willPurge": "{count, plural, =0 {Die nächste Bereinigung löscht kein Konto.} one {Die nächste Bereinigung löscht # Konto.} other {Die nächste Bereinigung löscht # Konten.}}"
+      "willPurge": "{count, plural, =0 {Die nächste Bereinigung löscht kein Konto.} one {Die nächste Bereinigung löscht # Konto.} other {Die nächste Bereinigung löscht # Konten.}}",
+      "voice": "Spracherkennung",
+      "voiceOk": "Verbunden",
+      "voiceDown": "Nicht verfügbar",
+      "voiceOff": "Nicht eingerichtet",
+      "voiceHint": "Die Option NABU_WHISPER des Stands stellt die Erkennung bereit.",
+      "harness": "Agent-Harness {name}",
+      "version": "Version"
     },
     "agent-pods": {
       "title": "Agenten",
@@ -748,6 +823,54 @@
       "embeddingsHint": "Ein Embedding-Modell einer Verbindung. Nach einem Wechsel werden die Vektoren im Hintergrund neu berechnet.",
       "wordsOnly": "Die Suche arbeitet nur nach Wörtern: Wählen Sie ein Embedding-Modell.",
       "noVectors": "Die Datenbank hat keine Vektor-Erweiterung: Die Suche arbeitet nur nach Wörtern."
+    },
+    "groups": {
+      "title": "Gruppen",
+      "create": "Gruppe erstellen",
+      "all": "Alle Benutzer",
+      "admins": "Administratoren",
+      "byRole": "nach Rolle · {count}",
+      "everyone": "Jeder Benutzer",
+      "adminsHint": "Mitglieder sind die Benutzer mit der Administratorrolle",
+      "adminsAll": "Administratoren haben alles, was auf der Plattform aktiviert ist",
+      "allEnabled": "alles Aktivierte",
+      "priority": "Das Standardmodell kommt von der höher stehenden Gruppe. Ein Benutzer hat alles, was seinen Gruppen gewährt ist.",
+      "onlyBuiltin": "Erstellen Sie eine Gruppe, um einem Teil der Benutzer Ressourcen zu gewähren",
+      "group": "Gruppe",
+      "members": "Mitglieder",
+      "memberCount": "{count, plural, one {# Mitglied} other {# Mitglieder}}",
+      "models": "Modelle",
+      "channels": "Kanäle",
+      "mcp": "MCP",
+      "skills": "Skills",
+      "name": "Name",
+      "description": "Beschreibung",
+      "up": "Höher",
+      "down": "Tiefer",
+      "defaultModel": "Standard der Gruppe",
+      "channelOff": "Der Kanal ist in der Instanz ausgeschaltet",
+      "itemUnpublished": "Der Eintrag ist nicht veröffentlicht",
+      "delete": "Gruppe löschen",
+      "deleteText": "Gruppe „{name}“ löschen? {count} Mitglieder verlieren den von ihr gewährten Zugriff.",
+      "mcpRevokeTitle": "Verbindungen werden gelöscht",
+      "mcpRevoke": "{count} Mitglieder verlieren den Zugriff auf „{item}“. Ihre Verbindungen werden gelöscht — sie müssen sich erneut verbinden.",
+      "addMember": "Benutzer nach Name oder E-Mail suchen",
+      "add": "Hinzufügen",
+      "remove": "Entfernen"
+    },
+    "access": {
+      "title": "Zugriff",
+      "addToGroup": "Zu einer Gruppe hinzufügen",
+      "via": "über {groups}",
+      "noModels": "Dem Benutzer ist kein Modell verfügbar: der Agent antwortet nicht",
+      "onlyWeb": "Nur Website",
+      "default": "Standard",
+      "defaultFrom": {
+        "user": "Wahl des Benutzers",
+        "group": "Standard einer Gruppe",
+        "global": "globaler Standard",
+        "first": "erstes Modell nach Name"
+      }
     }
   },
   "errors": {
@@ -852,7 +975,30 @@
     "catalog_tool_unknown": "Das Werkzeug fehlt in der letzten Prüfung des Eintrags. Prüfen Sie den Eintrag erneut.",
     "catalog_file_arg_invalid": "Nur ein Text-Argument eines erlaubten Werkzeugs kann eine Datei im Bereich sein.",
     "catalog_file_max_invalid": "Das Dateilimit liegt zwischen 0,001 und 100 MB.",
-    "catalog_check_needs_connection": "Verbinden Sie den Eintrag unter „Verbindungen“, um ihn zu prüfen: der Server antwortet nur mit persönlichem Zugang."
+    "catalog_check_needs_connection": "Verbinden Sie den Eintrag unter „Verbindungen“, um ihn zu prüfen: der Server antwortet nur mit persönlichem Zugang.",
+    "context_busy": "Warten Sie auf die Antwort oder stoppen Sie sie.",
+    "context_too_short": "Der Kontext ist bereits kurz.",
+    "invalid_instructions": "Die Anweisung ist länger als 500 Zeichen.",
+    "skill_unavailable": "Der Skill ist nicht verfügbar.",
+    "model_not_granted": "Das Modell ist für Sie nicht freigegeben.",
+    "model_no_tools": "Das Modell kann keine Werkzeuge aufrufen.",
+    "models_list_failed": "Die Modellliste konnte nicht abgerufen werden: {reason}",
+    "invalid_scope": "Unbekannter GigaChat-Bereich.",
+    "invalid_endpoint": "Der Endpunkt ist allgemein oder Coding Plan.",
+    "gigachat_unavailable": "GigaChat ist in dieser Installation nicht verfügbar.",
+    "transcription_too_long": "Die Aufnahme ist länger als 5 Minuten.",
+    "no_models_granted": "Ihnen ist kein Modell freigegeben — wenden Sie sich an einen Administrator.",
+    "group_name_taken": "Eine Gruppe mit diesem Namen existiert.",
+    "group_builtin": "Eine eingebaute Gruppe kann nicht gelöscht, umbenannt oder in ihren Mitgliedern geändert werden.",
+    "invalid_order": "Nennen Sie jede Gruppe einmal.",
+    "invalid_grant": "Diese Freigabe ist nicht möglich.",
+    "invalid_group": "Unbekannte oder eingebaute Gruppe.",
+    "invalid_users": "Von 1 bis 500 Benutzern.",
+    "use_groups": "Zugriff wird Gruppen unter Verwaltung → Gruppen gewährt.",
+    "last_admin": "Der letzte Administrator kann die Rolle nicht verlieren.",
+    "access_denied_item": "Kein Zugriff auf den Eintrag — wenden Sie sich an einen Administrator.",
+    "use_groups_models": "Die verfügbaren Modelle werden Gruppen gewährt.",
+    "confirm_required": "Bestätigen Sie die Aktion."
   },
   "comm": {
     "lead": "Was der Agent über Sie und Ihre Arbeitskorrespondenz weiß",
@@ -1075,5 +1221,21 @@
       "deleteAllTitle": "Alles Erfasste löschen?",
       "deleteAllText": "Notizen ({notes}), Zusagen ({commitments}), Personen und Themen werden gelöscht und die Gedächtnisaufgaben ausgeschaltet. Die Fakten bleiben."
     }
+  },
+  "models": {
+    "cap": {
+      "image": "Bilder",
+      "reasoning": "Reasoning",
+      "noTools": "ohne Werkzeuge",
+      "embeddings": "Embeddings"
+    },
+    "src": {
+      "provider": "Anbieter",
+      "catalog": "Verzeichnis",
+      "probe": "Test",
+      "manual": "manuell",
+      "default": "Standard"
+    },
+    "unconfirmed": "nicht bestätigt"
   }
 }

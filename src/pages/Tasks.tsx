@@ -78,12 +78,13 @@ function TaskRow({ task, lng, open, onToggle, onCancel, onResume, onPause }: {
   return (
     <>
       <tr>
-        <td>
+        {/* the kit keeps the first column on one line; a long instruction wraps here */}
+        <td style={{ whiteSpace: "normal", minWidth: 240 }}>
           <button className="linkbtn" onClick={onToggle} aria-expanded={open} style={{ border: 0, background: "none", padding: 0, textAlign: "left", color: "inherit", cursor: "pointer" }}>
             <b>{memory ? t(`tasks.memory.${task.kind}`) : task.title}</b>
           </button>
           {memory && <span className="pchip"><Icon name="brain" size={11} />{t("nav.memory")}</span>}
-          <div className="small muted">{memory ? t(`tasks.memory.${task.kind}_text`) : task.instruction}</div>
+          <div className={`small muted${open ? "" : " task-text"}`}>{memory ? t(`tasks.memory.${task.kind}_text`) : task.instruction}</div>
         </td>
         <td>
           <span className="task-sched"><Icon name={task.schedule.kind === "cron" ? "repeat" : "clock"} size={14} />{scheduleText(t, task)}</span>

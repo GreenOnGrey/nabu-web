@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { groupName } from "./groupName";
+import { adminPath } from "./paths";
+import { Link } from "react-router-dom";
 import { api } from "../../api/client";
-import type { AdminChannel, EmailLogEntry, EmailSettings, List } from "../../api/types";
+import type { UserGroup, AdminChannel, EmailLogEntry, EmailSettings, List } from "../../api/types";
 import { errorText } from "../../lib/errors";
 import { intlLocale } from "../../lib/i18n";
 import { dateTime } from "../../lib/format";
@@ -41,6 +44,7 @@ export function ChannelsAdmin() {
   const toast = useToast();
   const [editing, setEditing] = useState<AdminChannel | null>(null);
   const list = useQuery({ queryKey: ["admin", "channels"], queryFn: () => api.get<{ items: AdminChannel[] }>("/admin/api/v1/channels") });
+  const userGroups = useQuery({ queryKey: ["admin", "groups"], queryFn: () => api.get<{ items: UserGroup[] }>("/admin/api/v1/groups") });
   const inv = () => qc.invalidateQueries({ queryKey: ["admin", "channels"] });
   const patch = useMutation({
     mutationFn: ({ kind, ...p }: { kind: string; enabled?: boolean; allUsers?: boolean; groupsEnabled?: boolean }) => api.patch(`/admin/api/v1/channels/${kind}`, p),
@@ -56,7 +60,7 @@ export function ChannelsAdmin() {
         <table className="t">
           <thead><tr>
             <th>{t("admin.channels.channel")}</th><th>{t("admin.channels.state")}</th><th>{t("admin.channels.enabled")}</th>
-            <th>{t("admin.channels.allUsers")}</th><th>{t("admin.channels.groups")}</th><th>{t("admin.channels.users")}</th><th />
+            <th>{t("admin.channels.access")}</th><th>{t("admin.channels.groups")}</th><th />
           </tr></thead>
           <tbody>
             {items.map((c) => {
@@ -70,9 +74,11 @@ export function ChannelsAdmin() {
                       : <span className={`st ${c.status === "ok" ? "ok" : c.status === "error" ? "draft" : "review"}`} title={c.statusReason ?? undefined}>{t(`admin.channels.statuses.${c.status}`, { defaultValue: c.status })}</span>}
                     {c.status === "error" && c.statusReason && <div className="small err-t" style={{ maxWidth: 260 }}>{c.statusReason}</div>}</td>
                   <td><Switch on={c.enabled} disabled={c.locked} onChange={(v) => patch.mutate({ kind: c.kind, enabled: v })} /></td>
-                  <td><Switch on={c.allUsers} disabled={c.locked} onChange={(v) => patch.mutate({ kind: c.kind, allUsers: v })} /></td>
+                  {/* FTR.NAB.CMN-0007 design §3.4: the access of a channel is granted to groups */}
+                  <td className="small">{c.locked ? <span className="muted">{t("admin.channels.everybody")}</span> : <>
+                    {(userGroups.data?.items ?? []).filter((g) => g.allEnabled || g.grants?.channels.includes(c.kind)).map((g) => groupName(t, g)).join(", ")}
+                    {" · "}<Link to={adminPath("groups")}>{t("admin.channels.configureInGroups")}</Link></>}</td>
                   <td>{groups ? <Switch on={c.groupsEnabled} onChange={(v) => patch.mutate({ kind: c.kind, groupsEnabled: v })} /> : <span className="muted">—</span>}</td>
-                  <td>{c.locked || c.allUsers ? <span className="muted">{t("admin.channels.everybody")}</span> : c.usersCount}</td>
                   <td>{!c.locked && !c.product && <button className="btn sm" onClick={() => setEditing(c)}>{t("admin.channels.configure")}</button>}</td>
                 </tr>
               );

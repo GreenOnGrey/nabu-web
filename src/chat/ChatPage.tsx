@@ -1,10 +1,14 @@
 import { useCallback, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Icon, Loading } from "@green-on-grey/ui-kit";
+import { Icon, Loading, Menu, useToast } from "@green-on-grey/ui-kit";
 import { AgentButton, Chat, ChatLayout, ConversationList } from "@green-on-grey/ui-kit/chat";
 import { ApiError } from "../api/client";
-import { useAgent } from "../api/queries";
+import { api } from "../api/client";
+import { keys, useAgent } from "../api/queries";
+import type { Agent } from "../api/types";
+import { errorText } from "../lib/errors";
+import { useQueryClient } from "@tanstack/react-query";
 import type { Conversation } from "../api/types";
 import { useConversation, useConversations } from "./adapter";
 import { AgentMenu } from "./AgentMenu";
@@ -49,12 +53,37 @@ export function ChatPage() {
 function ConversationView({ conv, onMenu }: { conv: Conversation; onMenu: () => void }) {
   const { t } = useTranslation();
   const agent = useAgent();
+  const qc = useQueryClient();
+  const toast = useToast();
   const [agentMenu, setAgentMenu] = useState(false);
+  const [convMenu, setConvMenu] = useState(false);
   const closeAgentMenu = useCallback(() => setAgentMenu(false), []);
-  const { unarchive, ...chat } = useConversation(conv);
+  const closeConvMenu = useCallback(() => setConvMenu(false), []);
+  const { unarchive, pendingImages, command, busyTurn, ...chat } = useConversation(conv);
   const a = agent.data;
+  // FTR.NAB.CHAT-0001 R11: the model does not see images — say so and offer one that does
+  const blind = pendingImages && a?.model && !a.model.caps.image;
+  const seeing = blind ? a?.availableModels.find((m) => m.caps.image) : undefined;
+  const switchTo = async (m: Agent["availableModels"][number]) => {
+    try {
+      qc.setQueryData(keys.agent, await api.patch<Agent>("/api/v1/agent", { model: { connectionId: m.connectionId, model: m.model } }));
+    } catch (e) {
+      toast({ kind: "error", title: errorText(t, e) });
+    }
+  };
+  const run = (name: string) => {
+    setConvMenu(false);
+    void command(name, "").catch(() => undefined);
+  };
   return (
     <Chat {...chat} agentName={a?.name ?? "Nabu"} emptyHint={t("chat.emptyHint")}
+      aboveComposer={blind ? (
+        <div className="img-warn" role="status">
+          <Icon name="image" size={14} />
+          <span>{t("chat.imageNotSeen", { model: a?.model?.name })}</span>
+          {seeing && <button className="btn ghost sm push" onClick={() => void switchTo(seeing)}>{t("chat.switchTo", { model: seeing.name })}</button>}
+        </div>
+      ) : undefined}
       readOnly={conv.archivedAt !== null && (
         <>
           <span className="small muted">{t("chat.archivedHint")}</span>
@@ -78,6 +107,21 @@ function ConversationView({ conv, onMenu }: { conv: Conversation; onMenu: () => 
             </div>
             <span className="spacer" />
             <span className="small muted hide-m">{conv.kind === "main" ? t("chat.mainHint") : <>{conv.source === "email" && <Icon name="mail" size={13} />} {conv.title}</>}</span>
+            {conv.archivedAt === null && (
+              <span style={{ position: "relative" }}>
+                <button className="iconbtn" aria-label={t("chat.convMenu")} aria-expanded={convMenu} onClick={() => setConvMenu((v) => !v)}><Icon name="dots" /></button>
+                {convMenu && (
+                  <Menu onClose={closeConvMenu} label={t("chat.convMenu")} className="conv-menu">
+                    <button className="action" disabled={busyTurn} title={busyTurn ? t("chat.waitTurn") : undefined} onClick={() => run("new")}>
+                      <Icon name="undo" size={14} />{t("chat.cmd.new")}
+                    </button>
+                    <button className="action" disabled={busyTurn} title={busyTurn ? t("chat.waitTurn") : undefined} onClick={() => run("compact")}>
+                      <Icon name="compress" size={14} />{t("chat.cmd.compact")}
+                    </button>
+                  </Menu>
+                )}
+              </span>
+            )}
           </div>
           {agentMenu && a && <AgentMenu agent={a} onClose={closeAgentMenu} />}
         </>

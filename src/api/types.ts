@@ -38,18 +38,57 @@ export interface Me {
   channels: MyChannel[];
 }
 
+/** The capabilities of a model as the user sees them (FTR.NAB.CHAT-0001 R8, R16). */
+export interface ModelCaps {
+  image: boolean;
+  tools: boolean;
+  reasoning: boolean;
+  contextWindow: number;
+}
+
 export interface AvailableModel {
   connectionId: string;
   model: string;
   name: string;
   connection: string;
+  caps: ModelCaps;
+}
+
+/** The fill of the context window of a conversation (FTR.NAB.CHAT-0001 R3). */
+export interface ContextFill {
+  tokens: number;
+  window: number;
 }
 
 export interface Agent {
   name: string;
   tone: Tone;
   model: AvailableModel | null;
+  defaultModel: AvailableModel | null;
+  /** The user chose the model; false — the default one. */
+  chosen: boolean;
   availableModels: AvailableModel[];
+  /** The fill of the context of the main conversation. */
+  context: ContextFill;
+}
+
+/** A skill the user may call (FTR.NAB.CHAT-0001 R4). */
+export interface Skill {
+  name: string;
+  description: string;
+  itemId: string;
+  itemTitle: string;
+}
+
+/** An event of a conversation (FTR.NAB.CHAT-0001 R1, R2, R16). */
+export interface ChatEventData {
+  kind: "reset" | "compact" | "model";
+  auto?: boolean;
+  tokensBefore?: number;
+  tokensAfter?: number;
+  summary?: string;
+  model?: string;
+  name?: string;
 }
 
 export interface List<T> {
@@ -118,7 +157,12 @@ export interface Attachment {
 export interface Message {
   id: string;
   conversationId: string;
-  role: "user" | "assistant";
+  role: "user" | "assistant" | "event";
+  event?: ChatEventData;
+  /** The skill the user called with the message. */
+  skill?: string | null;
+  /** The text was recognized from a voice message. */
+  voice?: boolean;
   text: string;
   channel: string;
   status: "pending" | "streaming" | "done" | "failed";
@@ -492,20 +536,50 @@ export interface ModelDef {
   contextWindow: number;
   maxTokens: number;
   reasoning: boolean;
+  input?: string[];
   thinkingLevelMap?: Record<string, string | null>;
+  cost?: { input: number; output: number; cacheRead: number; cacheWrite: number };
+  /** FTR.NAB.CHAT-0001 R8: the model calls tools; it only answers /embeddings; other ids. */
+  tools?: boolean;
+  embeddings?: boolean;
+  aliases?: string[];
+  /** R7: where each capability came from; the fields an administrator set; the provider no longer lists it. */
+  sources?: Record<string, "provider" | "catalog" | "probe" | "manual" | "default">;
+  overrides?: string[];
+  gone?: boolean;
 }
+
+/** An edit of the capabilities of a model (R8). */
+export interface CapsPatch {
+  image?: boolean;
+  tools?: boolean;
+  reasoning?: boolean;
+  contextWindow?: number;
+  maxTokens?: number;
+  cost?: { input: number; output: number; cacheRead: number; cacheWrite: number };
+  reset?: string[];
+}
+
+export type ModelRef = { id: string; overrides?: CapsPatch };
+
+export type ConnectionType = "deepseek" | "gigachat" | "zai" | "openai_compatible";
 
 export interface ModelConnection {
   id: string;
   name: string;
-  type: "deepseek" | "openai_compatible";
+  type: ConnectionType;
   baseUrl: string;
+  options: Record<string, string>;
   models: ModelDef[];
+  /** R10: models the provider lists and the connection does not have. */
+  discovered: { id: string; name: string; firstSeenAt: string }[];
+  newCount: number;
   keyLast4: string;
   enabled: boolean;
   status: string;
   statusReason: string | null;
   checkedAt: string | null;
+  refreshedAt: string | null;
   createdAt: string;
 }
 
@@ -521,7 +595,9 @@ export interface PersonalModels {
 }
 
 export interface CheckResult {
-  results: { model: string; ok: boolean; latencyMs?: number; errorClass?: string; httpStatus?: number; message?: string; embeddings?: boolean }[];
+  results: { model: string; ok: boolean; latencyMs?: number; errorClass?: string; httpStatus?: number; message?: string; embeddings?: boolean;
+    /** R9: the probes of images and tools. */
+    caps?: Record<string, "confirmed" | "unconfirmed" | "skipped"> }[];
 }
 
 export interface Harness {
@@ -649,4 +725,40 @@ export interface AuditEntry {
   argsSummary: string | null;
   result: "ok" | "error";
   error: string | null;
+}
+
+// ─── FTR.NAB.CMN-0007: groups of users and access ───────────────────
+
+export interface GroupGrants {
+  models: Choice[];
+  defaultModel: Choice | null;
+  channels: string[];
+  catalogItems: string[];
+}
+
+export interface UserGroup {
+  id: string;
+  name: string;
+  description: string | null;
+  builtin: "all" | "admins" | null;
+  position: number;
+  memberCount: number;
+  /** null for «admins»: it has everything enabled. */
+  grants: GroupGrants | null;
+  allEnabled: boolean;
+}
+
+export interface GroupMember {
+  id: string;
+  email: string;
+  name: string;
+}
+
+export interface EffectiveAccess {
+  admin: boolean;
+  groups: { id: string; name: string; builtin: "all" | "admins" | null }[];
+  models: { connectionId: string; model: string; name: string; connection: string; via: string[] }[];
+  defaultModel: { connectionId: string; model: string; source: "user" | "group" | "global" | "first"; groupId?: string } | null;
+  channels: { kind: string; via: string[] }[];
+  catalogItems: { id: string; type: "mcp" | "skill"; title: string; mode: string | null; via: string[] }[];
 }

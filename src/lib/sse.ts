@@ -5,6 +5,8 @@ import { useEffect, useLayoutEffect, useRef } from "react";
 export const EVENT_TYPES = [
   "message.created", "message.delta", "message.done", "tool.step", "chat.error",
   "conversation.updated", "space.state",
+  // FTR.NAB.CHAT-0001 R3: the fill of the context of a conversation
+  "conversation.context",
   "task.created", "task.updated", "task.run.finished",
   "memory.changed", "agent.updated", "connections.changed",
   // FTR.NAB.CMN-0002 tech §3

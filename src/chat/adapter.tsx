@@ -1,13 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { Icon, useToast, type IconName } from "@green-on-grey/ui-kit";
-import type { ChatConfirmation, ChatConversation, ChatMark, ChatMessage, ChatProps } from "@green-on-grey/ui-kit/chat";
+import { tokens, type ChatCommand, type ChatConfirmation, type ChatConversation, type ChatMark, type ChatMessage, type ChatProps,
+  type ChatUpload } from "@green-on-grey/ui-kit/chat";
 import { apiUrl } from "../api/base";
 import { api } from "../api/client";
 import { keys } from "../api/queries";
-import type { AgentWait, Confirmation, Conversation, List, Message, ToolStep } from "../api/types";
+import type { AgentWait, Confirmation, ContextFill, Conversation, List, Message, Skill, ToolStep } from "../api/types";
 import { useSession } from "../app/session";
 import { errorText } from "../lib/errors";
 import { relativeTime } from "../lib/format";
@@ -41,16 +42,42 @@ export function stepText(t: TFunction, s: ToolStep): string {
   return server ? `${server}: ${rest}` : rest;
 }
 
+/** The text of an event of the conversation (FTR.NAB.CHAT-0001 design §3.2). */
+export function eventText(t: TFunction, m: Message, lng: string): ChatMessage["event"] {
+  const ev = m.event;
+  if (!ev) return undefined;
+  switch (ev.kind) {
+    case "reset":
+      return { icon: "undo", text: t("chat.event.reset") };
+    case "compact": {
+      const text = t("chat.event.compacted", { before: tokens(ev.tokensBefore ?? 0, lng), after: tokens(ev.tokensAfter ?? 0, lng) });
+      return { icon: "compress", text: ev.auto ? `${text} · ${t("chat.event.auto")}` : text, details: ev.summary || undefined };
+    }
+    case "model":
+      return { icon: "cpu", text: t("chat.event.model", { name: ev.name || ev.model }) };
+  }
+  return undefined;
+}
+
+/** The mark of a message of the user: the skill it called, the voice, the channel. */
+function userMark(t: TFunction, m: Message): ChatMark | undefined {
+  const ch = channelMark(t, m);
+  if (m.skill) return { icon: "spark", text: ch ? `${m.skill} · ${ch.text}` : m.skill };
+  if (m.voice) return { icon: "mic", text: ch ? `${ch.text} · ${t("chat.voiceMark")}` : t("chat.voiceMark") };
+  return ch;
+}
+
 /** A message of the API as the kit draws it. */
-export function toChatMessage(t: TFunction, m: Message, wait: AgentWait | null): ChatMessage {
+export function toChatMessage(t: TFunction, m: Message, wait: AgentWait | null, lng = "en"): ChatMessage {
   const base = { id: m.id, createdAt: m.createdAt, status: m.status };
+  if (m.role === "event") return { ...base, role: "event", text: "", event: eventText(t, m, lng) };
   if (m.role === "user") {
     // the outcome of a confirmation is a note, not words of the user
     const done = m.context?.confirmation;
     if (done) return { ...base, role: "note", text: t(`chat.confirm.${done.status}`, { action: done.summary }) };
     const mail = m.context?.email;
     return {
-      ...base, role: "user", text: m.text, mark: channelMark(t, m),
+      ...base, role: "user", text: m.text, mark: userMark(t, m),
       attachments: m.attachments.map((a) => ({ id: a.id, fileName: a.fileName, href: apiUrl(`/api/v1/attachments/${a.id}`) })),
       wait: wait?.messageId === m.id ? (wait.state === "queued" ? { state: "queued", position: wait.position ?? 0 } : { state: "starting" }) : undefined,
       content: mail && (
@@ -69,7 +96,7 @@ export function toChatMessage(t: TFunction, m: Message, wait: AgentWait | null):
   }
   const digest = m.card?.type === "digest";
   return {
-    ...base, role: "assistant", text: digest ? "" : m.text, mark: channelMark(t, m),
+    ...base, role: "assistant", text: digest ? "" : m.text, mark: channelMark(t, m), hint: m.model ?? undefined,
     steps: (m.toolSteps ?? []).map((s) => ({ id: s.id, text: stepText(t, s), title: s.summary, status: s.status })),
     // FTR.NAB.CMN-0003 tech §3.5: the digest of commitments is drawn instead of the text
     content: digest && m.card ? <DigestCardView card={m.card} /> : undefined,
@@ -120,8 +147,16 @@ export function useConversations() {
  * what the `Chat` of the kit needs, apart from the look. */
 export function useConversation(conv: Conversation): Pick<ChatProps,
   "messages" | "loading" | "hasOlder" | "loadingOlder" | "busy" | "confirmations" | "upload"
-  | "onSend" | "onLoadOlder" | "onRetry" | "onConfirm" | "onUpload" | "onTranscribe"> & { unarchive: () => void } {
-  const { t } = useTranslation();
+  | "onSend" | "onLoadOlder" | "onRetry" | "onConfirm" | "onUpload" | "onTranscribe"
+  | "commands" | "onCommand" | "context" | "onCompact" | "onReset" | "voiceMaxSeconds" | "onPendingChange"> & {
+  unarchive: () => void;
+  /** Images are attached to the message being written (R11). */
+  pendingImages: boolean;
+  /** Runs a command of the conversation: the menu of the conversation uses it too. */
+  command: (name: string, text: string) => Promise<void>;
+  busyTurn: boolean;
+} {
+  const { t, i18n } = useTranslation();
   const { config } = useSession();
   const qc = useQueryClient();
   const toast = useToast();
@@ -216,7 +251,41 @@ export function useConversation(conv: Conversation): Pick<ChatProps,
     qc.invalidateQueries({ queryKey: ["conversations"] });
   });
 
-  const messages = useMemo(() => raw.map((m) => toChatMessage(t, m, wait)), [raw, wait, t]);
+  const lng = i18n.language;
+  const messages = useMemo(() => raw.map((m) => toChatMessage(t, m, wait, lng)), [raw, wait, t, lng]);
+
+  // FTR.NAB.CHAT-0001 R3: the fill of the context of the conversation
+  const ctxKey = ["conversation-context", conv.id];
+  const ctx = useQuery({
+    queryKey: ctxKey,
+    queryFn: async () => (await api.get<{ context: ContextFill }>(`/api/v1/conversations/${conv.id}`)).context,
+  });
+  useEvent("conversation.context", (d: ContextFill & { conversationId: string }) => {
+    if (d.conversationId === conv.id) qc.setQueryData(ctxKey, { tokens: d.tokens, window: d.window });
+  });
+  // R4: the commands of the conversation and the skills of the user
+  const skills = useQuery({ queryKey: ["skills"], queryFn: () => api.get<{ items: Skill[] }>("/api/v1/skills"), staleTime: 60_000 });
+  const commands: ChatCommand[] = useMemo(() => [
+    { kind: "command", name: "new", description: t("chat.cmd.new") },
+    { kind: "command", name: "compact", description: t("chat.cmd.compact"), takesText: true },
+    ...(skills.data?.items ?? []).map((s): ChatCommand => ({ kind: "skill", name: s.name, description: s.description, source: s.itemTitle })),
+  ], [skills.data, t]);
+  const command = async (name: string, text: string) => {
+    try {
+      if (name === "new") await api.post(`/api/v1/conversations/${conv.id}/context:reset`);
+      else if (name === "compact") await api.post(`/api/v1/conversations/${conv.id}/context:compact`, { instructions: text });
+    } catch (e) {
+      fail(e);
+      throw e;
+    }
+  };
+  useEvent("chat.error", (d: { conversationId: string; command?: string; errorClass: string }) => {
+    if (d.conversationId === conv.id && d.command) toast({ kind: "error", title: t("chat.compactFailed"), text: llmErrorText(t, d.errorClass) });
+  });
+  // R11: which of the attached files are images
+  const [imageIds, setImageIds] = useState<Set<string>>(new Set());
+  const [pendingImages, setPendingImages] = useState(false);
+  const onPendingChange = useCallback((ups: ChatUpload[]) => setPendingImages(ups.some((u) => imageIds.has(u.id))), [imageIds]);
   const confirmations: ChatConfirmation[] = (pending.data?.items ?? []).map((c) => ({ id: c.id, summary: c.summary, preview: c.argsPreview }));
 
   const unarchive = useMutation({
@@ -225,7 +294,12 @@ export function useConversation(conv: Conversation): Pick<ChatProps,
   });
 
   return {
-    messages, confirmations, busy,
+    messages, confirmations, busy, busyTurn: busy || streaming,
+    commands, command, onCommand: command, pendingImages, onPendingChange,
+    context: ctx.data && ctx.data.window > 0 ? ctx.data : undefined,
+    onCompact: () => void command("compact", "").catch(() => undefined),
+    onReset: () => void command("new", "").catch(() => undefined),
+    voiceMaxSeconds: 300,
     loading: history.isLoading,
     hasOlder: history.hasNextPage,
     loadingOlder: history.isFetchingNextPage,
@@ -233,10 +307,10 @@ export function useConversation(conv: Conversation): Pick<ChatProps,
     onLoadOlder: () => void history.fetchNextPage(),
     onConfirm: (id, approve) => !resolve.isPending && resolve.mutate({ id, action: approve ? "approve" : "reject" }),
     unarchive: () => unarchive.mutate(),
-    async onSend(text, attachmentIds) {
+    async onSend(text, attachmentIds, _voice, skill) {
       setBusy(true);
       try {
-        const res = await api.post<{ messageId: string; message: Message }>(`/api/v1/conversations/${conv.id}/messages`, { text, attachmentIds });
+        const res = await api.post<{ messageId: string; message: Message }>(`/api/v1/conversations/${conv.id}/messages`, { text, attachmentIds, skill });
         put(res.message);
       } catch (e) {
         setBusy(false);
@@ -259,6 +333,7 @@ export function useConversation(conv: Conversation): Pick<ChatProps,
       form.append("file", file);
       try {
         const a = await api.upload<{ attachmentId: string }>("/api/v1/attachments", form);
+        if (file.type.startsWith("image/")) setImageIds((s) => new Set(s).add(a.attachmentId));
         return { id: a.attachmentId, fileName: file.name };
       } catch (e) {
         fail(e, file.name);

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { api, qs } from "../../api/client";
-import type { AdminUser, ArchiveResult, RestoreRequest, UserCard } from "../../api/types";
+import type { AdminUser, ArchiveResult, EffectiveAccess, RestoreRequest, UserCard, UserGroup } from "../../api/types";
 import { useSession } from "../../app/session";
 import { errorText } from "../../lib/errors";
 import { intlLocale } from "../../lib/i18n";
@@ -12,6 +12,7 @@ import { useEvent } from "../../lib/sse";
 import { Avatar, Icon, Modal, Switch, useToast } from "@green-on-grey/ui-kit";
 import { adminPath } from "./paths";
 import { channelLabel } from "./Channels";
+import { groupName } from "./groupName";
 
 const FILTERS = ["active", "archived", "purge"] as const;
 type Filter = (typeof FILTERS)[number];
@@ -204,7 +205,6 @@ function UserCardModal({ id, self, onClose, onArchive }: { id: string; self: boo
   const card = useQuery({ queryKey: key, queryFn: () => api.get<UserCard>(`/admin/api/v1/users/${id}`) });
   const done = () => { qc.invalidateQueries({ queryKey: key }); qc.invalidateQueries({ queryKey: ["admin", "users"] }); qc.invalidateQueries({ queryKey: ["admin", "channels"] }); };
   const fail = (e: unknown) => toast({ kind: "error", title: errorText(t, e) });
-  const setChannel = useMutation({ mutationFn: (p: Record<string, boolean>) => api.put(`/admin/api/v1/users/${id}/channels`, p), onSuccess: done, onError: fail });
   const unbind = useMutation({ mutationFn: () => api.del(`/admin/api/v1/users/${id}/channels/telegram/binding`), onSuccess: done, onError: fail });
   const u = card.data?.user;
   return (
@@ -215,20 +215,19 @@ function UserCardModal({ id, self, onClose, onArchive }: { id: string; self: boo
     </>}>
       {u && <div className="small muted" style={{ marginBottom: 12 }}>{u.email} · {t(`admin.users.statuses.${u.status}`)}</div>}
       <h3 className="sec" style={{ marginTop: 0 }}>{t("admin.users.channels")}</h3>
+      {/* FTR.NAB.CMN-0007 R5: channels come from groups; the card only shows them */}
       <table className="t"><tbody>
-        {(card.data?.channels ?? []).map((c) => {
-          const fixed = c.reason === "always" || c.reason === "all_users";
-          return (
-            <tr key={c.kind} className={fixed ? "locked" : ""}>
-              <td><b>{channelLabel(t, c.kind)}</b>
-                {c.binding && <div className="small muted">{t("connections.linkedAs", { account: c.binding.account, when: dateTime(c.binding.boundAt, locale) })}{" "}
-                  <button className="linklike small" onClick={() => unbind.mutate()}>{t("connections.unlink")}</button></div>}</td>
-              <td className="small">{fixed && <><Icon name="lock" size={14} /> </>}{t(`admin.users.reasons.${c.reason}`)}</td>
-              <td style={{ textAlign: "right" }}><Switch on={c.available} disabled={fixed || u?.status === "archived"} onChange={(v) => setChannel.mutate({ [c.kind]: v })} /></td>
-            </tr>
-          );
-        })}
+        {(card.data?.channels ?? []).map((c) => (
+          <tr key={c.kind}>
+            <td><b>{channelLabel(t, c.kind)}</b>
+              {c.binding && <div className="small muted">{t("connections.linkedAs", { account: c.binding.account, when: dateTime(c.binding.boundAt, locale) })}{" "}
+                <button className="linklike small" onClick={() => unbind.mutate()}>{t("connections.unlink")}</button></div>}</td>
+            <td className="small">{c.available ? <span className="ok-t">{t("admin.users.available")}</span> : <span className="muted">{t("admin.users.notAvailable")}</span>}</td>
+            <td className="small muted">{t(`admin.users.reasons.${c.reason}`, { defaultValue: c.reason })}</td>
+          </tr>
+        ))}
       </tbody></table>
+      {u && u.status !== "archived" && <UserAccess id={id} />}
       {(card.data?.groupAgents.length ?? 0) > 0 && (
         <>
           <h3 className="sec">{t("admin.group-agents.title")}</h3>
@@ -263,5 +262,78 @@ function Invite({ onClose }: { onClose: () => void }) {
       <div className="hint">{t("admin.users.inviteHint")}</div>
       {invite.error && <div className="err-text">{errorText(t, invite.error)}</div>}
     </Modal>
+  );
+}
+
+/** The access of a user (FTR.NAB.CMN-0007 R7, design §3.3): the groups and
+ * what they grant, each line with its source. */
+function UserAccess({ id }: { id: string }) {
+  const { t } = useTranslation();
+  const qc = useQueryClient();
+  const toast = useToast();
+  const key = ["admin", "user-access", id];
+  const acc = useQuery({ queryKey: key, queryFn: () => api.get<EffectiveAccess>(`/admin/api/v1/users/${id}/access`) });
+  const groups = useQuery({ queryKey: ["admin", "groups"], queryFn: () => api.get<{ items: UserGroup[] }>("/admin/api/v1/groups") });
+  const set = useMutation({
+    mutationFn: (ids: string[]) => api.put<EffectiveAccess>(`/admin/api/v1/users/${id}/groups`, { groupIds: ids }),
+    onSuccess: (a) => { qc.setQueryData(key, a); qc.invalidateQueries({ queryKey: ["admin", "groups"] }); },
+    onError: (e) => toast({ kind: "error", title: errorText(t, e) }),
+  });
+  const a = acc.data;
+  if (!a) return null;
+  const all = groups.data?.items ?? [];
+  const nameOf = (gid: string) => {
+    const g = all.find((x) => x.id === gid) ?? a.groups.find((x) => x.id === gid);
+    return g ? groupName(t, g) : "?";
+  };
+  const via = (ids: string[]) => t("admin.access.via", { groups: ids.map(nameOf).join(", ") });
+  const mine = a.groups.filter((g) => !g.builtin).map((g) => g.id);
+  const free = all.filter((g) => !g.builtin && !mine.includes(g.id));
+  const isDefault = (c: { connectionId: string; model: string }) => a.defaultModel?.connectionId === c.connectionId && a.defaultModel?.model === c.model;
+  return (
+    <>
+      <h3 className="sec">{t("admin.access.title")}</h3>
+      <div className="chips" style={{ alignItems: "center", marginBottom: 10 }}>
+        {a.groups.map((g) => g.builtin ? (
+          <span key={g.id} className="chip"><Icon name="lock" size={12} />{groupName(t, g)}</span>
+        ) : (
+          <span key={g.id} className="chip on">{g.name}
+            <button className="iconbtn" style={{ width: 18, height: 18 }} aria-label={t("common.remove")} onClick={() => set.mutate(mine.filter((x) => x !== g.id))}><Icon name="x" size={12} /></button>
+          </span>
+        ))}
+        {free.length > 0 && (
+          <select className="inp" style={{ width: "auto" }} value="" aria-label={t("admin.access.addToGroup")}
+            onChange={(e) => { if (e.target.value) set.mutate([...mine, e.target.value]); }}>
+            <option value="">{t("admin.access.addToGroup")}</option>
+            {free.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
+          </select>
+        )}
+      </div>
+      <div className="access-grid">
+        <div className="svc">
+          <div className="h"><b>{t("admin.groups.models")}</b></div>
+          {a.models.length === 0 && <div className="small err-t">{t("admin.access.noModels")}</div>}
+          {a.models.map((m) => (
+            <div key={m.connectionId + m.model} className="acc-row">
+              <span>{m.name} {isDefault(m) && <span className="pchip" title={t(`admin.access.defaultFrom.${a.defaultModel!.source}`)}>{t("admin.access.default")}</span>}</span>
+              <span className="small muted">{via(m.via)}</span>
+            </div>
+          ))}
+        </div>
+        <div className="svc">
+          <div className="h"><b>{t("admin.groups.channels")}</b></div>
+          {a.channels.length === 0 && <div className="small muted">{t("admin.access.onlyWeb")}</div>}
+          {a.channels.map((c) => <div key={c.kind} className="acc-row"><span>{channelLabel(t, c.kind)}</span><span className="small muted">{via(c.via)}</span></div>)}
+        </div>
+        {(["mcp", "skill"] as const).map((type) => (
+          <div key={type} className="svc">
+            <div className="h"><b>{t(type === "mcp" ? "admin.groups.mcp" : "admin.groups.skills")}</b></div>
+            {a.catalogItems.filter((i) => i.type === type).map((i) => (
+              <div key={i.id} className="acc-row"><span>{i.title}</span><span className="small muted">{via(i.via)}</span></div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </>
   );
 }

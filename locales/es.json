@@ -18,7 +18,8 @@
     "done": "Listo",
     "more": "Mostrar más",
     "saved": "Guardado",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "search": "Buscar"
   },
   "login": {
     "logoAlt": "Logotipo de Nabu",
@@ -58,7 +59,11 @@
   "agent": {
     "menu": "Agente",
     "tone": "Tono",
-    "everywhere": "El cambio se aplica en todos los canales y servicios conectados."
+    "everywhere": "El cambio se aplica en todos los canales y servicios conectados.",
+    "model": "Modelo",
+    "modelDefault": "Predeterminado",
+    "modelCompactWarn": "El contexto se compactará antes de la próxima respuesta",
+    "noModels": "No hay modelos disponibles: consulte a un administrador"
   },
   "channels": {
     "web": "Sitio web",
@@ -107,7 +112,23 @@
       "empty": "No hay acuerdos abiertos",
       "all": "Todos los acuerdos",
       "count": "{count, plural, one {# acuerdo} other {# acuerdos}}"
-    }
+    },
+    "event": {
+      "reset": "Contexto restablecido",
+      "compacted": "Contexto compactado: {before} → {after} tokens",
+      "auto": "automáticamente",
+      "model": "Modelo: {name}"
+    },
+    "voiceMark": "voz",
+    "cmd": {
+      "new": "Empezar con un contexto limpio",
+      "compact": "Compactar el contexto"
+    },
+    "compactFailed": "El contexto no se compactó",
+    "imageNotSeen": "{model} no ve imágenes: el agente recibirá un archivo en el espacio",
+    "switchTo": "Cambiar a {model}",
+    "convMenu": "Menú de la conversación",
+    "waitTurn": "Espere la respuesta"
   },
   "llm": {
     "retry": "Reintentar",
@@ -124,7 +145,8 @@
       "user_blocked": "El acceso al agente está cerrado para su cuenta.",
       "workspace_not_connected": "El espacio de trabajo no se conectó.",
       "limit_exceeded": "La ejecución superó sus límites.",
-      "no_capacity": "No hay capacidad libre para el agente."
+      "no_capacity": "No hay capacidad libre para el agente.",
+      "no_models_granted": "No tiene ningún modelo disponible: consulte a un administrador."
     }
   },
   "tasks": {
@@ -342,8 +364,11 @@
         "always": "siempre",
         "all_users": "para todos",
         "user": "activado para el usuario",
-        "disabled": "no disponible"
-      }
+        "disabled": "no disponible",
+        "group": "concedido a un grupo"
+      },
+      "available": "disponible",
+      "notAvailable": "no disponible"
     },
     "models": {
       "title": "Conexiones de modelos",
@@ -352,7 +377,9 @@
       "type": "Tipo",
       "types": {
         "deepseek": "DeepSeek",
-        "openai_compatible": "Compatible con OpenAI"
+        "openai_compatible": "Compatible con OpenAI",
+        "gigachat": "GigaChat",
+        "zai": "Z.AI"
       },
       "name": "Nombre",
       "baseUrl": "URL base",
@@ -384,7 +411,46 @@
         "high": "Alto",
         "xhigh": "Muy alto",
         "max": "Máximo"
-      }
+      },
+      "authKey": "Clave de autorización",
+      "scope": "Ámbito",
+      "scopes": {
+        "GIGACHAT_API_PERS": "Persona física (PERS)",
+        "GIGACHAT_API_B2B": "Empresas, prepago (B2B)",
+        "GIGACHAT_API_CORP": "Empresas, pospago (CORP)"
+      },
+      "endpoint": "Endpoint",
+      "endpoints": {
+        "general": "General",
+        "coding": "GLM Coding Plan"
+      },
+      "load": "Cargar modelos",
+      "refresh": "Actualizar modelos",
+      "refreshedAt": "actualizado {when}",
+      "noList": "El proveedor no lista modelos. Se muestran los modelos conocidos de este tipo.",
+      "addManually": "Añadir a mano: model-a, model-b",
+      "newHint": "Los modelos nuevos del proveedor no se añaden solos: la tarjeta los marca como «nuevo».",
+      "picked": "{picked} de {total}",
+      "new": "nuevo",
+      "newCount": "{count, plural, one {# nuevo} other {# nuevos}}",
+      "addModel": "Añadir",
+      "gone": "ya no está en el proveedor",
+      "confirmed": "confirmado",
+      "switchOff": "Desactivar",
+      "probe": {
+        "image": "Imágenes",
+        "tools": "Herramientas"
+      },
+      "cap": {
+        "image": "Imágenes",
+        "tools": "Herramientas",
+        "reasoning": "Razonamiento",
+        "contextWindow": "Ventana de contexto",
+        "maxTokens": "Respuesta máxima",
+        "cost": "Precio entrada / salida por 1 M"
+      },
+      "resetEdits": "Restablecer los cambios manuales",
+      "availableByGroups": "Los modelos que pueden elegir los usuarios se conceden a grupos."
     },
     "harness": {
       "title": "Harness",
@@ -609,7 +675,9 @@
       "secretSet": "Definido. Introduzca un valor nuevo para reemplazarlo",
       "secretHint": "El secreto se guarda cifrado y no se vuelve a mostrar.",
       "rules": "El bot responde por correo solo si es el único destinatario: una dirección en Para y Cc vacío. Los demás correos se responden en el tema de la aplicación web. Las acciones que modifican datos esperan la confirmación del usuario.",
-      "rejected": "Rechazados recientemente"
+      "rejected": "Rechazados recientemente",
+      "access": "Acceso",
+      "configureInGroups": "Configurar en grupos"
     },
     "group-agents": {
       "title": "Agentes de grupo",
@@ -643,7 +711,14 @@
       "retentionHint": "Pasado este plazo, la cuenta archivada y sus datos se eliminan definitivamente. El mismo plazo se aplica a los datos de un agente de grupo eliminado de su grupo.",
       "confirmTitle": "Retención del archivo",
       "confirmText": "La nueva retención de {days} días se aplica a todas las cuentas archivadas.",
-      "willPurge": "{count, plural, =0 {La próxima limpieza no elimina ninguna cuenta.} one {La próxima limpieza elimina # cuenta.} other {La próxima limpieza elimina # cuentas.}}"
+      "willPurge": "{count, plural, =0 {La próxima limpieza no elimina ninguna cuenta.} one {La próxima limpieza elimina # cuenta.} other {La próxima limpieza elimina # cuentas.}}",
+      "voice": "Reconocimiento de voz",
+      "voiceOk": "Conectado",
+      "voiceDown": "No disponible",
+      "voiceOff": "No configurado",
+      "voiceHint": "La opción NABU_WHISPER del entorno despliega el reconocedor.",
+      "harness": "Harness del agente {name}",
+      "version": "Versión"
     },
     "agent-pods": {
       "title": "Agentes",
@@ -748,6 +823,54 @@
       "embeddingsHint": "Un modelo de embeddings de una conexión. Tras un cambio los vectores se recalculan en segundo plano.",
       "wordsOnly": "La búsqueda funciona solo por palabras: elija un modelo de embeddings.",
       "noVectors": "La base de datos no tiene la extensión vector: la búsqueda funciona solo por palabras."
+    },
+    "groups": {
+      "title": "Grupos",
+      "create": "Crear un grupo",
+      "all": "Todos los usuarios",
+      "admins": "Administradores",
+      "byRole": "por rol · {count}",
+      "everyone": "Cada usuario",
+      "adminsHint": "Los miembros son los usuarios con el rol de administrador",
+      "adminsAll": "Los administradores tienen todo lo habilitado en la plataforma",
+      "allEnabled": "todo lo habilitado",
+      "priority": "El modelo predeterminado viene del grupo más alto de la lista. Un usuario tiene todo lo concedido a sus grupos.",
+      "onlyBuiltin": "Cree un grupo para conceder recursos a una parte de los usuarios",
+      "group": "Grupo",
+      "members": "Miembros",
+      "memberCount": "{count, plural, one {# miembro} other {# miembros}}",
+      "models": "Modelos",
+      "channels": "Canales",
+      "mcp": "MCP",
+      "skills": "Skills",
+      "name": "Nombre",
+      "description": "Descripción",
+      "up": "Más arriba",
+      "down": "Más abajo",
+      "defaultModel": "predeterminado del grupo",
+      "channelOff": "El canal está desactivado en la instancia",
+      "itemUnpublished": "El elemento no está publicado",
+      "delete": "Eliminar el grupo",
+      "deleteText": "¿Eliminar el grupo «{name}»? {count} miembros perderán el acceso que concede.",
+      "mcpRevokeTitle": "Se eliminarán conexiones",
+      "mcpRevoke": "{count} miembros perderán el acceso a «{item}». Sus conexiones se eliminarán: tendrán que conectarse de nuevo.",
+      "addMember": "Buscar un usuario por nombre o correo",
+      "add": "Añadir",
+      "remove": "Quitar"
+    },
+    "access": {
+      "title": "Acceso",
+      "addToGroup": "Añadir a un grupo",
+      "via": "a través de {groups}",
+      "noModels": "El usuario no tiene ningún modelo: el agente no responderá",
+      "onlyWeb": "Solo el sitio",
+      "default": "predeterminado",
+      "defaultFrom": {
+        "user": "elección del usuario",
+        "group": "predeterminado de un grupo",
+        "global": "predeterminado global",
+        "first": "primer modelo por nombre"
+      }
     }
   },
   "errors": {
@@ -852,7 +975,30 @@
     "catalog_tool_unknown": "La herramienta no está en la última comprobación del elemento. Compruébelo de nuevo.",
     "catalog_file_arg_invalid": "Solo un argumento de texto de una herramienta permitida puede ser un archivo del espacio.",
     "catalog_file_max_invalid": "El límite de archivo es de 0,001 a 100 MB.",
-    "catalog_check_needs_connection": "Conecte el elemento en Conexiones para comprobarlo: el servidor solo responde con un acceso personal."
+    "catalog_check_needs_connection": "Conecte el elemento en Conexiones para comprobarlo: el servidor solo responde con un acceso personal.",
+    "context_busy": "Espere la respuesta o deténgala.",
+    "context_too_short": "El contexto ya es corto.",
+    "invalid_instructions": "La indicación supera los 500 caracteres.",
+    "skill_unavailable": "El skill no está disponible.",
+    "model_not_granted": "El modelo no está disponible para usted.",
+    "model_no_tools": "El modelo no puede llamar herramientas.",
+    "models_list_failed": "No se pudo obtener la lista de modelos: {reason}",
+    "invalid_scope": "Ámbito de GigaChat desconocido.",
+    "invalid_endpoint": "El endpoint es general o Coding Plan.",
+    "gigachat_unavailable": "GigaChat no está disponible en esta instalación.",
+    "transcription_too_long": "La grabación supera los 5 minutos.",
+    "no_models_granted": "No tiene ningún modelo disponible: consulte a un administrador.",
+    "group_name_taken": "Ya existe un grupo con este nombre.",
+    "group_builtin": "Un grupo integrado no se puede eliminar, renombrar ni cambiar sus miembros.",
+    "invalid_order": "Indique cada grupo una vez.",
+    "invalid_grant": "No se puede conceder.",
+    "invalid_group": "Grupo desconocido o integrado.",
+    "invalid_users": "De 1 a 500 usuarios.",
+    "use_groups": "El acceso se concede a grupos en Administración → Grupos.",
+    "last_admin": "El último administrador no puede perder el rol.",
+    "access_denied_item": "Sin acceso al elemento: consulte a un administrador.",
+    "use_groups_models": "Los modelos disponibles se conceden a grupos.",
+    "confirm_required": "Confirme la acción."
   },
   "comm": {
     "lead": "Lo que el agente sabe de usted y de su correspondencia de trabajo",
@@ -1075,5 +1221,21 @@
       "deleteAllTitle": "¿Eliminar todo lo recopilado?",
       "deleteAllText": "Se eliminan las notas ({notes}), los compromisos ({commitments}), las personas y los temas, y se desactivan las tareas de memoria. Los hechos se conservan."
     }
+  },
+  "models": {
+    "cap": {
+      "image": "imágenes",
+      "reasoning": "razonamiento",
+      "noTools": "sin herramientas",
+      "embeddings": "embeddings"
+    },
+    "src": {
+      "provider": "proveedor",
+      "catalog": "directorio",
+      "probe": "prueba",
+      "manual": "manual",
+      "default": "predeterminado"
+    },
+    "unconfirmed": "no confirmado"
   }
 }
