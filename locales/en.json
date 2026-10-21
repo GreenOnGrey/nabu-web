@@ -57,13 +57,7 @@
     "mentor": "Mentor"
   },
   "agent": {
-    "menu": "Agent",
-    "tone": "Tone",
-    "everywhere": "The change applies in every channel and connected service.",
-    "model": "Model",
-    "modelDefault": "Default",
-    "modelCompactWarn": "The context will be compacted before the next answer",
-    "noModels": "No models granted — ask an administrator"
+    "menu": "Agent"
   },
   "channels": {
     "web": "Website",

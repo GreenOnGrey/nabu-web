@@ -57,13 +57,7 @@
     "mentor": "导师"
   },
   "agent": {
-    "menu": "智能体",
-    "tone": "语气",
-    "everywhere": "更改在所有渠道和已连接的服务中生效。",
-    "model": "模型",
-    "modelDefault": "默认",
-    "modelCompactWarn": "下次回答前将压缩上下文",
-    "noModels": "没有可用的模型——请联系管理员"
+    "menu": "智能体"
   },
   "channels": {
     "web": "网站",

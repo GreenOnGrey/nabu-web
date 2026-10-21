@@ -3,9 +3,14 @@ import type { Agent, AvailableModel, Message } from "../api/types";
 import { createI18n } from "../lib/i18n";
 import { voiceState } from "../pages/admin/Settings";
 import { contextOf, eventText, toChatMessage, unseenImages } from "./adapter";
-import { modelOptions } from "./AgentMenu";
+import { agentModelOptions } from "@green-on-grey/ui-kit/chat";
 
-const t = createI18n("en").t;
+const i18n = createI18n("en");
+const t = i18n.t;
+// the block «Model» is the kit's (FTR.HMR.SPEC-0001); Nabu gives it the models of the agent
+const kitT = i18n.getFixedT("en", "uikit");
+const modelOptions = (_: unknown, a: Agent, lng: string) =>
+  agentModelOptions(kitT, lng, { available: a.availableModels, model: a.model, defaultModel: a.defaultModel, chosen: a.chosen, contextTokens: a.context.tokens });
 
 const msg = (m: Partial<Message>): Message => ({
   id: "m1", conversationId: "main", role: "user", text: "Hi", channel: "web", status: "done", attachments: [], toolSteps: [],

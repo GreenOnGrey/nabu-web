@@ -13,7 +13,7 @@
     "shots": "playwright test"
   },
   "dependencies": {
-    "@green-on-grey/ui-kit": "1.6.0",
+    "@green-on-grey/ui-kit": "1.8.0",
     "@tanstack/react-query": "^5.103.2",
     "@types/d3-force": "^3.0.10",
     "d3-force": "^3.0.0",

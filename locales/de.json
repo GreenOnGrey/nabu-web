@@ -57,13 +57,7 @@
     "mentor": "Mentor"
   },
   "agent": {
-    "menu": "Agent",
-    "tone": "Ton",
-    "everywhere": "Die Änderung gilt in allen Kanälen und verbundenen Diensten.",
-    "model": "Modell",
-    "modelDefault": "Standard",
-    "modelCompactWarn": "Der Kontext wird vor der nächsten Antwort komprimiert",
-    "noModels": "Keine Modelle freigegeben — wenden Sie sich an einen Administrator"
+    "menu": "Agent"
   },
   "channels": {
     "web": "Website",

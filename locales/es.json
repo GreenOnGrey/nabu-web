@@ -57,13 +57,7 @@
     "mentor": "Mentor"
   },
   "agent": {
-    "menu": "Agente",
-    "tone": "Tono",
-    "everywhere": "El cambio se aplica en todos los canales y servicios conectados.",
-    "model": "Modelo",
-    "modelDefault": "Predeterminado",
-    "modelCompactWarn": "El contexto se compactará antes de la próxima respuesta",
-    "noModels": "No hay modelos disponibles: consulte a un administrador"
+    "menu": "Agente"
   },
   "channels": {
     "web": "Sitio web",
