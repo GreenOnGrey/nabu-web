@@ -1000,7 +1000,9 @@
     "last_admin": "El último administrador no puede perder el rol.",
     "access_denied_item": "Sin acceso al elemento: consulte a un administrador.",
     "use_groups_models": "Los modelos disponibles se conceden a grupos.",
-    "confirm_required": "Confirme la acción."
+    "confirm_required": "Confirme la acción.",
+    "invalid_notice": "La notificación no es válida.",
+    "delegation_required": "Solo un cliente de servicio en nombre del usuario puede hacerlo."
   },
   "comm": {
     "lead": "Lo que el agente sabe de usted y de su correspondencia de trabajo",

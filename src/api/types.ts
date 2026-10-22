@@ -154,8 +154,11 @@ export interface Attachment {
 export interface Message {
   id: string;
   conversationId: string;
-  role: "user" | "assistant" | "event";
+  role: "user" | "assistant" | "event" | "notice";
   event?: ChatEventData;
+  /** FTR.NAB.CHAT-0002 R2: the service client that wrote a notice and its data for the product. */
+  clientName?: string | null;
+  payload?: Record<string, unknown> | null;
   /** The skill the user called with the message. */
   skill?: string | null;
   /** The text was recognized from a voice message. */

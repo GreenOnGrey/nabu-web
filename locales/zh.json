@@ -1000,7 +1000,9 @@
     "last_admin": "最后一位管理员不能失去该角色。",
     "access_denied_item": "无权访问该项——请联系管理员。",
     "use_groups_models": "可用模型授予群组。",
-    "confirm_required": "请确认操作。"
+    "confirm_required": "请确认操作。",
+    "invalid_notice": "通知无效。",
+    "delegation_required": "只有代表用户的服务客户端可以执行此操作。"
   },
   "comm": {
     "lead": "助手了解的关于您和您工作往来的信息",

@@ -94,6 +94,11 @@ export function toChatMessage(t: TFunction, m: Message, wait: AgentWait | null, 
       ),
     };
   }
+  if (m.role === "notice") {
+    // FTR.NAB.CHAT-0002 design §3.1: a notice of a product, not words of the agent
+    const name = m.clientName ?? m.channel.replace(/^client:/, "");
+    return { ...base, role: "assistant", variant: "notice", text: m.text, mark: { icon: "plug", text: name.replace(/^./, (c) => c.toUpperCase()) } };
+  }
   const digest = m.card?.type === "digest";
   return {
     ...base, role: "assistant", text: digest ? "" : m.text, mark: channelMark(t, m), hint: m.model ?? undefined,

@@ -1000,7 +1000,9 @@
     "last_admin": "The last administrator cannot lose the role.",
     "access_denied_item": "No access to the item — ask an administrator.",
     "use_groups_models": "The available models are granted to groups.",
-    "confirm_required": "Confirm the action."
+    "confirm_required": "Confirm the action.",
+    "invalid_notice": "The notice is not valid.",
+    "delegation_required": "Only a service client acting for the user can do this."
   },
   "comm": {
     "lead": "What the agent knows about you and your work correspondence",

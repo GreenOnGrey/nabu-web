@@ -1000,7 +1000,9 @@
     "last_admin": "Der letzte Administrator kann die Rolle nicht verlieren.",
     "access_denied_item": "Kein Zugriff auf den Eintrag — wenden Sie sich an einen Administrator.",
     "use_groups_models": "Die verfügbaren Modelle werden Gruppen gewährt.",
-    "confirm_required": "Bestätigen Sie die Aktion."
+    "confirm_required": "Bestätigen Sie die Aktion.",
+    "invalid_notice": "Die Benachrichtigung ist ungültig.",
+    "delegation_required": "Nur ein Dienstclient im Namen des Nutzers kann das tun."
   },
   "comm": {
     "lead": "Was der Agent über Sie und Ihre Arbeitskorrespondenz weiß",
