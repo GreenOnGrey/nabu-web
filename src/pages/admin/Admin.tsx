@@ -17,6 +17,7 @@ import { GroupAgentsAdmin } from "./GroupAgents";
 import { AgentPodsAdmin } from "./AgentPods";
 import { SettingsAdmin } from "./Settings";
 import { CommAdmin } from "./Comm";
+import { SandboxImagesAdmin } from "./SandboxImages";
 
 
 /** The administration panel (R33–R34, design §2): for platform administrators only. */
@@ -38,6 +39,7 @@ export function AdminPage() {
           <Route path="models" element={<ModelsAdmin />} />
           <Route path="catalog" element={<CatalogAdmin />} />
           <Route path="service-agents" element={<ServiceAgentsAdmin />} />
+          <Route path="sandbox-images" element={<SandboxImagesAdmin />} />
           <Route path="clients" element={<ClientsAdmin />} />
           <Route path="usage" element={<UsageAdmin />} />
           <Route path="audit" element={<AuditAdmin />} />

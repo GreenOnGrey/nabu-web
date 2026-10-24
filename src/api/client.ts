@@ -63,6 +63,11 @@ function safeJSON(text: string): unknown {
 
 /** The content of a file (an attachment for its preview); the session cookie goes with it. */
 async function blob(path: string): Promise<Blob> {
+  return (await raw(path)).blob();
+}
+
+/** The answer of a GET with the session cookie, its headers included; an answer with an error throws. */
+async function raw(path: string): Promise<Response> {
   let res: Response;
   try {
     res = await fetch(apiUrl(path), { credentials: "include" });
@@ -73,7 +78,7 @@ async function blob(path: string): Promise<Blob> {
     const text = await res.text();
     throw apiError(res, text ? safeJSON(text) : undefined);
   }
-  return res.blob();
+  return res;
 }
 
 export const api = {
@@ -84,6 +89,7 @@ export const api = {
   del: <T>(path: string, body?: Body) => request<T>("DELETE", path, body),
   upload: <T>(path: string, form: FormData) => request<T>("POST", path, form),
   blob,
+  raw,
 };
 
 export function qs(params: Record<string, string | number | boolean | undefined | null>): string {

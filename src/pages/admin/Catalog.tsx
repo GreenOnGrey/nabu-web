@@ -6,7 +6,7 @@ import type { AdminCatalogItem } from "../../api/types";
 import { errorText } from "../../lib/errors";
 import { Icon, Modal, Switch, useToast } from "@green-on-grey/ui-kit";
 import { ToolsBlock, type ToolsValue } from "./CatalogTools";
-import { allowedCount, allowedOf, bytesToMb, DEFAULT_FILE_MAX_BYTES, mbToBytes, readOnlyPreset, type ToolChoice } from "./catalogTools";
+import { allowedCount, allowedOf, bytesToMb, DEFAULT_FILE_MAX_BYTES, DEFAULT_RESULT_MAX_BYTES, mbToBytes, readOnlyPreset, type ToolChoice } from "./catalogTools";
 
 /** The catalog of skills and MCP (R11–R14, design §3.11): source (URL, upload,
  * git), access mode, publication, check of MCP servers; items in development are marked.
@@ -77,9 +77,9 @@ function toolsLabel(t: (k: string, o?: Record<string, unknown>) => string, it: A
 }
 
 function initialChoice(item: AdminCatalogItem | null): ToolChoice {
-  if (!item) return { allowed: [], fileArgs: [] };
+  if (!item) return { allowed: [], fileArgs: [], resultArgs: [], spaceOnly: [] };
   const allowed = item.allowedTools ?? (item.readOnly ? readOnlyPreset(item.tools) : item.tools.map((tl) => tl.name));
-  return { allowed, fileArgs: item.fileArgs ?? [] };
+  return { allowed, fileArgs: item.fileArgs ?? [], resultArgs: item.resultArgs ?? [], spaceOnly: item.spaceOnlyTools ?? [] };
 }
 
 function EditItem({ item: initial, type, onClose }: { item: AdminCatalogItem | null; type: "mcp" | "skill"; onClose: () => void }) {
@@ -87,7 +87,7 @@ function EditItem({ item: initial, type, onClose }: { item: AdminCatalogItem | n
   // the item as the server last returned it: "Save and check" and "Check" refresh it in the form
   const [item, setItem] = useState<AdminCatalogItem | null>(initial);
   const [tools, setTools] = useState<ToolsValue>(() => ({ choice: initialChoice(initial), readOnly: initial?.readOnly ?? true,
-    fileMax: bytesToMb(initial?.fileMaxBytes ?? DEFAULT_FILE_MAX_BYTES) }));
+    fileMax: bytesToMb(initial?.fileMaxBytes ?? DEFAULT_FILE_MAX_BYTES), resultMax: bytesToMb(initial?.resultMaxBytes || DEFAULT_RESULT_MAX_BYTES) }));
   const { choice } = tools;
   const qc = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -111,14 +111,17 @@ function EditItem({ item: initial, type, onClose }: { item: AdminCatalogItem | n
   const [exposure, setExposure] = useState(item?.exposure ?? "deferred");
   const [inDev, setInDev] = useState(item?.inDevelopment ?? false);
   const fileMaxBytes = mbToBytes(tools.fileMax);
+  const resultMaxBytes = mbToBytes(tools.resultMax, DEFAULT_RESULT_MAX_BYTES);
   const toSave = async () => {
       const body: Record<string, unknown> = { type, name, title, description, inDevelopment: inDev,
         source: srcKind === "url" ? { kind: "url", url } : srcKind === "git" ? { kind: "git", repo, path, ref } : { kind: "upload" } };
       if (type === "mcp") {
         Object.assign(body, { mode, exposure });
         if (item && item.tools.length > 0) {
-          Object.assign(body, { allowedTools: allowedOf(item.tools, choice.allowed), fileArgs: choice.fileArgs });
+          Object.assign(body, { allowedTools: allowedOf(item.tools, choice.allowed), fileArgs: choice.fileArgs, resultArgs: choice.resultArgs,
+            spaceOnlyTools: choice.spaceOnly });
           if (choice.fileArgs.length > 0 && fileMaxBytes !== null) body.fileMaxBytes = fileMaxBytes;
+          if (choice.resultArgs.length > 0 && resultMaxBytes !== null) body.resultMaxBytes = resultMaxBytes;
         } else {
           body.readOnly = tools.readOnly;
         }
@@ -150,7 +153,8 @@ function EditItem({ item: initial, type, onClose }: { item: AdminCatalogItem | n
   return (
     <Modal wide title={item ? item.title || item.name : type === "mcp" ? t("admin.catalog.addMcp") : t("admin.catalog.addSkill")} onClose={onClose} footer={<>
       <button className="btn ghost" onClick={onClose}>{t("common.cancel")}</button>
-      <button className="btn primary" disabled={!name || save.isPending || (choice.fileArgs.length > 0 && fileMaxBytes === null)} onClick={() => save.mutate()}>{t("common.save")}</button>
+      <button className="btn primary" disabled={!name || save.isPending || (choice.fileArgs.length > 0 && fileMaxBytes === null)
+        || (choice.resultArgs.length > 0 && resultMaxBytes === null)} onClick={() => save.mutate()}>{t("common.save")}</button>
     </>}>
       <div className="form-grid">
         <div className="field"><label htmlFor="ci-name">{t("admin.catalog.name")}</label><input id="ci-name" className="inp mono" disabled={!!item} value={name} onChange={(e) => setName(e.target.value)} placeholder="jira" /></div>

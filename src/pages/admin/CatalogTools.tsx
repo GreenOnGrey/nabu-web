@@ -5,16 +5,20 @@ import { Icon, Switch } from "@green-on-grey/ui-kit";
 import type { AdminCatalogItem } from "../../api/types";
 import { ApiError } from "../../api/client";
 import { errorText } from "../../lib/errors";
-import { allowedOf, applyReadOnly, isFileArg, isReadOnly, sortTools, toggleFileArg, toggleTool, type ToolChoice } from "./catalogTools";
+import {
+  allowedOf, applyReadOnly, hasResult, isFileArg, isReadOnly, isResultArg, sortTools, toggleFileArg, toggleResultArg, toggleSpaceOnly, toggleTool,
+  type ToolChoice,
+} from "./catalogTools";
 
 const SEARCH_FROM = 8;
 
 /** What the block edits: the chosen tools, the old switch "Read-only" of an
- * item without a check, the file limit in megabytes. */
+ * item without a check, the file and result limits in megabytes. */
 export interface ToolsValue {
   choice: ToolChoice;
   readOnly: boolean;
   fileMax: string;
+  resultMax: string;
 }
 
 /** The check of the item from the block. */
@@ -26,10 +30,11 @@ export interface ToolsCheck {
 }
 
 /** The field of the block an error of saving points at (design §3.2). */
-function invalidField(err: unknown): "tools" | "fileMax" | null {
+function invalidField(err: unknown): "tools" | "fileMax" | "resultMax" | null {
   if (!(err instanceof ApiError)) return null;
   if (err.code === "catalog_file_max_invalid") return "fileMax";
-  if (err.code === "catalog_tool_unknown" || err.code === "catalog_file_arg_invalid") return "tools";
+  if (err.code === "catalog_result_max_invalid") return "resultMax";
+  if (["catalog_tool_unknown", "catalog_file_arg_invalid", "catalog_result_arg_invalid", "catalog_space_only_invalid"].includes(err.code)) return "tools";
   return null;
 }
 
@@ -92,6 +97,7 @@ export function ToolsBlock({ item, value, onChange, check, saveError }: {
 
   const shown = sortTools(tools, choice.allowed).filter((tl) => !query || tl.name.toLowerCase().includes(query.toLowerCase()));
   const anyFile = choice.fileArgs.length > 0;
+  const anyResult = choice.resultArgs.length > 0;
   return (
     <div className={`field ctools${check.pending ? " busy" : ""}${invalid === "tools" ? " invalid" : ""}`}>
       {header}
@@ -106,8 +112,10 @@ export function ToolsBlock({ item, value, onChange, check, saveError }: {
       <ul className="ctools-list">
         {shown.map((tl) => {
           const on = choice.allowed.includes(tl.name);
-          const args = tl.stringArgs ?? [];
+          const lists = tl.stringListArgs ?? [];
+          const args = [...(tl.stringArgs ?? []), ...lists];
           const hasFile = choice.fileArgs.some((f) => f.tool === tl.name);
+          const result = hasResult(choice, tl.name);
           const id = `ct-${tl.name}`;
           return (
             <li key={tl.name} className={`ctools-tool${on ? "" : " off"}`}>
@@ -118,17 +126,37 @@ export function ToolsBlock({ item, value, onChange, check, saveError }: {
                   {!tl.readOnly && <span className="ctools-lb chg">{t("admin.catalog.toolChanges")}</span>}
                   {item?.newTools?.includes(tl.name) && !on && <span className="ctools-lb new">{t("admin.catalog.toolNew")}</span>}
                   {hasFile && <span className="ctools-lb file"><Icon name="files" size={11} />{t("admin.catalog.fileShort")}</span>}
+                  {result && <span className="ctools-lb file"><Icon name="download" size={11} />{t("admin.catalog.toolResult")}</span>}
                 </label>
                 {tl.description && <div className="ctools-desc" title={tl.description}>{tl.description}</div>}
                 {on && args.length > 0 && open === tl.name && (
                   <div className="ctools-args">
-                    {args.map((a) => (
-                      <div key={a} className="ctools-arg">
-                        <span className="mono ctools-argname">{a}</span>
-                        <Switch on={isFileArg(choice, tl.name, a)} onChange={(v) => setChoice(toggleFileArg(choice, tl.name, a, v))} label={t("admin.catalog.fileArg")} />
-                      </div>
-                    ))}
+                    {args.map((a) => {
+                      const list = lists.includes(a);
+                      const file = isFileArg(choice, tl.name, a);
+                      const res = isResultArg(choice, tl.name, a);
+                      return (
+                        <div key={a} className="ctools-arg">
+                          <span className="mono ctools-argname">{a}{list && <span className="small muted"> · {t("admin.catalog.fileList")}</span>}</span>
+                          <span title={res ? t("admin.catalog.argTaken", { kind: t("admin.catalog.resultArg") }) : undefined}>
+                            <Switch on={file} disabled={res} onChange={(v) => setChoice(toggleFileArg(choice, tl.name, a, v))} label={t("admin.catalog.fileArg")} />
+                          </span>
+                          {!list && (
+                            <span title={file ? t("admin.catalog.argTaken", { kind: t("admin.catalog.fileArg") }) : undefined}>
+                              <Switch on={res} disabled={file} onChange={(v) => setChoice(toggleResultArg(choice, tl.name, a, v))} label={t("admin.catalog.resultArg")} />
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
                     <div className="hint">{t("admin.catalog.fileArgHint")}</div>
+                    <div className="hint">{t("admin.catalog.resultArgHint")}</div>
+                    {result && (
+                      <div className="ctools-arg">
+                        <Switch on={choice.spaceOnly.includes(tl.name)} onChange={(v) => setChoice(toggleSpaceOnly(choice, tl.name, v))} label={t("admin.catalog.spaceOnly")} />
+                        <span className="hint">{t("admin.catalog.spaceOnlyHint")}</span>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -147,6 +175,13 @@ export function ToolsBlock({ item, value, onChange, check, saveError }: {
           <input id="ct-fmax" className={`inp ctools-fmaxinp${invalid === "fileMax" ? " ctools-bad" : ""}`} inputMode="decimal"
             aria-invalid={invalid === "fileMax"} value={value.fileMax} onChange={(e) => onChange({ ...value, fileMax: e.target.value })} />
           <span className="hint">{t("admin.catalog.fileMaxHint")}</span>
+        </div>
+      )}
+      {anyResult && (
+        <div className="ctools-fmax">
+          <label htmlFor="ct-rmax" className="small">{t("admin.catalog.resultMax")}</label>
+          <input id="ct-rmax" className={`inp ctools-fmaxinp${invalid === "resultMax" ? " ctools-bad" : ""}`} inputMode="decimal"
+            aria-invalid={invalid === "resultMax"} value={value.resultMax} onChange={(e) => onChange({ ...value, resultMax: e.target.value })} />
         </div>
       )}
     </div>

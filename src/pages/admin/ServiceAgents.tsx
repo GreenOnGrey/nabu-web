@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { api } from "../../api/client";
+import { useSandboxProfiles } from "../../api/queries";
 import type { AdminCatalogItem, Harness, List, ModelConnection, Run, ServiceAgent, ServiceClient } from "../../api/types";
 import { errorText } from "../../lib/errors";
 import { intlLocale } from "../../lib/i18n";
@@ -66,6 +67,7 @@ function AgentForm({ agent, onClose }: { agent: ServiceAgent | null; onClose: ()
   const catalog = useQuery({ queryKey: ["admin", "catalog"], queryFn: () => api.get<{ items: AdminCatalogItem[] }>("/admin/api/v1/catalog") });
   const clients = useQuery({ queryKey: ["admin", "clients"], queryFn: () => api.get<{ items: ServiceClient[] }>("/admin/api/v1/clients") });
   const harnesses = useQuery({ queryKey: ["admin", "harnesses"], queryFn: () => api.get<{ items: Harness[] }>("/admin/api/v1/harnesses") });
+  const profiles = useSandboxProfiles();
   const [f, setF] = useState<Omit<ServiceAgent, "enabled" | "runsWeek" | "failedWeek" | "updatedAt">>(agent ?? {
     name: "", description: "", harness: "pi", model: { connectionId: "", model: "", thinking: "off" }, instructions: "",
     skills: [], mcp: [], acceptCallerMcp: true, workspace: "none", limits: { timeoutSec: 1800, maxTokens: 0 }, clients: [],
@@ -118,6 +120,17 @@ function AgentForm({ agent, onClose }: { agent: ServiceAgent | null; onClose: ()
         <div className="mini-seg" style={{ display: "inline-flex" }}>
           {(["none", "nabu", "external"] as const).map((w) => <button key={w} className={f.workspace === w ? "on" : ""} onClick={() => set("workspace", w)}>{t(`admin.service-agents.workspaces.${w}`)}</button>)}
         </div></div>
+      {f.workspace === "nabu" && (
+        // FTR.NAB.CMN-0008 R6, design §3.5: the image the agent runs its commands in
+        <div className="field"><label htmlFor="sa-prof">{t("admin.service-agents.profile")}</label>
+          <select id="sa-prof" className="inp" value={f.workspaceProfile ?? ""} onChange={(e) => set("workspaceProfile", e.target.value || undefined)}>
+            <option value="">{t("admin.service-agents.profileDefault", { profile: profiles.data?.assignments.defaults.service ?? "base" })}</option>
+            {(profiles.data?.profiles ?? []).filter((p) => p.state === "ready" || !!p.imageDigest).map((p) => (
+              <option key={p.name} value={p.name}>{p.name}{p.kind === "custom" ? ` · ${t("admin.sandbox-images.kindCustom")}` : ""}</option>
+            ))}
+          </select>
+          <div className="hint">{t("admin.service-agents.profileHint")}</div></div>
+      )}
       <div className="form-grid">
         <div className="field"><label htmlFor="sa-to">{t("admin.service-agents.timeout")}</label><input id="sa-to" type="number" min={60} className="inp" value={f.limits.timeoutSec} onChange={(e) => set("limits", { ...f.limits, timeoutSec: Number(e.target.value) })} /></div>
         <div className="field"><label htmlFor="sa-tok">{t("admin.service-agents.maxTokens")}</label><input id="sa-tok" type="number" min={0} className="inp" value={f.limits.maxTokens} onChange={(e) => set("limits", { ...f.limits, maxTokens: Number(e.target.value) })} /></div>

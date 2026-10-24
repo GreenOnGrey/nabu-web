@@ -16,6 +16,32 @@ const me = (theme = "light") => ({ id: "u1", email: "ada@example.com", name: "А
   channels: [{ kind: "telegram", available: true, reason: "all_users", binding: { account: "@ada", boundAt: T("09:00", "01") } }, { kind: "email", available: true, reason: "always", address: "ada@nabu.example" }] });
 const config = { authProvider: "github", providerLabel: "GitHub", allowedOrg: "GreenOnGrey", languages: ["en", "ru", "de", "es", "zh"], defaultLanguage: "en",
   uploadMaxBytes: 20000000, voice: true, spaces: true, channels: { telegram: true, email: true }, version: "1.0.0" };
+// FTR.NAB.CMN-0008: requests of libraries and the profiles of sandbox images
+const pkg = (ecosystem, name, users, agent, auto, kinds, extra = {}) => ({ ecosystem, name, aliases: [], users, signals: agent + auto, bySource: { agent, auto },
+  byProfile: { documents: agent + auto }, byKind: kinds, previousSignals: Math.round((agent + auto) * 0.7), new: false, lastAt: T("10:00"), status: "new", ...extra });
+const sandboxPackages = [
+  pkg("pypi", "opencv-python", 14, 9, 23, { personal: 22, group: 7, service: 3 }, { aliases: [{ ecosystem: "python-module", name: "cv2", builtin: true }] }),
+  pkg("apt", "ffmpeg", 9, 4, 17, { personal: 18, group: 3 }, { status: "planned", aliases: [{ ecosystem: "command", name: "ffmpeg", builtin: false }] }),
+  pkg("pypi", "pymupdf", 6, 2, 8, { personal: 10 }, { status: "added", profile: "documents", version: "v0.4.0", previousSignals: 10 }),
+  pkg("python-module", "qrcode", 4, 0, 5, { personal: 4, service: 1 }, { new: true, previousSignals: 0 }),
+  pkg("pypi", "tensorflow", 3, 3, 2, { personal: 5 }, { status: "rejected", note: "Слишком тяжёлый", previousSignals: 7 }),
+  pkg("pypi", "reqeusts", 1, 1, 0, { personal: 1 }, { new: true, previousSignals: 0, lookalike: "requests" }),
+];
+const prof = (name, kind, extra) => ({ name, kind, description: "", state: "ready", nodesReady: 1, nodesTotal: 1,
+  assignedTo: { personal: false, group: false, services: [] }, baseVersion: "v0.5.0", ...extra });
+const sandboxProfiles = { customImages: true, prefixes: ["registry.company.local/nabu/"], currentVersion: "v0.5.0",
+  assignments: { personal: "company-tools", group: "documents", defaults: { personal: "documents", group: "documents", service: "base" } },
+  profiles: [
+    prof("base", "builtin", { imageRef: "ghcr.io/greenongrey/nabu-sandbox-base:v0.5.0", assignedTo: { personal: false, group: false, services: ["memory-collector"] },
+      inventory: { name: "base", kind: "builtin", tools: [{ group: "Архивы", name: "zip", version: "3.0" }, { group: "Python", name: "python3", version: "3.13.5" }] } }),
+    prof("documents", "builtin", { imageRef: "ghcr.io/greenongrey/nabu-sandbox-documents:v0.5.0", assignedTo: { personal: false, group: true, services: ["report-builder"] },
+      inventory: { name: "documents", kind: "builtin", includes: "base", tools: [{ group: "PDF", name: "typst", version: "0.15.1" }], python: [{ name: "pandas", version: "3.1.0" }] } }),
+    prof("company-tools", "custom", { imageRef: "registry.company.local/nabu/company-tools:2025.10", imageDigest: "sha256:3f9a1d2c4b5e6f70819a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5ec21e",
+      baseVersion: "v0.4.0", nodesReady: 2, nodesTotal: 3, description: "Есть Oracle Instant Client и sqlplus.", assignedTo: { personal: true, group: false, services: [] },
+      inventory: { name: "company-tools", kind: "custom", commands: ["sqlplus", "corp-tickets"], python: [{ name: "oracledb", version: "3.3.0" }] } }),
+    prof("oracle-client", "custom", { imageRef: "registry.company.local/nabu/oracle-client:1.2", state: "error", error: "sandbox_probe_no_bash", nodesReady: 0, nodesTotal: 0 }),
+  ] };
+
 const model = { connectionId: "c1", model: "sonnet", name: "sonnet-5", connection: "Anthropic", caps: { image: true, tools: true, reasoning: true, contextWindow: 200000 } };
 const flash = { connectionId: "c2", model: "deepseek-v4.1-flash", name: "DeepSeek V4.1 Flash", connection: "DeepSeek", caps: { image: true, tools: true, reasoning: false, contextWindow: 128000 } };
 const agent = { name: "Набу", tone: "business", model, defaultModel: model, chosen: false, availableModels: [model, flash], context: { tokens: 42000, window: 200000 } };
@@ -124,6 +150,13 @@ function api(url, theme) {
   if (p === "/admin/api/v1/groups") return { items: userGroups };
   if (/^\/admin\/api\/v1\/groups\/[^/]+\/members$/.test(p)) return { items: members, nextCursor: null };
   if (p === "/admin/api/v1/harnesses") return { items: [{ name: "pi", version: "1.3.0", status: "ok" }] };
+  // FTR.NAB.CMN-0008: sandbox images
+  if (p === "/admin/api/v1/sandbox/packages") return { items: sandboxPackages };
+  if (p.startsWith("/admin/api/v1/sandbox/packages/")) return { ...sandboxPackages[0], reasons: [
+    { text: "Распознать таблицу на фото накладной перед загрузкой в Excel", profile: "documents", at: T("10:00") },
+    { text: "Найти и вырезать подписи на сканах договоров", profile: "documents", at: T("09:00", "10") }],
+    daily: [3, 5, 1, 0, 6, 8, 4, 7, 11, 5, 9, 12, 9, 13].map((n, i) => ({ day: `2026-10-${String(i + 1).padStart(2, "0")}`, signals: n })), history: [] };
+  if (p === "/admin/api/v1/sandbox/profiles") return sandboxProfiles;
   if (p === "/admin/api/v1/voice") return { configured: true, ok: true, url: "http://whisper.nabu.svc:9000" };
   if (p === "/admin/api/v1/users") return { items: url.searchParams.get("status") === "archived" ? [] : users };
   return { items: [], nextCursor: null };

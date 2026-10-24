@@ -13,6 +13,7 @@ const SECTIONS = [
   { path: "agent-pods", icon: "bolt" },
   { path: "group-agents", icon: "grid" },
   { path: "service-agents", icon: "spark" },
+  { path: "sandbox-images", icon: "box" }, // FTR.NAB.CMN-0008 design §2
   { path: "models", icon: "cpu" },
   { path: "catalog", icon: "plug" },
   { path: "comm", icon: "brain" },

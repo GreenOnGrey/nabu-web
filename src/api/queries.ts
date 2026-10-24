@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "./client";
-import type { AdminCatalogItem, AdminChannel, Agent, Me, ModelConnectionList, PublicConfig, UserGroup } from "./types";
+import type { AdminCatalogItem, AdminChannel, Agent, Me, ModelConnectionList, PublicConfig, SandboxProfiles, UserGroup } from "./types";
 
 // Query keys shared by pages and the SSE invalidation in App.
 export const keys = {
@@ -38,7 +38,16 @@ export const adminKeys = {
   catalog: ["admin", "catalog"] as const,
   connections: ["admin", "connections"] as const,
   channels: ["admin", "channels"] as const,
+  // FTR.NAB.CMN-0008: the profiles of sandboxes — the page of images and the form of a service agent
+  sandboxProfiles: ["admin", "sandbox-profiles"] as const,
 };
+
+/** The profiles of sandboxes; `follow` re-reads them while a custom image is being checked. */
+export const useSandboxProfiles = (follow = false) =>
+  useQuery({
+    queryKey: adminKeys.sandboxProfiles, queryFn: () => api.get<SandboxProfiles>("/admin/api/v1/sandbox/profiles"),
+    refetchInterval: follow ? (query) => (query.state.data?.profiles.some((p) => p.state === "checking" || p.pendingRef) ? 5000 : false) : false,
+  });
 
 export const useAdminGroups = () =>
   useQuery({ queryKey: adminKeys.groups, queryFn: () => api.get<{ items: UserGroup[] }>("/admin/api/v1/groups") });

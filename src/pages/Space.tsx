@@ -6,6 +6,8 @@ import { apiUrl } from "../api/base";
 import { api, request } from "../api/client";
 import { keys } from "../api/queries";
 import type { List, SpaceFile, SpaceInfo } from "../api/types";
+import { useSession } from "../app/session";
+import { loadOfficePreview } from "../chat/preview";
 import { errorText } from "../lib/errors";
 import { intlLocale } from "../lib/i18n";
 import { bytes, dateTime } from "../lib/format";
@@ -26,6 +28,8 @@ export function SpacePage() {
   const linked = params.get("path");
   const info = useQuery({ queryKey: keys.space, queryFn: () => api.get<SpaceInfo>("/api/v1/space") });
   const [viewing, setViewing] = useState<ChatAttachment | null>(null);
+  // FTR.NAB.CHAT-0003 R13: documents and spreadsheets of the space open in the preview as well
+  const office = !!useSession().config.previewOffice;
   const files = useInfiniteQuery({
     queryKey: keys.files,
     initialPageParam: "",
@@ -90,7 +94,7 @@ export function SpacePage() {
                   <td>{dateTime(f.modifiedAt, lng)} · {f.modifiedBy === "agent" ? t("space.byAgent") : t("space.byUser")}</td>
                   <td>
                     <div className="file-actions">
-                      <PreviewButton file={f} onOpen={() => setViewing(spaceAttachment(f))} />
+                      <PreviewButton file={f} office={office} onOpen={() => setViewing(spaceAttachment(f))} />
                       <a className="btn sm" href={contentUrl(f.path)}><Icon name="download" size={14} />{t("space.download")}</a>
                       <button className="iconbtn" aria-label={t("common.delete")} onClick={() => del.mutate(f.path)}><Icon name="trash" size={16} /></button>
                     </div>
@@ -102,15 +106,15 @@ export function SpacePage() {
         </div>
       )}
       {files.hasNextPage && <button className="btn ghost sm" onClick={() => files.fetchNextPage()}>{t("common.more")}</button>}
-      {viewing && <AttachmentPreview a={viewing} load={loadSpaceFile} onClose={() => setViewing(null)} />}
+      {viewing && <AttachmentPreview a={viewing} load={loadSpaceFile} loadPreview={office ? loadSpacePreview : undefined} onClose={() => setViewing(null)} />}
     </div>
   );
 }
 
 /** FTR.NAB.CHAT-0001 R34: a file with a preview opens it; the icon is the one of its kind. Others have none. */
-function PreviewButton({ file, onOpen }: { file: SpaceFile; onOpen: () => void }) {
+function PreviewButton({ file, office, onOpen }: { file: SpaceFile; office: boolean; onOpen: () => void }) {
   const { t } = useTranslation();
-  const kind = previewKind({ fileName: file.path });
+  const kind = previewKind({ fileName: file.path }, office);
   if (!kind) return null;
   const label = t("space.preview", { name: file.path });
   return <button className="iconbtn" aria-label={label} title={label} onClick={onOpen}><Icon name={previewIcon(kind)} size={16} /></button>;
@@ -126,3 +130,6 @@ function spaceAttachment(f: SpaceFile): ChatAttachment {
 
 /** Loads a file of the space for the preview with the session of the user. */
 const loadSpaceFile = (a: ChatAttachment) => api.blob(contentPath(a.id));
+
+/** The preview of a document or a spreadsheet of the space (FTR.NAB.CHAT-0003 R13). */
+const loadSpacePreview = (a: ChatAttachment) => loadOfficePreview({ path: a.id }, a.fileName);

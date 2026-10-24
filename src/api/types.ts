@@ -16,6 +16,8 @@ export interface PublicConfig {
   spaces: boolean;
   channels: Record<string, boolean>;
   version: string;
+  /** Documents and spreadsheets open in the preview (FTR.NAB.CHAT-0003 R22). */
+  previewOffice?: boolean;
 }
 
 /** A channel in the Connections of a user (FTR.NAB.CMN-0002 tech §3). */
@@ -142,6 +144,19 @@ export interface ToolStep {
   tool: string;
   summary: string;
   status: "running" | "done" | "error";
+}
+
+/** The sheets of a spreadsheet in its preview (FTR.NAB.CHAT-0003 tech §6.2): at most 500 rows and 50
+ * columns; a formula comes as its text. */
+export interface PreviewSheets {
+  sheets: {
+    name: string;
+    rows: number;
+    cols: number;
+    cells: { v?: string; n?: number; f?: string }[][];
+    merges: string[];
+    freeze: string;
+  }[];
 }
 
 export interface Attachment {
@@ -620,6 +635,8 @@ export interface CatalogTool {
   destructive?: boolean;
   /** String arguments: the ones that can be files of the space. */
   stringArgs?: string[];
+  /** Arguments that are lists of strings: lists of files of the space (FTR.NAB.CHAT-0003 R12). */
+  stringListArgs?: string[];
 }
 
 /** A string argument of a tool that is a path in the user's space (R14). */
@@ -649,6 +666,10 @@ export interface AdminCatalogItem {
   allowedTools: string[] | null;
   fileArgs: FileArg[];
   fileMaxBytes: number;
+  /** FTR.NAB.CHAT-0003 R10, R11, R25: result paths, their limit, the tools that write only to the space. */
+  resultArgs?: FileArg[];
+  resultMaxBytes?: number;
+  spaceOnlyTools?: string[];
   newTools?: string[];
   /** The last successful check. */
   checkedAt: string | null;
@@ -669,6 +690,8 @@ export interface ServiceAgent {
   mcp: string[];
   acceptCallerMcp: boolean;
   workspace: "none" | "nabu" | "external";
+  /** FTR.NAB.CMN-0008 R6: the sandbox profile of a workspace in Nabu; absent — the default of the stand. */
+  workspaceProfile?: string;
   limits: { timeoutSec: number; maxTokens: number };
   clients: string[];
   enabled: boolean;
@@ -767,4 +790,68 @@ export interface EffectiveAccess {
   defaultModel: { connectionId: string; model: string; source: "user" | "group" | "global" | "first"; groupId?: string } | null;
   channels: { kind: string; via: string[] }[];
   catalogItems: { id: string; type: "mcp" | "skill"; title: string; mode: string | null; via: string[] }[];
+}
+
+// ─── FTR.NAB.CMN-0008: sandbox profiles and library requests ─────────
+
+export interface SandboxPackage { name: string; version?: string }
+export interface SandboxManifest {
+  name: string;
+  kind: "builtin" | "custom";
+  version?: string;
+  digest?: string;
+  tools?: { group: string; name: string; version?: string }[];
+  python?: SandboxPackage[];
+  system?: SandboxPackage[];
+  commands?: string[];
+  includes?: string;
+  description?: string;
+}
+export interface SandboxProfile {
+  name: string;
+  kind: "builtin" | "custom";
+  imageRef: string;
+  imageDigest?: string;
+  pendingRef?: string;
+  description: string;
+  state: "checking" | "ready" | "error";
+  error?: string;
+  baseVersion?: string;
+  nodesReady: number;
+  nodesTotal: number;
+  assignedTo: { personal: boolean; group: boolean; services: string[] };
+  inventory?: SandboxManifest;
+  checkedAt?: string;
+}
+export interface SandboxProfiles {
+  customImages: boolean;
+  prefixes: string[];
+  currentVersion: string;
+  profiles: SandboxProfile[];
+  assignments: { personal: string; group: string; defaults: Record<string, string> };
+}
+export type PackageEcosystem = "pypi" | "apt" | "binary" | "python-module" | "command";
+export type PackageStatus = "new" | "planned" | "added" | "rejected";
+export interface PackageRow {
+  ecosystem: PackageEcosystem;
+  name: string;
+  aliases: { ecosystem: string; name: string; builtin: boolean }[];
+  users: number;
+  signals: number;
+  bySource: { agent?: number; auto?: number };
+  byProfile: Record<string, number>;
+  byKind: { personal?: number; group?: number; service?: number };
+  previousSignals: number;
+  new: boolean;
+  lastAt: string;
+  status: PackageStatus;
+  profile?: string;
+  version?: string;
+  note?: string;
+  lookalike?: string;
+}
+export interface PackageCard extends PackageRow {
+  reasons: { text: string; profile: string; at: string }[];
+  daily: { day: string; signals: number }[];
+  history: { status: PackageStatus; profile?: string; version?: string; note?: string; by?: string; at: string }[];
 }

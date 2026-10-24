@@ -16,7 +16,7 @@ const click = (name: string) => async (page: Page) => {
   await page.getByRole("button", { name, exact: true }).first().click();
 };
 
-const ADMIN = ["users", "channels", "group-agents", "agent-pods", "models", "groups", "catalog", "service-agents", "comm", "clients", "usage", "audit", "settings"];
+const ADMIN = ["users", "channels", "group-agents", "agent-pods", "models", "groups", "catalog", "service-agents", "sandbox-images", "comm", "clients", "usage", "audit", "settings"];
 
 export const SCREENS: Screen[] = [
   { name: "login", path: "/login", visitor: true },
@@ -59,6 +59,9 @@ export const SCREENS: Screen[] = [
   { name: "connections", path: "/connections" },
   { name: "admin", path: "/admin" },
   ...ADMIN.map((s) => ({ name: `admin-${s}`, path: `/admin/${s}` })),
+  // FTR.NAB.CMN-0008 design §3: the card of a package, the profiles
+  { name: "admin-sandbox-package", path: "/admin/sandbox-images", only: "desktop", act: async (page) => { await page.getByText("opencv-python").first().click(); } },
+  { name: "admin-sandbox-profiles", path: "/admin/sandbox-images", act: async (page) => { await page.getByRole("tab", { name: "Профили" }).click(); } },
   { name: "admin-clients-edit", path: "/admin/clients", act: click("Изменить") },
   { name: "admin-clients-delete", path: "/admin/clients", act: click("Удалить") },
   // FTR.NAB.CMN-0006 design §3: the tools of a checked item with its file argument open, and a new item before a check

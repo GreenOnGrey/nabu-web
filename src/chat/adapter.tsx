@@ -10,6 +10,7 @@ import { api } from "../api/client";
 import { keys } from "../api/queries";
 import type { Agent, AgentWait, Confirmation, ContextFill, Conversation, List, Message, Skill, Tone, ToolStep } from "../api/types";
 import { useSession } from "../app/session";
+import { loadOfficePreview } from "./preview";
 import { errorText } from "../lib/errors";
 import { relativeTime } from "../lib/format";
 import { intlLocale } from "../lib/i18n";
@@ -120,6 +121,9 @@ const attachmentPath = (id: string) => `/api/v1/attachments/${id}`;
 
 /** Loads a file of a message for the preview with the session of the user (FTR.NAB.CHAT-0001 R34). */
 export const loadAttachment = (a: ChatAttachment) => api.blob(attachmentPath(a.id));
+
+/** The preview of a document or a spreadsheet of a message (FTR.NAB.CHAT-0003 R13). */
+export const loadAttachmentPreview = (a: ChatAttachment) => loadOfficePreview({ attachment: a.id }, a.fileName);
 
 /** A conversation of the API as a row of the list of the kit. */
 export function toChatConversation(t: TFunction, c: Conversation, locale: string): ChatConversation {
@@ -239,7 +243,7 @@ function useCommands(conv: Conversation) {
  * window of the model of the agent: the size of an empty context. */
 export function useConversation(conv: Conversation, modelWindow = 0): Pick<ChatProps,
   "messages" | "loading" | "hasOlder" | "loadingOlder" | "busy" | "confirmations" | "upload"
-  | "onSend" | "onLoadOlder" | "onRetry" | "onConfirm" | "onUpload" | "onTranscribe" | "loadAttachment"
+  | "onSend" | "onLoadOlder" | "onRetry" | "onConfirm" | "onUpload" | "onTranscribe" | "loadAttachment" | "loadPreview"
   | "commands" | "onCommand" | "context" | "onCompact" | "onReset" | "voiceMaxSeconds" | "onPendingChange"> & {
   unarchive: () => void;
   /** Images are attached to the message being written (R11). */
@@ -401,6 +405,7 @@ export function useConversation(conv: Conversation, modelWindow = 0): Pick<ChatP
       }
     },
     loadAttachment,
+    loadPreview: config.previewOffice ? loadAttachmentPreview : undefined,
     // the voice input exists where the deployment has a recognizer; a failure is a toast of the kit
     // with «Retry» on the same recording (design §3.1)
     onTranscribe: config.voice ? async (recording) => {

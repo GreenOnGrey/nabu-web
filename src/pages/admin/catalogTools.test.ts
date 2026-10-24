@@ -1,15 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { allowedCount, applyReadOnly, bytesToMb, isReadOnly, mbToBytes, sortTools, toggleFileArg, toggleTool, type ItemTool } from "./catalogTools";
+import {
+  allowedCount, applyReadOnly, bytesToMb, isReadOnly, mbToBytes, sortTools, toggleFileArg, toggleResultArg, toggleSpaceOnly, toggleTool, type ItemTool,
+  type ToolChoice,
+} from "./catalogTools";
+
+const none: ToolChoice = { allowed: [], fileArgs: [], resultArgs: [], spaceOnly: [] };
 
 const tools: ItemTool[] = [
-  { name: "convert", readOnly: false, stringArgs: ["source"] },
+  { name: "convert", readOnly: false, stringArgs: ["source", "dest"] },
   { name: "export", readOnly: true },
   { name: "list_cached", readOnly: true },
 ];
 
 describe("FTR.NAB.CMN-0006 tools of an item", () => {
   it("UI-01: Read-only checks the reading tools", () => {
-    const c = applyReadOnly({ allowed: ["convert"], fileArgs: [{ tool: "convert", arg: "source" }] }, tools, true);
+    const c = applyReadOnly({ ...none, allowed: ["convert"], fileArgs: [{ tool: "convert", arg: "source" }] }, tools, true);
     expect(c.allowed).toEqual(["export", "list_cached"]);
     expect(c.fileArgs).toEqual([]);
     expect(isReadOnly(tools, c.allowed)).toBe(true);
@@ -18,11 +23,11 @@ describe("FTR.NAB.CMN-0006 tools of an item", () => {
     expect(isReadOnly(tools, ["export", "convert"])).toBe(false);
   });
   it("UI-04: unchecking a tool drops its file arguments", () => {
-    let c = toggleTool({ allowed: [], fileArgs: [] }, "convert", true);
+    let c = toggleTool(none, "convert", true);
     c = toggleFileArg(c, "convert", "source", true);
     expect(c.fileArgs).toEqual([{ tool: "convert", arg: "source" }]);
     c = toggleTool(c, "convert", false);
-    expect(c).toEqual({ allowed: [], fileArgs: [] });
+    expect(c).toEqual(none);
     expect(toggleFileArg(c, "convert", "source", true).fileArgs).toEqual([]);
   });
   it("sorts the checked tools first", () => {
@@ -39,5 +44,29 @@ describe("FTR.NAB.CMN-0006 tools of an item", () => {
     expect(mbToBytes("0")).toBeNull();
     expect(mbToBytes("101")).toBeNull();
     expect(bytesToMb(20 << 20)).toBe("20");
+  });
+});
+
+describe("FTR.NAB.CHAT-0003 result paths", () => {
+  it("UI-10: an argument is a space file or a result path, not both", () => {
+    let c = toggleTool(none, "convert", true);
+    c = toggleFileArg(c, "convert", "source", true);
+    expect(toggleResultArg(c, "convert", "source", true).resultArgs).toEqual([]);
+    c = toggleResultArg(c, "convert", "dest", true);
+    expect(c.resultArgs).toEqual([{ tool: "convert", arg: "dest" }]);
+    expect(toggleFileArg(c, "convert", "dest", true).fileArgs).toEqual([{ tool: "convert", arg: "source" }]);
+  });
+  it("UI-11: «writes only to the space» needs a result path and goes with the last one", () => {
+    let c = toggleTool(none, "convert", true);
+    expect(toggleSpaceOnly(c, "convert", true).spaceOnly).toEqual([]);
+    c = toggleSpaceOnly(toggleResultArg(c, "convert", "dest", true), "convert", true);
+    expect(c.spaceOnly).toEqual(["convert"]);
+    expect(toggleResultArg(c, "convert", "dest", false)).toEqual({ ...c, resultArgs: [], spaceOnly: [] });
+    expect(toggleTool(c, "convert", false)).toEqual(none);
+    expect(applyReadOnly(c, tools, true).spaceOnly).toEqual([]);
+  });
+  it("limits a result to 50 MB", () => {
+    expect(mbToBytes("50", 50 << 20)).toBe(50 << 20);
+    expect(mbToBytes("51", 50 << 20)).toBeNull();
   });
 });
