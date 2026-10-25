@@ -209,8 +209,14 @@ table.comm-t td:nth-child(1),table.comm-t td:nth-child(2){display:inline-block;w
 .ctools-lb.file{background:var(--surface-2);color:var(--text-2)}
 .ctools-argsbtn{border:0;background:none;padding:0;font-size:12px;color:var(--violet-text);white-space:nowrap}
 .ctools-args{margin-top:6px;border-left:2px solid var(--violet-soft);padding:4px 0 4px 12px}
-.ctools-arg{display:flex;align-items:center;gap:12px;font-size:13px;padding:3px 0}
-.ctools-argname{min-width:90px}
+/* FTR.NAB.CHAT-0003 design §3.6: name | space file | result path, the same columns in every row */
+.ctools-arggrid{display:grid;grid-template-columns:minmax(90px,max-content) max-content max-content;column-gap:20px;row-gap:8px;align-items:center;font-size:13px}
+.ctools-argname{display:flex;flex-direction:column;overflow-wrap:anywhere}
+.ctools-argnote{font-family:var(--font);font-size:11px;color:var(--muted)}
+.ctools-argsw{white-space:nowrap}
+.ctools-arghint{margin:8px 0 0}
+.ctools-spaceonly{margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);font-size:13px}
+@media (max-width:640px){.ctools-arggrid{grid-template-columns:minmax(0,1fr);row-gap:4px}.ctools-argname{margin-top:6px}}
 .ctools-fmax{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;border-top:1px solid var(--border)}
 .ctools-fmaxinp{width:90px}
 .ctools-plate{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:12px 14px;padding:14px;border-radius:var(--r-m);background:var(--surface-2);color:var(--text-2);font-size:14px}

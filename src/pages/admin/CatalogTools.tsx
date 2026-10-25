@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Icon, Switch } from "@green-on-grey/ui-kit";
@@ -131,30 +131,35 @@ export function ToolsBlock({ item, value, onChange, check, saveError }: {
                 {tl.description && <div className="ctools-desc" title={tl.description}>{tl.description}</div>}
                 {on && args.length > 0 && open === tl.name && (
                   <div className="ctools-args">
-                    {args.map((a) => {
-                      const list = lists.includes(a);
-                      const file = isFileArg(choice, tl.name, a);
-                      const res = isResultArg(choice, tl.name, a);
-                      return (
-                        <div key={a} className="ctools-arg">
-                          <span className="mono ctools-argname">{a}{list && <span className="small muted"> · {t("admin.catalog.fileList")}</span>}</span>
-                          <span title={res ? t("admin.catalog.argTaken", { kind: t("admin.catalog.resultArg") }) : undefined}>
-                            <Switch on={file} disabled={res} onChange={(v) => setChoice(toggleFileArg(choice, tl.name, a, v))} label={t("admin.catalog.fileArg")} />
-                          </span>
-                          {!list && (
-                            <span title={file ? t("admin.catalog.argTaken", { kind: t("admin.catalog.fileArg") }) : undefined}>
-                              <Switch on={res} disabled={file} onChange={(v) => setChoice(toggleResultArg(choice, tl.name, a, v))} label={t("admin.catalog.resultArg")} />
+                    {/* a grid: the switches of every argument stand in the same columns */}
+                    <div className="ctools-arggrid">
+                      {args.map((a) => {
+                        const list = lists.includes(a);
+                        const file = isFileArg(choice, tl.name, a);
+                        const res = isResultArg(choice, tl.name, a);
+                        return (
+                          <Fragment key={a}>
+                            <span className="mono ctools-argname">{a}{list && <span className="ctools-argnote">{t("admin.catalog.fileList")}</span>}</span>
+                            <span className="ctools-argsw" title={res ? t("admin.catalog.argTaken", { kind: t("admin.catalog.resultArg") }) : undefined}>
+                              <Switch on={file} disabled={res} onChange={(v) => setChoice(toggleFileArg(choice, tl.name, a, v))} label={t("admin.catalog.fileArg")} />
                             </span>
-                          )}
-                        </div>
-                      );
-                    })}
-                    <div className="hint">{t("admin.catalog.fileArgHint")}</div>
-                    <div className="hint">{t("admin.catalog.resultArgHint")}</div>
+                            {list ? <span /> : (
+                              <span className="ctools-argsw" title={file ? t("admin.catalog.argTaken", { kind: t("admin.catalog.fileArg") }) : undefined}>
+                                <Switch on={res} disabled={file} onChange={(v) => setChoice(toggleResultArg(choice, tl.name, a, v))} label={t("admin.catalog.resultArg")} />
+                              </span>
+                            )}
+                          </Fragment>
+                        );
+                      })}
+                    </div>
+                    <p className="hint ctools-arghint">{t("admin.catalog.fileArgHint")}</p>
+                    <p className="hint ctools-arghint">{t("admin.catalog.resultArgHint")}</p>
                     {result && (
-                      <div className="ctools-arg">
-                        <Switch on={choice.spaceOnly.includes(tl.name)} onChange={(v) => setChoice(toggleSpaceOnly(choice, tl.name, v))} label={t("admin.catalog.spaceOnly")} />
-                        <span className="hint">{t("admin.catalog.spaceOnlyHint")}</span>
+                      <div className="ctools-spaceonly">
+                        <span className="ctools-argsw">
+                          <Switch on={choice.spaceOnly.includes(tl.name)} onChange={(v) => setChoice(toggleSpaceOnly(choice, tl.name, v))} label={t("admin.catalog.spaceOnly")} />
+                        </span>
+                        <p className="hint ctools-arghint">{t("admin.catalog.spaceOnlyHint")}</p>
                       </div>
                     )}
                   </div>
