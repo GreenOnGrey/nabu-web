@@ -700,7 +700,18 @@
       "createAndCheck": "Создать и проверить",
       "map": "Сопоставить",
       "invSearch": "Найти пакет или команду",
-      "invNothing": "Ничего не найдено"
+      "invNothing": "Ничего не найдено",
+      "groups": {
+        "archives": "Архивы",
+        "utilities": "Утилиты",
+        "python": "Python",
+        "node-git": "Node.js и git",
+        "pdf": "PDF",
+        "html-assets": "Ресурсы для HTML",
+        "python-packages": "Пакеты Python",
+        "system": "Системные пакеты",
+        "commands": "Команды"
+      }
     },
     "clients": {
       "title": "Сервисные клиенты",

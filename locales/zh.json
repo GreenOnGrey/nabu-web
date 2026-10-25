@@ -700,7 +700,18 @@
       "createAndCheck": "创建并检查",
       "map": "关联",
       "invSearch": "查找软件包或命令",
-      "invNothing": "未找到"
+      "invNothing": "未找到",
+      "groups": {
+        "archives": "压缩工具",
+        "utilities": "实用工具",
+        "python": "Python",
+        "node-git": "Node.js 和 git",
+        "pdf": "PDF",
+        "html-assets": "HTML 资源",
+        "python-packages": "Python 包",
+        "system": "系统软件包",
+        "commands": "命令"
+      }
     },
     "clients": {
       "title": "服务客户端",

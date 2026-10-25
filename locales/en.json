@@ -700,7 +700,18 @@
       "createAndCheck": "Create and check",
       "map": "Map",
       "invSearch": "Find a package or a command",
-      "invNothing": "Nothing found"
+      "invNothing": "Nothing found",
+      "groups": {
+        "archives": "Archives",
+        "utilities": "Utilities",
+        "python": "Python",
+        "node-git": "Node.js and git",
+        "pdf": "PDF",
+        "html-assets": "Assets for HTML",
+        "python-packages": "Python packages",
+        "system": "System packages",
+        "commands": "Commands"
+      }
     },
     "clients": {
       "title": "Service clients",

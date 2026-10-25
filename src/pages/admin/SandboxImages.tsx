@@ -444,7 +444,7 @@ function ProfileCard({ p, current, onInUse }: { p: SandboxProfile; current: stri
       {rows.length > 0 && (
         <table className="t nb-sbx-inv">
           <thead><tr><th>{t("admin.sandbox-images.invGroup")}</th><th>{t("admin.sandbox-images.invTool")}</th><th>{t("admin.sandbox-images.invVersion")}</th></tr></thead>
-          <tbody>{rows.map((r, i) => <tr key={i}><td>{r.group}</td><td className="mono">{r.name}</td><td className="mono t2">{r.version || "—"}</td></tr>)}</tbody>
+          <tbody>{rows.map((r, i) => <tr key={i}><td>{t(`admin.sandbox-images.groups.${r.group}`, { defaultValue: r.group })}</td><td className="mono">{r.name}</td><td className="mono t2">{r.version || "—"}</td></tr>)}</tbody>
         </table>
       )}
       <div className="nb-sbx-actions" style={{ marginTop: 8 }}>
@@ -462,9 +462,9 @@ function profileRows(inv: SandboxProfile["inventory"], full: boolean) {
   if (!inv) return [];
   const rows: { group: string; name: string; version?: string }[] = [];
   for (const tl of inv.tools ?? []) rows.push(tl);
-  for (const p of inv.python ?? []) rows.push({ group: "Python", name: p.name, version: p.version });
-  if (full) for (const p of inv.system ?? []) rows.push({ group: "Debian", name: p.name, version: p.version });
-  if (!inv.tools?.length && inv.kind === "custom") for (const c of (inv.commands ?? []).slice(0, full ? 5000 : 0)) rows.push({ group: "PATH", name: c });
+  for (const p of inv.python ?? []) rows.push({ group: "python-packages", name: p.name, version: p.version });
+  if (full) for (const p of inv.system ?? []) rows.push({ group: "system", name: p.name, version: p.version });
+  if (!inv.tools?.length && inv.kind === "custom") for (const c of (inv.commands ?? []).slice(0, full ? 5000 : 0)) rows.push({ group: "commands", name: c });
   return full ? rows : rows.slice(0, 12);
 }
 

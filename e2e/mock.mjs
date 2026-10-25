@@ -33,7 +33,7 @@ const sandboxProfiles = { customImages: true, prefixes: ["registry.company.local
   assignments: { personal: "company-tools", group: "documents", defaults: { personal: "documents", group: "documents", service: "base" } },
   profiles: [
     prof("base", "builtin", { imageRef: "ghcr.io/greenongrey/nabu-sandbox-base:v0.5.0", assignedTo: { personal: false, group: false, services: ["memory-collector"] },
-      inventory: { name: "base", kind: "builtin", tools: [{ group: "Архивы", name: "zip", version: "3.0" }, { group: "Python", name: "python3", version: "3.13.5" }] } }),
+      inventory: { name: "base", kind: "builtin", tools: [{ group: "archives", name: "zip", version: "3.0" }, { group: "python", name: "python3", version: "3.13.5" }] } }),
     prof("documents", "builtin", { imageRef: "ghcr.io/greenongrey/nabu-sandbox-documents:v0.5.0", assignedTo: { personal: false, group: true, services: ["report-builder"] },
       inventory: { name: "documents", kind: "builtin", includes: "base", tools: [{ group: "PDF", name: "typst", version: "0.15.1" }], python: [{ name: "pandas", version: "3.1.0" }] } }),
     prof("company-tools", "custom", { imageRef: "registry.company.local/nabu/company-tools:2025.10", imageDigest: "sha256:3f9a1d2c4b5e6f70819a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d5ec21e",

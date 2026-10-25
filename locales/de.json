@@ -700,7 +700,18 @@
       "createAndCheck": "Erstellen und prüfen",
       "map": "Zuordnen",
       "invSearch": "Paket oder Befehl suchen",
-      "invNothing": "Nichts gefunden"
+      "invNothing": "Nichts gefunden",
+      "groups": {
+        "archives": "Archive",
+        "utilities": "Werkzeuge",
+        "python": "Python",
+        "node-git": "Node.js und git",
+        "pdf": "PDF",
+        "html-assets": "Ressourcen für HTML",
+        "python-packages": "Python-Pakete",
+        "system": "Systempakete",
+        "commands": "Befehle"
+      }
     },
     "clients": {
       "title": "Dienst-Clients",
