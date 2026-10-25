@@ -157,6 +157,19 @@ function Trend({ row }: { row: PackageRow }) {
   return pct > 0 ? <span className="ok-t">↑ {pct} %</span> : <span className="err-t">↓ {Math.abs(pct)} %</span>;
 }
 
+/** Every day of the period, the days without signals included: one day of signals is one narrow column,
+ * not the whole width (design §3.2). Days are UTC, as the server counts them. */
+export function periodDays(daily: { day: string; signals: number }[], period: Period, now: number): { day: string; signals: number }[] {
+  const n = Number.parseInt(period, 10);
+  const by = new Map(daily.map((d) => [d.day.slice(0, 10), d.signals]));
+  const out: { day: string; signals: number }[] = [];
+  for (let i = n - 1; i >= 0; i--) {
+    const day = new Date(now - i * 86_400_000).toISOString().slice(0, 10);
+    out.push({ day, signals: by.get(day) ?? 0 });
+  }
+  return out;
+}
+
 function StatusChip({ row }: { row: { status: PackageStatus; profile?: string; version?: string } }) {
   const { t } = useTranslation();
   const extra = row.status === "added" && row.profile ? ` · ${row.profile}${row.version ? ` ${row.version}` : ""}` : "";
@@ -183,7 +196,8 @@ function PackagePanel({ row, period, mapping, onClose }: { row: PackageRow; peri
     onError: (e) => toast({ kind: "error", title: errorText(t, e) }),
   });
   const c = card.data;
-  const maxDay = Math.max(1, ...(c?.daily ?? []).map((d) => d.signals));
+  const days = c ? periodDays(c.daily, period, card.dataUpdatedAt) : [];
+  const maxDay = Math.max(1, ...days.map((d) => d.signals));
   return (
     <aside className="nb-sbx-side" aria-label={row.name}>
       <div className="nb-sbx-side-h">
@@ -203,7 +217,7 @@ function PackagePanel({ row, period, mapping, onClose }: { row: PackageRow; peri
           </div>
           <h4 className="nb-sbx-h4">{t("admin.sandbox-images.daily")}</h4>
           <div className="nb-sbx-cols" role="img" aria-label={t("admin.sandbox-images.daily")}>
-            {c.daily.map((d) => <i key={d.day} title={`${d.day}: ${d.signals}`} style={{ height: `${(d.signals / maxDay) * 100}%` }} />)}
+            {days.map((d) => <i key={d.day} title={`${d.day}: ${d.signals}`} style={{ height: `${(d.signals / maxDay) * 100}%` }} />)}
           </div>
           <h4 className="nb-sbx-h4">{t("admin.sandbox-images.reasons")}</h4>
           {c.reasons.length === 0 && <p className="small muted">{t("admin.sandbox-images.noReasons")}</p>}

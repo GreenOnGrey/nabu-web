@@ -597,10 +597,10 @@
       "status": "Статус",
       "allStatuses": "Статус: все",
       "statuses": {
-        "new": "new",
-        "planned": "planned",
-        "added": "added",
-        "rejected": "rejected"
+        "new": "новый",
+        "planned": "запланирован",
+        "added": "добавлен",
+        "rejected": "отклонён"
       },
       "source": "Источник",
       "allSources": "Источник: все",
