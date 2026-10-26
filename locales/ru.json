@@ -630,7 +630,7 @@
         "service": "Служебные"
       },
       "kindTip": "Сигналы по типам агентов",
-      "trendNew": "новый",
+      "trendNew": "впервые",
       "lookalike": "похоже на {name}",
       "kpiUsers": "{count, plural, one {пользователь} few {пользователя} many {пользователей} other {пользователя}}",
       "kpiSignals": "сигналов · {agent} агент, {auto} авто",

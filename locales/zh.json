@@ -630,7 +630,7 @@
         "service": "服务"
       },
       "kindTip": "按智能体类型的信号",
-      "trendNew": "新",
+      "trendNew": "首次",
       "lookalike": "类似 {name}",
       "kpiUsers": "位用户",
       "kpiSignals": "信号 · 智能体 {agent}，自动 {auto}",

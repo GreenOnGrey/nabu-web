@@ -630,7 +630,7 @@
         "service": "Service"
       },
       "kindTip": "Signals by agent type",
-      "trendNew": "new",
+      "trendNew": "first seen",
       "lookalike": "looks like {name}",
       "kpiUsers": "{count, plural, one {user} other {users}}",
       "kpiSignals": "signals · {agent} agent, {auto} auto",

@@ -630,7 +630,7 @@
         "service": "De servicio"
       },
       "kindTip": "Señales por tipo de agente",
-      "trendNew": "nuevo",
+      "trendNew": "primera vez",
       "lookalike": "se parece a {name}",
       "kpiUsers": "{count, plural, one {usuario} other {usuarios}}",
       "kpiSignals": "señales · {agent} agente, {auto} automático",

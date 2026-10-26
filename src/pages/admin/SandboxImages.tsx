@@ -92,7 +92,7 @@ function Requests() {
             <div style={{ overflowX: "auto" }}>
               <table className="t nb-sbx-table">
                 <thead><tr>
-                  <th>{t("admin.sandbox-images.cols.package")}</th><th>{t("admin.sandbox-images.cols.users")}</th>
+                  <th>{t("admin.sandbox-images.cols.package")}</th><th className="nb-num">{t("admin.sandbox-images.cols.users")}</th>
                   <th>{t("admin.sandbox-images.cols.signals")}</th><th>{t("admin.sandbox-images.cols.kinds")}</th>
                   <th>{t("admin.sandbox-images.cols.trend")}</th><th>{t("admin.sandbox-images.cols.last")}</th><th>{t("admin.sandbox-images.cols.status")}</th>
                 </tr></thead>
@@ -101,14 +101,19 @@ function Requests() {
                     <tr key={`${r.ecosystem}/${r.name}`} className={open?.ecosystem === r.ecosystem && open.name === r.name ? "nb-sel" : undefined}
                       onClick={() => { setOpen(r); setMapping(false); }} style={{ cursor: "pointer" }}>
                       <td>
-                        <span className="small muted">{t(`admin.sandbox-images.ecosystems.${r.ecosystem}`)}</span> <span className="mono">{r.name}</span>
-                        {r.lookalike && <> <span className="nb-sbx-look">{t("admin.sandbox-images.lookalike", { name: r.lookalike })}</span></>}
-                        {(r.ecosystem === "python-module" || r.ecosystem === "command") && (
-                          <> <button type="button" className="linkish small" onClick={(e) => { e.stopPropagation(); setOpen(r); setMapping(true); }}>{t("admin.sandbox-images.map")}</button></>
-                        )}
+                        <div className="nb-sbx-pkg">
+                          <span className="mono">{r.name}</span>
+                          {r.lookalike && <span className="nb-sbx-look">{t("admin.sandbox-images.lookalike", { name: r.lookalike })}</span>}
+                        </div>
+                        <div className="nb-sbx-pkg small muted">
+                          <span>{t(`admin.sandbox-images.ecosystems.${r.ecosystem}`)}</span>
+                          {(r.ecosystem === "python-module" || r.ecosystem === "command") && (
+                            <button type="button" className="linkish small" onClick={(e) => { e.stopPropagation(); setOpen(r); setMapping(true); }}>{t("admin.sandbox-images.map")}</button>
+                          )}
+                        </div>
                         {r.aliases.length > 0 && <div className="small muted">{r.aliases.map((a) => `${t(`admin.sandbox-images.aliasKinds.${a.ecosystem}`)} ${a.name}`).join(", ")}</div>}
                       </td>
-                      <td><b>{r.users}</b></td>
+                      <td className="nb-num"><b>{r.users}</b></td>
                       <td className="nb-nowrap small">
                         {(r.bySource.agent ?? 0) > 0 && <span className="nb-sbx-src" title={t("admin.sandbox-images.sourceAgent")}><Icon name="spark" size={13} />{r.bySource.agent}</span>}
                         {(r.bySource.auto ?? 0) > 0 && <span className="nb-sbx-src" title={t("admin.sandbox-images.sourceAuto")}><Icon name="bolt" size={13} />{r.bySource.auto}</span>}

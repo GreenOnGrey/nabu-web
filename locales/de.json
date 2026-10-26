@@ -630,7 +630,7 @@
         "service": "Dienst"
       },
       "kindTip": "Signale nach Agententyp",
-      "trendNew": "neu",
+      "trendNew": "erstmals",
       "lookalike": "ähnelt {name}",
       "kpiUsers": "{count, plural, one {Nutzer} other {Nutzer}}",
       "kpiSignals": "Signale · {agent} Agent, {auto} automatisch",

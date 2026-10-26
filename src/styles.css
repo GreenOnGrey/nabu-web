@@ -316,6 +316,11 @@ table.comm-t td:nth-child(1),table.comm-t td:nth-child(2){display:inline-block;w
 .nb-sbx-tip-row b{margin-left:auto;padding-left:12px;color:var(--text)}
 .nb-sbx-new{color:var(--violet-text)}
 .nb-sbx-look{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:500;padding:1px 7px;border-radius:999px;background:var(--amber-soft);color:var(--amber);white-space:nowrap}
+.nb-sbx-pkg{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.nb-sbx-pkg + .nb-sbx-pkg{margin-top:2px}
+/* the package takes the free width; the other columns are as narrow as their content */
+.nb-sbx-table th:not(:first-child),.nb-sbx-table td:not(:first-child){width:1%;white-space:nowrap;padding-left:20px}
+.nb-sbx-table .nb-num{text-align:right}
 .nb-sbx-st{display:inline-block;font-size:12px;font-weight:500;padding:2px 8px;border-radius:999px;white-space:nowrap}
 .nb-sbx-st-new{background:var(--surface-2);color:var(--text-2)}
 .nb-sbx-st-planned{background:var(--violet-soft);color:var(--violet-text)}
