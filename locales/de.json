@@ -1079,7 +1079,7 @@
     "invalid_auth": "Ungültige Zugriffseinstellungen.",
     "invalid_timezone": "Unbekannte Zeitzone.",
     "invalid_tone": "Unbekannter Ton.",
-    "not_retryable": "Nur eine fehlgeschlagene Antwort kann wiederholt werden.",
+    "not_retryable": "Nur eine fehlgeschlagene oder gestoppte Antwort kann wiederholt werden.",
     "main_not_archivable": "Das Hauptgespräch kann nicht archiviert werden.",
     "agent_not_allowed": "Der Dienstagent ist nicht erlaubt.",
     "invalid_harness": "Unbekannter Harness.",
@@ -1193,7 +1193,10 @@
     "probe_report_too_large": "Der Bericht der Image-Prüfung ist größer als 2 MB.",
     "preview_disabled": "Die Vorschau von Dokumenten ist auf diesem Stand nicht aktiviert.",
     "preview_unsupported": "Für diese Datei gibt es keine Vorschau — laden Sie sie herunter.",
-    "preview_unavailable": "Die Vorschau ist nicht verfügbar."
+    "preview_unavailable": "Die Vorschau ist nicht verfügbar.",
+    "queue_full": "In der Warteschlange sind bereits {max} Nachrichten — warten Sie auf die Antworten oder brechen Sie einige ab",
+    "message_started": "Der Agent beantwortet diese Nachricht bereits",
+    "not_running": "Die Antwort ist bereits beendet"
   },
   "comm": {
     "lead": "Was der Agent über Sie und Ihre Arbeitskorrespondenz weiß",

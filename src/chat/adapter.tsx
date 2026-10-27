@@ -6,7 +6,7 @@ import { Icon, useToast, type IconName } from "@green-on-grey/ui-kit";
 import { tokens, type ChatAttachment, type ChatCommand, type ChatConfirmation, type ChatConversation, type ChatMark, type ChatMessage, type ChatProps,
   type ChatUpload } from "@green-on-grey/ui-kit/chat";
 import { apiUrl } from "../api/base";
-import { api } from "../api/client";
+import { api, ApiError } from "../api/client";
 import { keys } from "../api/queries";
 import type { Agent, AgentWait, Confirmation, ContextFill, Conversation, List, Message, Skill, Tone, ToolStep } from "../api/types";
 import { useSession } from "../app/session";
@@ -78,7 +78,7 @@ export function toChatMessage(t: TFunction, m: Message, wait: AgentWait | null, 
     if (done) return { ...base, role: "note", text: t(`chat.confirm.${done.status}`, { action: done.summary }) };
     const mail = m.context?.email;
     return {
-      ...base, role: "user", text: m.text, mark: userMark(t, m),
+      ...base, role: "user", text: m.text, mark: userMark(t, m), queued: m.queued,
       attachments: chatAttachments(m),
       wait: wait?.messageId === m.id ? (wait.state === "queued" ? { state: "queued", position: wait.position ?? 0 } : { state: "starting" }) : undefined,
       content: mail && (
@@ -103,7 +103,7 @@ export function toChatMessage(t: TFunction, m: Message, wait: AgentWait | null, 
   const digest = m.card?.type === "digest";
   return {
     ...base, role: "assistant", text: digest ? "" : m.text, mark: channelMark(t, m), hint: m.model ?? undefined,
-    steps: (m.toolSteps ?? []).map((s) => ({ id: s.id, text: stepText(t, s), title: s.summary, status: s.status })),
+    steps: (m.toolSteps ?? []).map((s) => ({ id: s.id, text: stepText(t, s), title: s.summary, status: s.status, subagents: s.subagents })),
     // FTR.NAB.CMN-0003 tech §3.5: the digest of commitments is drawn instead of the text
     content: digest && m.card ? <DigestCardView card={m.card} /> : undefined,
     // FTR.NAB.CHAT-0001 R33: the files the agent sent
@@ -244,7 +244,8 @@ function useCommands(conv: Conversation) {
 export function useConversation(conv: Conversation, modelWindow = 0): Pick<ChatProps,
   "messages" | "loading" | "hasOlder" | "loadingOlder" | "busy" | "confirmations" | "upload"
   | "onSend" | "onLoadOlder" | "onRetry" | "onConfirm" | "onUpload" | "onTranscribe" | "loadAttachment" | "loadPreview"
-  | "commands" | "onCommand" | "context" | "onCompact" | "onReset" | "voiceMaxSeconds" | "onPendingChange"> & {
+  | "commands" | "onCommand" | "context" | "onCompact" | "onReset" | "voiceMaxSeconds" | "onPendingChange"
+  | "allowQueue" | "onCancelQueued" | "onStop"> & {
   unarchive: () => void;
   /** Images are attached to the message being written (R11). */
   pendingImages: boolean;
@@ -289,12 +290,17 @@ export function useConversation(conv: Conversation, modelWindow = 0): Pick<ChatP
     getNextPageParam: (last) => last.nextCursor ?? undefined,
   });
 
+  // FTR.NAB.CHAT-0004 R3: the messages cancelled in the queue leave the conversation
+  const [cancelled, setCancelled] = useState<ReadonlySet<string>>(new Set());
+  // FTR.NAB.CHAT-0004 design §3 p. 8: a retry behind the queue waits marked on its answer
+  const [retrying, setRetrying] = useState<ReadonlySet<string>>(new Set());
   const raw = useMemo(() => {
     const byId = new Map<string, Message>();
     for (const p of history.data?.pages ?? []) for (const m of p.items) byId.set(m.id, m);
     for (const m of Object.values(overrides)) if (m.conversationId === conv.id) byId.set(m.id, { ...byId.get(m.id), ...m });
+    for (const id of cancelled) byId.delete(id);
     return [...byId.values()].toSorted((a, b) => a.createdAt.localeCompare(b.createdAt) || (a.role === "user" ? -1 : 1));
-  }, [history.data, overrides, conv.id]);
+  }, [history.data, overrides, conv.id, cancelled]);
 
   const streaming = raw.some((m) => m.role === "assistant" && (m.status === "streaming" || m.status === "pending"));
   const [wasStreaming, setWasStreaming] = useState(streaming);
@@ -328,6 +334,16 @@ export function useConversation(conv: Conversation, modelWindow = 0): Pick<ChatP
     if (!m || m.conversationId !== conv.id) return;
     put(m);
     if (m.role === "assistant") setWait(null);
+    // FTR.NAB.CHAT-0004 R1: the answer began — its message is no longer in the queue
+    const asked = m.replyTo ? raw.find((x) => x.id === m.replyTo) : undefined;
+    if (asked?.queued) put({ ...asked, queued: false });
+    if (m.role === "assistant" && m.replyTo) {
+      const retried = raw.filter((x) => x.role === "assistant" && x.replyTo === m.replyTo && retrying.has(x.id)).map((x) => x.id);
+      if (retried.length > 0) setRetrying((r) => new Set([...r].filter((id) => !retried.includes(id))));
+    }
+  });
+  useEvent("message.cancelled", (d: { id: string; conversationId: string }) => {
+    if (d.conversationId === conv.id) setCancelled((s) => new Set(s).add(d.id));
   });
   useEvent("message.delta", (d: { messageId: string; conversationId: string; delta: string }) => {
     if (d.conversationId !== conv.id) return;
@@ -362,7 +378,7 @@ export function useConversation(conv: Conversation, modelWindow = 0): Pick<ChatP
   });
 
   const lng = i18n.language;
-  const messages = useMemo(() => raw.map((m) => toChatMessage(t, m, wait, lng)), [raw, wait, t, lng]);
+  const messages = useMemo(() => raw.map((m) => ({ ...toChatMessage(t, m, wait, lng), retryQueued: retrying.has(m.id) || undefined })), [raw, wait, t, lng, retrying]);
 
   const context = useContextFill(conv, modelWindow);
   const commands = useCommands(conv);
@@ -378,7 +394,7 @@ export function useConversation(conv: Conversation, modelWindow = 0): Pick<ChatP
   });
 
   return {
-    messages, confirmations, busy,
+    messages, confirmations, busy, allowQueue: true,
     ...commands, pendingImages, onPendingChange, context,
     voiceMaxSeconds: config.voiceMaxSeconds || 300,
     loading: history.isLoading,
@@ -394,7 +410,25 @@ export function useConversation(conv: Conversation, modelWindow = 0): Pick<ChatP
         const res = await api.post<{ messageId: string; message: Message }>(`/api/v1/conversations/${conv.id}/messages`, { text, attachmentIds, skill });
         put(res.message);
       } catch (e) {
-        setBusy(false);
+        fail(e); // FTR.NAB.CHAT-0004 R4: queue_full keeps the text and the files in the field
+        throw e;
+      } finally {
+        setBusy(false); // FTR.NAB.CHAT-0004 tech §4: busy is the request only; the answer is waited for in the queue
+      }
+    },
+    async onCancelQueued(messageId) {
+      try {
+        await api.del(`/api/v1/messages/${messageId}`);
+        setCancelled((s) => new Set(s).add(messageId));
+      } catch (e) {
+        fail(e); // message_started: the agent began the answer, its events come next
+      }
+    },
+    async onStop(answerId) {
+      try {
+        await api.post(`/api/v1/messages/${answerId}/stop`);
+      } catch (e) {
+        if (e instanceof ApiError && e.code === "not_running") return; // the answer ended by itself
         fail(e);
         throw e;
       }
@@ -404,9 +438,13 @@ export function useConversation(conv: Conversation, modelWindow = 0): Pick<ChatP
       setBusy(true);
       try {
         await api.post(`/api/v1/messages/${messageId}/retry`);
+        const old = raw.find((x) => x.id === messageId);
+        const behind = raw.some((x) => (x.role === "assistant" && (x.status === "streaming" || x.status === "pending")) || x.queued);
+        if (old && behind) setRetrying((r) => new Set(r).add(old.id));
       } catch (e) {
-        setBusy(false);
         fail(e);
+      } finally {
+        setBusy(false);
       }
     },
     async onUpload(file) {

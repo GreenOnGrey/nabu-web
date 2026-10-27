@@ -1079,7 +1079,7 @@
     "invalid_auth": "Invalid access settings.",
     "invalid_timezone": "Unknown time zone.",
     "invalid_tone": "Unknown tone.",
-    "not_retryable": "Only a failed answer can be retried.",
+    "not_retryable": "Only a failed or stopped answer can be retried.",
     "main_not_archivable": "The main conversation cannot be archived.",
     "agent_not_allowed": "The service agent is not allowed.",
     "invalid_harness": "Unknown harness.",
@@ -1193,7 +1193,10 @@
     "probe_report_too_large": "The report of the image check is over 2 MB.",
     "preview_disabled": "Previews of documents are not enabled on this stand.",
     "preview_unsupported": "This file has no preview — download it.",
-    "preview_unavailable": "Preview is not available."
+    "preview_unavailable": "Preview is not available.",
+    "queue_full": "{max, plural, one {The queue already has # message} other {The queue already has # messages}} — wait for the answers or cancel some",
+    "message_started": "The agent is already answering this message",
+    "not_running": "The answer has already ended"
   },
   "comm": {
     "lead": "What the agent knows about you and your work correspondence",

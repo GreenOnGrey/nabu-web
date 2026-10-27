@@ -1079,7 +1079,7 @@
     "invalid_auth": "访问设置无效。",
     "invalid_timezone": "未知时区。",
     "invalid_tone": "未知语气。",
-    "not_retryable": "只有失败的回答可以重试。",
+    "not_retryable": "只能重试失败或已停止的回答。",
     "main_not_archivable": "主对话不能归档。",
     "agent_not_allowed": "不允许使用该服务智能体。",
     "invalid_harness": "未知 harness。",
@@ -1193,7 +1193,10 @@
     "probe_report_too_large": "镜像检查报告超过 2 MB。",
     "preview_disabled": "此环境未启用文档预览。",
     "preview_unsupported": "此文件无法预览 — 请下载。",
-    "preview_unavailable": "无法预览。"
+    "preview_unavailable": "无法预览。",
+    "queue_full": "队列中已有 {max} 条消息——请等待回答或取消部分消息",
+    "message_started": "代理已在回答这条消息",
+    "not_running": "回答已经结束"
   },
   "comm": {
     "lead": "助手了解的关于您和您工作往来的信息",

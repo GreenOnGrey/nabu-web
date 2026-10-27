@@ -1,4 +1,5 @@
 // Types mirror the JSON of nabu-core (FTR.NAB.CMN-0001 tech §2–5).
+import type { ChatSubagent } from "@green-on-grey/ui-kit/chat";
 
 export type Tone = "business" | "friendly" | "brief" | "mentor";
 export const TONES: Tone[] = ["business", "friendly", "brief", "mentor"];
@@ -144,6 +145,8 @@ export interface ToolStep {
   tool: string;
   summary: string;
   status: "running" | "done" | "error";
+  /** The tasks of a call of subagents (FTR.NAB.CMN-0009 R8). */
+  subagents?: ChatSubagent[];
 }
 
 /** The sheets of a spreadsheet in its preview (FTR.NAB.CHAT-0003 tech §6.2): at most 500 rows and 50
@@ -182,7 +185,10 @@ export interface Message {
   voice?: boolean;
   text: string;
   channel: string;
-  status: "pending" | "streaming" | "done" | "failed";
+  /** `stopped`: the user stopped the answer (FTR.NAB.CHAT-0004 R9). */
+  status: "pending" | "streaming" | "done" | "failed" | "stopped";
+  /** A user message waiting in the queue for its answer (FTR.NAB.CHAT-0004 R1). */
+  queued?: boolean;
   attachments: Attachment[];
   toolSteps: ToolStep[];
   context?: MessageContext;

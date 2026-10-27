@@ -3,7 +3,7 @@ import { useEffect, useLayoutEffect, useRef } from "react";
 
 // One SSE stream carries every event of the user (FTR.NAB.CMN-0001 tech §3.2).
 export const EVENT_TYPES = [
-  "message.created", "message.delta", "message.done", "tool.step", "chat.error",
+  "message.created", "message.delta", "message.done", "message.cancelled", "tool.step", "chat.error",
   "conversation.updated", "space.state",
   // FTR.NAB.CHAT-0001 R3: the fill of the context of a conversation
   "conversation.context",

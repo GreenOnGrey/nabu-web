@@ -1079,7 +1079,7 @@
     "invalid_auth": "Ajustes de acceso no válidos.",
     "invalid_timezone": "Zona horaria desconocida.",
     "invalid_tone": "Tono desconocido.",
-    "not_retryable": "Solo se puede reintentar una respuesta con error.",
+    "not_retryable": "Solo se puede reintentar una respuesta fallida o detenida.",
     "main_not_archivable": "La conversación principal no se puede archivar.",
     "agent_not_allowed": "El agente de servicio no está permitido.",
     "invalid_harness": "Harness desconocido.",
@@ -1193,7 +1193,10 @@
     "probe_report_too_large": "El informe de la comprobación de la imagen supera los 2 MB.",
     "preview_disabled": "La vista previa de documentos no está activada en este entorno.",
     "preview_unsupported": "Este archivo no tiene vista previa: descárgalo.",
-    "preview_unavailable": "La vista previa no está disponible."
+    "preview_unavailable": "La vista previa no está disponible.",
+    "queue_full": "Ya hay {max} mensajes en la cola: espere las respuestas o cancele algunos",
+    "message_started": "El agente ya está respondiendo a este mensaje",
+    "not_running": "La respuesta ya ha terminado"
   },
   "comm": {
     "lead": "Lo que el agente sabe de usted y de su correspondencia de trabajo",
