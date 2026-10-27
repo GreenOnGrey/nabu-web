@@ -169,6 +169,8 @@ export interface Attachment {
 export interface Message {
   id: string;
   conversationId: string;
+  /** an event too large for the bus: only ids and status came (FTR.NAB.CMN-0001 tech, decision 23) */
+  truncated?: boolean;
   role: "user" | "assistant" | "event" | "notice";
   event?: ChatEventData;
   /** FTR.NAB.CHAT-0002 R2: the service client that wrote a notice and its data for the product. */

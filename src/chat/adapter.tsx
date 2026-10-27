@@ -312,8 +312,20 @@ export function useConversation(conv: Conversation, modelWindow = 0): Pick<ChatP
   useEvent("agent.state", (d: AgentWait) => {
     if (d.conversationId === conv.id) setWait(d);
   });
-  useEvent("message.created", (m: Message) => {
-    if (m.conversationId !== conv.id) return;
+  // An event too large for the bus comes as ids only, or without data from an
+  // older server: the message is read again (FTR.NAB.CMN-0001 tech, decision 23).
+  const reread = (m: Partial<Message> | null) => {
+    if (m?.conversationId && m.conversationId !== conv.id) return false;
+    if (m && !m.truncated) return false;
+    // the live copy of the answer goes once the history has the saved one
+    const live = (x: Message) => (m?.id ? x.id === m.id : x.role === "assistant" && (x.status === "streaming" || x.status === "pending"));
+    void qc.refetchQueries({ queryKey: keys.messages(conv.id) }).then(() =>
+      setOverrides((o) => Object.fromEntries(Object.entries(o).filter(([, x]) => !live(x)))));
+    return true;
+  };
+  useEvent("message.created", (m: Message | null) => {
+    if (reread(m)) return;
+    if (!m || m.conversationId !== conv.id) return;
     put(m);
     if (m.role === "assistant") setWait(null);
   });
@@ -337,8 +349,13 @@ export function useConversation(conv: Conversation, modelWindow = 0): Pick<ChatP
       return { ...o, [d.messageId]: { ...cur, toolSteps: steps } };
     });
   });
-  useEvent("message.done", (m: Message) => {
-    if (m.conversationId !== conv.id) return;
+  useEvent("message.done", (m: Message | null) => {
+    if (reread(m)) {
+      setWait(null);
+      qc.invalidateQueries({ queryKey: ["conversations"] });
+      return;
+    }
+    if (!m || m.conversationId !== conv.id) return;
     put(m);
     setWait(null);
     qc.invalidateQueries({ queryKey: ["conversations"] });
