@@ -416,10 +416,10 @@ function ProfileCard({ p, current, onInUse }: { p: SandboxProfile; current: stri
   return (
     <section className="nb-sbx-card">
       <div className="nb-sbx-card-h">
-        <span className="chip mono">{p.name}</span>
+        <h3 className="nb-sbx-name mono">{p.name}</h3>
         <span className={`nb-sbx-kind${custom ? " custom" : ""}`}>{t(custom ? "admin.sandbox-images.kindCustom" : "admin.sandbox-images.kindBuiltin")}</span>
-        <span className={`nb-sbx-pst nb-sbx-pst-${p.state}`}>{p.state === "checking" && <span className="spin" aria-hidden="true" />}{t(`admin.sandbox-images.states.${p.state}`)}</span>
         {custom && <span className="nb-sbx-look"><Icon name="shield" size={12} /> {t("admin.sandbox-images.notScanned")}</span>}
+        <span className={`nb-sbx-pst nb-sbx-pst-${p.state}`}>{p.state === "checking" && <span className="spin" aria-hidden="true" />}{t(`admin.sandbox-images.states.${p.state}`)}</span>
       </div>
       <div className="nb-sbx-meta">
         <span className="mono">{p.imageRef}</span>
@@ -466,10 +466,10 @@ function ProfileCard({ p, current, onInUse }: { p: SandboxProfile; current: stri
           <tbody>{rows.map((r, i) => <tr key={i}><td>{t(`admin.sandbox-images.groups.${r.group}`, { defaultValue: r.group })}</td><td className="mono">{r.name}</td><td className="mono t2">{r.version || "—"}</td></tr>)}</tbody>
         </table>
       )}
-      <div className="nb-sbx-actions" style={{ marginTop: 8 }}>
+      <div className="nb-sbx-card-actions">
         {custom && <button className="btn sm" disabled={refresh.isPending || !!p.pendingRef} onClick={() => refresh.mutate()}>{t("admin.sandbox-images.refreshImage")}</button>}
         {inv && <button className="btn ghost sm" onClick={() => setFull(!full)}>{t(full ? "admin.sandbox-images.showLess" : "admin.sandbox-images.showAll")}</button>}
-        {custom && <button className="btn ghost sm danger-t" disabled={del.isPending} onClick={() => del.mutate()}>{t("common.delete")}</button>}
+        {custom && <button className="btn ghost sm nb-sbx-del" disabled={del.isPending} onClick={() => del.mutate()}>{t("common.delete")}</button>}
       </div>
     </section>
   );

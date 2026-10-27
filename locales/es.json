@@ -555,6 +555,11 @@
         "nabu": "Sandbox de Nabu",
         "external": "De quien llama"
       },
+      "workspaceHints": {
+        "none": "Sin archivos ni comandos: el agente solo trabaja con herramientas MCP.",
+        "nabu": "Un sandbox temporal de Nabu para una ejecución: archivos y comandos en la imagen elegida. Se elimina al terminar.",
+        "external": "El agente trabaja en el espacio de trabajo del servicio que lo llamó (por ejemplo, un checkout del repositorio en un runner). Ese servicio define el entorno y las herramientas."
+      },
       "timeout": "Límite de tiempo, segundos",
       "maxTokens": "Límite de tokens (0 — ninguno)",
       "runsOf": "Ejecuciones de {name}",

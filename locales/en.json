@@ -555,6 +555,11 @@
         "nabu": "Nabu sandbox",
         "external": "Of the caller"
       },
+      "workspaceHints": {
+        "none": "No files or commands: the agent works with MCP tools only.",
+        "nabu": "A temporary Nabu sandbox for one run: files and commands in the selected image. It is removed after the run.",
+        "external": "The agent works in the workspace of the service that called it (for example a repository checkout in a runner). That service sets the environment and tools."
+      },
       "timeout": "Time limit, seconds",
       "maxTokens": "Token limit (0 — none)",
       "runsOf": "Runs of {name}",

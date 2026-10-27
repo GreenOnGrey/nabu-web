@@ -119,7 +119,8 @@ function AgentForm({ agent, onClose }: { agent: ServiceAgent | null; onClose: ()
       <div className="field"><label>{t("admin.service-agents.workspace")}</label>
         <div className="mini-seg" style={{ display: "inline-flex" }}>
           {(["none", "nabu", "external"] as const).map((w) => <button key={w} className={f.workspace === w ? "on" : ""} onClick={() => set("workspace", w)}>{t(`admin.service-agents.workspaces.${w}`)}</button>)}
-        </div></div>
+        </div>
+        <div className="hint">{t(`admin.service-agents.workspaceHints.${f.workspace}`)}</div></div>
       {f.workspace === "nabu" && (
         // FTR.NAB.CMN-0008 R6, design §3.5: the image the agent runs its commands in
         <div className="field"><label htmlFor="sa-prof">{t("admin.service-agents.profile")}</label>

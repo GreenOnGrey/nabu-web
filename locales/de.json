@@ -555,6 +555,11 @@
         "nabu": "Nabu-Sandbox",
         "external": "Des Aufrufers"
       },
+      "workspaceHints": {
+        "none": "Ohne Dateien und Befehle: Der Agent arbeitet nur mit MCP-Werkzeugen.",
+        "nabu": "Eine temporäre Nabu-Sandbox für einen Lauf: Dateien und Befehle im gewählten Image. Sie wird nach dem Lauf gelöscht.",
+        "external": "Der Agent arbeitet im Arbeitsbereich des Dienstes, der ihn aufgerufen hat (zum Beispiel ein Repository-Checkout in einem Runner). Umgebung und Werkzeuge legt dieser Dienst fest."
+      },
       "timeout": "Zeitlimit, Sekunden",
       "maxTokens": "Tokenlimit (0 — keins)",
       "runsOf": "Läufe von {name}",
