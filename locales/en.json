@@ -532,7 +532,13 @@
       "resultMax": "Result limit, MB",
       "toolResult": "result",
       "spaceOnly": "Writes only to the space",
-      "spaceOnlyHint": "In mail topics it runs without the user's confirmation. Overwriting an existing file still waits for confirmation."
+      "spaceOnlyHint": "In mail topics it runs without the user's confirmation. Overwriting an existing file still waits for confirmation.",
+      "checking": "Checking…",
+      "checked": "{name} works · {count, plural, one {# tool} other {# tools}}",
+      "checkedNew": "{count, plural, one {# new} other {# new}}",
+      "checkFailed": "{name}: {reason}",
+      "synced": "{name} synchronized · {count, plural, one {# skill} other {# skills}}",
+      "syncing": "Synchronizing…"
     },
     "service-agents": {
       "title": "Service agents",

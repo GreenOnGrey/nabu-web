@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
+import type { AdminCatalogItem } from "../../api/types";
+import { createI18n } from "../../lib/i18n";
 import {
-  allowedCount, applyReadOnly, bytesToMb, isReadOnly, mbToBytes, sortTools, toggleFileArg, toggleResultArg, toggleSpaceOnly, toggleTool, type ItemTool,
+  actionResult, allowedCount, applyReadOnly, bytesToMb, isReadOnly, mbToBytes, sortTools, toggleFileArg, toggleResultArg, toggleSpaceOnly, toggleTool, type ItemTool,
   type ToolChoice,
 } from "./catalogTools";
 
@@ -68,5 +70,22 @@ describe("FTR.NAB.CHAT-0003 result paths", () => {
   it("limits a result to 50 MB", () => {
     expect(mbToBytes("50", 50 << 20)).toBe(50 << 20);
     expect(mbToBytes("51", 50 << 20)).toBeNull();
+  });
+});
+
+// FTR.NAB.CMN-0001 design §11: «Check» and «Synchronize» tell their result.
+describe("FTR.NAB.CMN-0001 the result of a check", () => {
+  const ru = createI18n("ru").t;
+  const mcp = { type: "mcp", name: "hammurapi", title: "Hammurapi", status: "ok", statusReason: null, skills: [],
+    tools: [{ name: "a", readOnly: true }, { name: "b", readOnly: false }] } as unknown as AdminCatalogItem;
+  it("a working server names its tools and the new ones", () => {
+    expect(actionResult(ru, mcp)).toEqual({ kind: "ok", title: "Hammurapi работает · 2 инструмента" });
+    expect(actionResult(ru, { ...mcp, newTools: ["b"] }).title).toBe("Hammurapi работает · 2 инструмента · 1 новый");
+  });
+  it("a failing server is an error with its reason", () => {
+    expect(actionResult(ru, { ...mcp, status: "error", statusReason: "connection refused" })).toEqual({ kind: "error", title: "Hammurapi: connection refused" });
+  });
+  it("skills tell how many came", () => {
+    expect(actionResult(ru, { ...mcp, type: "skill", tools: [], skills: ["a", "b", "c", "d", "e"] }).title).toBe("Hammurapi синхронизирован · 5 скиллов");
   });
 });

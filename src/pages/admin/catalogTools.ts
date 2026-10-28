@@ -1,7 +1,7 @@
 /** The choice of tools of an MCP item, of its file arguments
  * (FTR.NAB.CMN-0006 R13, R14; design §3.2) and of its result paths (FTR.NAB.CHAT-0003 R10, R11, R25). Pure functions: the form keeps
  * the state, these decide what a click changes. */
-import type { CatalogTool, FileArg } from "../../api/types";
+import type { AdminCatalogItem, CatalogTool, FileArg } from "../../api/types";
 
 /** The default limit of a file argument; the server has the same (catalog.DefaultFileMaxBytes). */
 export const DEFAULT_FILE_MAX_BYTES = 20 << 20;
@@ -110,4 +110,15 @@ export function mbToBytes(mb: string, max = 100 * MB): number | null {
 
 export function bytesToMb(b: number): string {
   return String(Math.round((b / MB) * 1000) / 1000);
+}
+
+/** The toast of «Check» and «Synchronize» from the item the server returned: a check
+ * that reached a failing server is an answer, not a request error (FTR.NAB.CMN-0001 design §11). */
+export function actionResult(t: (k: string, o?: Record<string, unknown>) => string, it: AdminCatalogItem): { kind: "ok" | "error"; title: string } {
+  const name = it.title || it.name;
+  if (it.status === "error") return { kind: "error", title: t("admin.catalog.checkFailed", { name, reason: it.statusReason ?? "" }) };
+  if (it.type === "skill") return { kind: "ok", title: t("admin.catalog.synced", { name, count: it.skills.length }) };
+  const fresh = it.newTools?.length ?? 0;
+  const title = t("admin.catalog.checked", { name, count: it.tools.length });
+  return { kind: "ok", title: fresh > 0 ? `${title} · ${t("admin.catalog.checkedNew", { count: fresh })}` : title };
 }

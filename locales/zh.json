@@ -532,7 +532,13 @@
       "resultMax": "结果上限，MB",
       "toolResult": "结果",
       "spaceOnly": "只写入空间",
-      "spaceOnlyHint": "在邮件话题中无需用户确认即可调用。覆盖已有文件仍需确认。"
+      "spaceOnlyHint": "在邮件话题中无需用户确认即可调用。覆盖已有文件仍需确认。",
+      "checking": "正在检查…",
+      "checked": "{name} 正常 · {count, plural, other {# 个工具}}",
+      "checkedNew": "{count, plural, other {# 个新工具}}",
+      "checkFailed": "{name}：{reason}",
+      "synced": "{name} 已同步 · {count, plural, other {# 个技能}}",
+      "syncing": "正在同步…"
     },
     "service-agents": {
       "title": "服务智能体",

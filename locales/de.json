@@ -532,7 +532,13 @@
       "resultMax": "Ergebnislimit, MB",
       "toolResult": "Ergebnis",
       "spaceOnly": "Schreibt nur in den Bereich",
-      "spaceOnlyHint": "In Mail-Themen läuft es ohne Bestätigung des Nutzers. Das Überschreiben einer vorhandenen Datei wartet weiterhin auf Bestätigung."
+      "spaceOnlyHint": "In Mail-Themen läuft es ohne Bestätigung des Nutzers. Das Überschreiben einer vorhandenen Datei wartet weiterhin auf Bestätigung.",
+      "checking": "Wird geprüft…",
+      "checked": "{name} funktioniert · {count, plural, one {# Werkzeug} other {# Werkzeuge}}",
+      "checkedNew": "{count, plural, one {# neues} other {# neue}}",
+      "checkFailed": "{name}: {reason}",
+      "synced": "{name} synchronisiert · {count, plural, one {# Skill} other {# Skills}}",
+      "syncing": "Wird synchronisiert…"
     },
     "service-agents": {
       "title": "Dienstagenten",

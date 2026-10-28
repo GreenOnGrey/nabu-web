@@ -6,7 +6,7 @@ import type { AdminCatalogItem } from "../../api/types";
 import { errorText } from "../../lib/errors";
 import { Icon, Modal, Switch, useToast } from "@green-on-grey/ui-kit";
 import { ToolsBlock, type ToolsValue } from "./CatalogTools";
-import { allowedCount, allowedOf, bytesToMb, DEFAULT_FILE_MAX_BYTES, DEFAULT_RESULT_MAX_BYTES, mbToBytes, readOnlyPreset, type ToolChoice } from "./catalogTools";
+import { actionResult, allowedCount, allowedOf, bytesToMb, DEFAULT_FILE_MAX_BYTES, DEFAULT_RESULT_MAX_BYTES, mbToBytes, readOnlyPreset, type ToolChoice } from "./catalogTools";
 
 /** The catalog of skills and MCP (R11–R14, design §3.11): source (URL, upload,
  * git), access mode, publication, check of MCP servers; items in development are marked.
@@ -18,11 +18,13 @@ export function CatalogAdmin() {
   const [editing, setEditing] = useState<AdminCatalogItem | "mcp" | "skill" | null>(null);
   const list = useQuery({ queryKey: ["admin", "catalog"], queryFn: () => api.get<{ items: AdminCatalogItem[] }>("/admin/api/v1/catalog") });
   const inv = () => qc.invalidateQueries({ queryKey: ["admin", "catalog"] });
+  // the row shows the check going on, the toast its result (design §11)
   const act = useMutation({
-    mutationFn: ({ id, action }: { id: string; action: "check" | "sync" }) => api.post(`/admin/api/v1/catalog/${id}/${action}`),
-    onSuccess: inv,
+    mutationFn: ({ id, action }: { id: string; action: "check" | "sync" }) => api.post<AdminCatalogItem>(`/admin/api/v1/catalog/${id}/${action}`),
+    onSuccess: (it) => { inv(); toast(actionResult(t, it)); },
     onError: (e) => toast({ kind: "error", title: errorText(t, e) }),
   });
+  const running = (id: string) => act.isPending && act.variables?.id === id;
   const publish = useMutation({
     mutationFn: ({ id, published }: { id: string; published: boolean }) => api.patch(`/admin/api/v1/catalog/${id}`, { published }),
     onSuccess: inv,
@@ -55,8 +57,8 @@ export function CatalogAdmin() {
                   {(it.newTools?.length ?? 0) > 0 && <span className="ctools-dot" title={t("admin.catalog.newTools")} aria-label={t("admin.catalog.newTools")} />}</td>
                 <td><Switch on={it.published} onChange={(v) => publish.mutate({ id: it.id, published: v })} /></td>
                 <td style={{ whiteSpace: "nowrap" }}>
-                  {it.type === "mcp" && <button className="btn sm" onClick={() => act.mutate({ id: it.id, action: "check" })}>{t("admin.catalog.check")}</button>}
-                  {it.type === "skill" && it.source.kind === "git" && <button className="btn sm" onClick={() => act.mutate({ id: it.id, action: "sync" })}>{t("admin.catalog.sync")}</button>}{" "}
+                  {it.type === "mcp" && <ActButton busy={running(it.id)} label={t("admin.catalog.check")} busyLabel={t("admin.catalog.checking")} onClick={() => act.mutate({ id: it.id, action: "check" })} />}
+                  {it.type === "skill" && it.source.kind === "git" && <ActButton busy={running(it.id)} label={t("admin.catalog.sync")} busyLabel={t("admin.catalog.syncing")} onClick={() => act.mutate({ id: it.id, action: "sync" })} />}{" "}
                   <button className="btn ghost sm" onClick={() => setEditing(it)}>{t("common.edit")}</button>
                 </td>
               </tr>
@@ -66,6 +68,15 @@ export function CatalogAdmin() {
       </div>
       {editing && <EditItem item={typeof editing === "string" ? null : editing} type={typeof editing === "string" ? editing : editing.type} onClose={() => setEditing(null)} />}
     </>
+  );
+}
+
+/** «Check» or «Synchronize» of a row: a spinner and «Checking…» while the request goes. */
+function ActButton({ busy, label, busyLabel, onClick }: { busy: boolean; label: string; busyLabel: string; onClick: () => void }) {
+  return (
+    <button className="btn sm" disabled={busy} aria-busy={busy} onClick={onClick}>
+      {busy ? <><span className="spin" aria-hidden="true" />{busyLabel}</> : label}
+    </button>
   );
 }
 

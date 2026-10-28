@@ -532,7 +532,13 @@
       "resultMax": "Límite del resultado, MB",
       "toolResult": "resultado",
       "spaceOnly": "Escribe solo en el espacio",
-      "spaceOnlyHint": "En los temas de correo se ejecuta sin confirmación del usuario. Sobrescribir un archivo existente sigue esperando confirmación."
+      "spaceOnlyHint": "En los temas de correo se ejecuta sin confirmación del usuario. Sobrescribir un archivo existente sigue esperando confirmación.",
+      "checking": "Comprobando…",
+      "checked": "{name} funciona · {count, plural, one {# herramienta} other {# herramientas}}",
+      "checkedNew": "{count, plural, one {# nueva} other {# nuevas}}",
+      "checkFailed": "{name}: {reason}",
+      "synced": "{name} sincronizado · {count, plural, one {# skill} other {# skills}}",
+      "syncing": "Sincronizando…"
     },
     "service-agents": {
       "title": "Agentes de servicio",
