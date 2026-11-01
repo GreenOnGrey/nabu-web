@@ -558,13 +558,11 @@
       "callerMcp": "Accept MCP servers of the caller",
       "workspaces": {
         "none": "None",
-        "nabu": "Nabu sandbox",
-        "external": "Of the caller"
+        "nabu": "Nabu sandbox"
       },
       "workspaceHints": {
         "none": "No files or commands: the agent works with MCP tools only.",
-        "nabu": "A temporary Nabu sandbox for one run: files and commands in the selected image. It is removed after the run.",
-        "external": "The agent works in the workspace of the service that called it (for example a repository checkout in a runner). That service sets the environment and tools."
+        "nabu": "A temporary Nabu sandbox for one run: files and commands in the selected image. It is removed after the run."
       },
       "timeout": "Time limit, seconds",
       "maxTokens": "Token limit (0 — none)",
@@ -579,7 +577,10 @@
       },
       "profile": "Workspace profile",
       "profileDefault": "Stand default ({profile})",
-      "profileHint": "The image where the agent runs commands. See Sandbox images for its contents."
+      "profileHint": "The image where the agent runs commands. See Sandbox images for its contents.",
+      "proxies": "Proxies",
+      "proxiesHint": "Where the agent’s sandbox may go outside. Without a proxy — nowhere.",
+      "runFiles": "Working copy: {files, plural, one {# file} other {# files}}, {size} · {changed} changed"
     },
     "sandbox-images": {
       "title": "Sandbox images",
@@ -671,7 +672,6 @@
         "personal": "Personal agents",
         "group": "Group agents"
       },
-      "assignService": "Service agents: in the agent form, {profile} by default",
       "standDefault": "stand default",
       "assignSaved": "Sandboxes switch to the new profile when next idle",
       "newProfile": "New profile",
@@ -722,6 +722,61 @@
         "python-packages": "Python packages",
         "system": "System packages",
         "commands": "Commands"
+      },
+      "tabProxies": "Proxies",
+      "assignProfile": "Profile",
+      "assignProxies": "Proxies",
+      "noProxies": "No proxies",
+      "proxiesSaved": "Sandboxes get the new proxies at their next idle time",
+      "serviceAssign": "Service agents: the profile and proxies are in the agent form; by default {profile} without proxies",
+      "proxies": {
+        "lead": "Proxies let sandboxes reach chosen addresses. Without a proxy a sandbox has no internet.",
+        "new": "New proxy",
+        "editTitle": "Proxy “{title}”",
+        "empty": "No proxies. Sandboxes have no internet access",
+        "kind": {
+          "packages": "Package registries",
+          "hosts": "Addresses"
+        },
+        "state": {
+          "ok": "Working",
+          "unreachable": "Unreachable",
+          "checking": "Checking"
+        },
+        "recheck": "Check again",
+        "description": "Description for the agent",
+        "descriptionHint": "The agent reads this before work: what the proxy opens and when to use it.",
+        "title": "Title",
+        "name": "Name",
+        "nameFixed": "Agents refer to the name",
+        "kindLabel": "Kind",
+        "ecosystems": "Ecosystems",
+        "ecosystem": "Ecosystem",
+        "private": "Private registries",
+        "addRegistry": "Add a registry",
+        "token": "Token",
+        "tokenSet": "set",
+        "result": "What the sandbox gets",
+        "hosts": "Addresses",
+        "addHost": "Add an address",
+        "port": "Port",
+        "internal": "Internal address",
+        "internalHint": "“Internal address” allows addresses inside the company network. Mark only your own registries and services.",
+        "env": "Environment variables",
+        "envName": "Variable name",
+        "envValue": "Value",
+        "addEnv": "Add a variable",
+        "secret": "Secret",
+        "secretWarn": "The agent in the sandbox sees the value.",
+        "noEnv": "None",
+        "assigned": "Given to",
+        "notAssigned": "Not given",
+        "nextRun": "Addresses apply within 30 seconds, variables from the next sandbox start.",
+        "assignedTitle": "The proxy is given",
+        "deleteConfirm": "Delete the proxy “{title}”? Sandboxes lose access to its addresses within 30 seconds.",
+        "err": {
+          "invalid_name": "The name is lowercase latin letters, digits and dashes, 2–40 characters"
+        }
       }
     },
     "clients": {
@@ -1202,7 +1257,30 @@
     "preview_unavailable": "Preview is not available.",
     "queue_full": "{max, plural, one {The queue already has # message} other {The queue already has # messages}} — wait for the answers or cancel some",
     "message_started": "The agent is already answering this message",
-    "not_running": "The answer has already ended"
+    "not_running": "The answer has already ended",
+    "wide_mask": "The mask is too wide: name a domain of the second level or deeper, e.g. *.company.local",
+    "private_address": "The address is inside the company network: mark “Internal address”",
+    "reserved_env": "Nabu uses this variable name",
+    "invalid_host": "This is not a host name",
+    "invalid_env": "A variable name is A–Z, digits and _, without repeats",
+    "invalid_port": "The port is 1–65535",
+    "too_many": "At most 50 addresses and 30 variables",
+    "token_unsupported": "A token for a private Go proxy is not supported",
+    "unknown_proxy": "No such proxy",
+    "proxy_assigned": "The proxy is given to agents: take it away first",
+    "proxy_not_found": "No such proxy",
+    "invalid_kind": "Unknown kind of proxy",
+    "invalid_ecosystem": "The ecosystem is go, npm or pypi",
+    "invalid_description": "The description is at most 500 characters",
+    "no_workspace": "The agent has no Nabu sandbox for a working copy",
+    "upload_not_found": "The working copy is not found or has expired",
+    "upload_in_use": "The working copy is already given to a run",
+    "run_not_finished": "The run is still going",
+    "no_changes": "The agent changed no files",
+    "no_files": "The run has no working copy",
+    "bad_archive": "The archive of the working copy is broken or has paths outside its directory",
+    "workspace_too_large": "The working copy is over the limit: {files, number} files, {bytes, number} bytes; at most {maxFiles, number} files and {maxBytes, number} bytes",
+    "expired": "The files of the run are already deleted"
   },
   "comm": {
     "lead": "What the agent knows about you and your work correspondence",

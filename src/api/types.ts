@@ -697,9 +697,12 @@ export interface ServiceAgent {
   skills: string[];
   mcp: string[];
   acceptCallerMcp: boolean;
-  workspace: "none" | "nabu" | "external";
+  /** FTR.HMR.CMN-0007 R12: the workspace of the caller is gone. */
+  workspace: "none" | "nabu";
   /** FTR.NAB.CMN-0008 R6: the sandbox profile of a workspace in Nabu; absent — the default of the stand. */
   workspaceProfile?: string;
+  /** FTR.HMR.CMN-0007 R17: the proxies of the sandbox of a run. */
+  proxies?: string[];
   limits: { timeoutSec: number; maxTokens: number };
   clients: string[];
   enabled: boolean;
@@ -719,6 +722,10 @@ export interface Run {
   errorText: string | null;
   startedAt: string;
   finishedAt: string | null;
+  /** FTR.HMR.CMN-0007 R20, tech §2.3. */
+  proxies?: string[];
+  files?: { files: number; bytes: number } | null;
+  changes?: { files: number } | null;
 }
 
 export interface ServiceClient {
@@ -836,8 +843,30 @@ export interface SandboxProfiles {
   prefixes: string[];
   currentVersion: string;
   profiles: SandboxProfile[];
-  assignments: { personal: string; group: string; defaults: Record<string, string> };
+  assignments: { personal: string; group: string; defaults: Record<string, string>;
+    /** FTR.HMR.CMN-0007 R24: the proxies of personal and group sandboxes. */
+    proxies?: { personal: string[]; group: string[] } };
 }
+
+/** FTR.HMR.CMN-0007 R16, tech §3.1: a proxy of sandboxes. */
+export interface ProxyHost { host: string; port: number; internal: boolean }
+export interface ProxyEnv { name: string; value?: string; secret: boolean; set?: boolean }
+export interface ProxyRegistry { ecosystem: string; url: string; internal: boolean; token?: string; tokenSet?: boolean }
+export interface SandboxProxy {
+  name: string;
+  kind: "packages" | "hosts";
+  title: string;
+  description: string;
+  ecosystems?: string[];
+  registries?: ProxyRegistry[];
+  allow: ProxyHost[];
+  env: ProxyEnv[];
+  state: "checking" | "ok" | "unreachable";
+  checkError?: string;
+  checkedAt?: string;
+  assigned?: { personal: boolean; group: boolean; services: string[] };
+}
+export type ProxyTemplates = { packages: Record<string, { hosts: string[]; env: string[] }> };
 export type PackageEcosystem = "pypi" | "apt" | "binary" | "python-module" | "command";
 export type PackageStatus = "new" | "planned" | "added" | "rejected";
 export interface PackageRow {

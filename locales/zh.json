@@ -558,13 +558,11 @@
       "callerMcp": "接受调用方的 MCP 服务器",
       "workspaces": {
         "none": "无",
-        "nabu": "Nabu 沙箱",
-        "external": "调用方的"
+        "nabu": "Nabu 沙箱"
       },
       "workspaceHints": {
         "none": "没有文件和命令：智能体只使用 MCP 工具。",
-        "nabu": "为一次运行创建的临时 Nabu 沙箱：在所选镜像中处理文件和执行命令。运行结束后删除。",
-        "external": "智能体在调用它的服务的工作区中工作（例如运行器中的仓库检出）。环境和工具由该服务决定。"
+        "nabu": "为一次运行创建的临时 Nabu 沙箱：在所选镜像中处理文件和执行命令。运行结束后删除。"
       },
       "timeout": "时间限制（秒）",
       "maxTokens": "令牌限制（0 表示不限）",
@@ -579,7 +577,10 @@
       },
       "profile": "工作环境配置",
       "profileDefault": "环境默认（{profile}）",
-      "profileHint": "智能体执行命令的镜像，内容见“沙箱镜像”。"
+      "profileHint": "智能体执行命令的镜像，内容见“沙箱镜像”。",
+      "proxies": "代理",
+      "proxiesHint": "智能体的沙箱可以访问的外部地址。没有代理则无法访问。",
+      "runFiles": "工作副本：{files} 个文件，{size} · 已更改 {changed}"
     },
     "sandbox-images": {
       "title": "沙箱镜像",
@@ -671,7 +672,6 @@
         "personal": "个人智能体",
         "group": "群组智能体"
       },
-      "assignService": "服务智能体：在智能体表单中设置，默认 {profile}",
       "standDefault": "环境默认",
       "assignSaved": "沙箱将在下次空闲时切换到新配置",
       "newProfile": "新配置",
@@ -722,6 +722,61 @@
         "python-packages": "Python 包",
         "system": "系统软件包",
         "commands": "命令"
+      },
+      "tabProxies": "代理",
+      "assignProfile": "配置",
+      "assignProxies": "代理",
+      "noProxies": "无代理",
+      "proxiesSaved": "沙箱将在下次空闲时获得新的代理",
+      "serviceAssign": "服务智能体：配置和代理在智能体表单中设置，默认 {profile}，无代理",
+      "proxies": {
+        "lead": "代理让沙箱可以访问选定的地址。没有代理时，沙箱无法访问互联网。",
+        "new": "新建代理",
+        "editTitle": "代理“{title}”",
+        "empty": "没有代理。沙箱无法访问互联网",
+        "kind": {
+          "packages": "软件包仓库",
+          "hosts": "地址"
+        },
+        "state": {
+          "ok": "正常",
+          "unreachable": "不可用",
+          "checking": "检查中"
+        },
+        "recheck": "重新检查",
+        "description": "给智能体的说明",
+        "descriptionHint": "智能体在工作前会阅读：代理开放了什么，何时使用。",
+        "title": "名称",
+        "name": "标识",
+        "nameFixed": "智能体通过标识引用代理",
+        "kindLabel": "类型",
+        "ecosystems": "生态系统",
+        "ecosystem": "生态系统",
+        "private": "私有仓库",
+        "addRegistry": "添加仓库",
+        "token": "令牌",
+        "tokenSet": "已设置",
+        "result": "沙箱将获得",
+        "hosts": "地址",
+        "addHost": "添加地址",
+        "port": "端口",
+        "internal": "内部地址",
+        "internalHint": "“内部地址”允许访问公司网络内的地址。仅为自己的仓库和服务勾选。",
+        "env": "环境变量",
+        "envName": "变量名",
+        "envValue": "值",
+        "addEnv": "添加变量",
+        "secret": "机密",
+        "secretWarn": "沙箱中的智能体可以看到该值。",
+        "noEnv": "无",
+        "assigned": "分配给",
+        "notAssigned": "未分配",
+        "nextRun": "地址在 30 秒内生效，变量从沙箱下次启动时生效。",
+        "assignedTitle": "代理已分配",
+        "deleteConfirm": "删除代理“{title}”？沙箱将在 30 秒内失去对其地址的访问。",
+        "err": {
+          "invalid_name": "标识为小写拉丁字母、数字和连字符，2–40 个字符"
+        }
       }
     },
     "clients": {
@@ -1202,7 +1257,30 @@
     "preview_unavailable": "无法预览。",
     "queue_full": "队列中已有 {max} 条消息——请等待回答或取消部分消息",
     "message_started": "代理已在回答这条消息",
-    "not_running": "回答已经结束"
+    "not_running": "回答已经结束",
+    "wide_mask": "掩码过宽：请指定二级或更深的域名，例如 *.company.local",
+    "private_address": "地址位于公司网络内：请勾选“内部地址”",
+    "reserved_env": "Nabu 使用此变量名",
+    "invalid_host": "这不是主机名",
+    "invalid_env": "变量名由 A–Z、数字和 _ 组成，不可重复",
+    "invalid_port": "端口为 1–65535",
+    "too_many": "最多 50 个地址和 30 个变量",
+    "token_unsupported": "不支持私有 Go 代理的令牌",
+    "unknown_proxy": "没有该代理",
+    "proxy_assigned": "该代理已分配给智能体：请先取消分配",
+    "proxy_not_found": "没有该代理",
+    "invalid_kind": "未知的代理类型",
+    "invalid_ecosystem": "生态系统为 go、npm 或 pypi",
+    "invalid_description": "描述最多 500 个字符",
+    "no_workspace": "该智能体没有用于工作副本的 Nabu 沙箱",
+    "upload_not_found": "未找到工作副本或已过期",
+    "upload_in_use": "工作副本已交给某次运行",
+    "run_not_finished": "运行尚未结束",
+    "no_changes": "智能体未修改任何文件",
+    "no_files": "该运行没有工作副本",
+    "bad_archive": "工作副本的归档已损坏或包含目录之外的路径",
+    "workspace_too_large": "工作副本超出限制：{files, number} 个文件，{bytes, number} 字节；最多 {maxFiles, number} 个文件和 {maxBytes, number} 字节",
+    "expired": "该运行的文件已被删除"
   },
   "comm": {
     "lead": "助手了解的关于您和您工作往来的信息",

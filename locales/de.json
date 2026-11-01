@@ -558,13 +558,11 @@
       "callerMcp": "MCP-Server des Aufrufers akzeptieren",
       "workspaces": {
         "none": "Keiner",
-        "nabu": "Nabu-Sandbox",
-        "external": "Des Aufrufers"
+        "nabu": "Nabu-Sandbox"
       },
       "workspaceHints": {
         "none": "Ohne Dateien und Befehle: Der Agent arbeitet nur mit MCP-Werkzeugen.",
-        "nabu": "Eine temporäre Nabu-Sandbox für einen Lauf: Dateien und Befehle im gewählten Image. Sie wird nach dem Lauf gelöscht.",
-        "external": "Der Agent arbeitet im Arbeitsbereich des Dienstes, der ihn aufgerufen hat (zum Beispiel ein Repository-Checkout in einem Runner). Umgebung und Werkzeuge legt dieser Dienst fest."
+        "nabu": "Eine temporäre Nabu-Sandbox für einen Lauf: Dateien und Befehle im gewählten Image. Sie wird nach dem Lauf gelöscht."
       },
       "timeout": "Zeitlimit, Sekunden",
       "maxTokens": "Tokenlimit (0 — keins)",
@@ -579,7 +577,10 @@
       },
       "profile": "Profil der Arbeitsumgebung",
       "profileDefault": "Standard der Umgebung ({profile})",
-      "profileHint": "Das Image, in dem der Agent Befehle ausführt. Inhalt unter Sandbox-Images."
+      "profileHint": "Das Image, in dem der Agent Befehle ausführt. Inhalt unter Sandbox-Images.",
+      "proxies": "Proxys",
+      "proxiesHint": "Wohin die Sandbox des Agenten nach außen darf. Ohne Proxy — nirgendwohin.",
+      "runFiles": "Arbeitskopie: {files, plural, one {# Datei} other {# Dateien}}, {size} · {changed} geändert"
     },
     "sandbox-images": {
       "title": "Sandbox-Images",
@@ -671,7 +672,6 @@
         "personal": "Persönliche Agenten",
         "group": "Gruppenagenten"
       },
-      "assignService": "Dienstagenten: im Agentenformular, standardmäßig {profile}",
       "standDefault": "Standard der Umgebung",
       "assignSaved": "Sandboxen wechseln beim nächsten Leerlauf auf das neue Profil",
       "newProfile": "Neues Profil",
@@ -722,6 +722,61 @@
         "python-packages": "Python-Pakete",
         "system": "Systempakete",
         "commands": "Befehle"
+      },
+      "tabProxies": "Proxys",
+      "assignProfile": "Profil",
+      "assignProxies": "Proxys",
+      "noProxies": "Ohne Proxys",
+      "proxiesSaved": "Sandboxen erhalten die neuen Proxys bei der nächsten Leerlaufzeit",
+      "serviceAssign": "Dienstagenten: Profil und Proxys im Agentenformular, standardmäßig {profile} ohne Proxys",
+      "proxies": {
+        "lead": "Proxys öffnen Sandboxen den Weg zu ausgewählten Adressen. Ohne Proxy hat eine Sandbox kein Internet.",
+        "new": "Neuer Proxy",
+        "editTitle": "Proxy „{title}“",
+        "empty": "Keine Proxys. Sandboxen arbeiten ohne Internetzugang",
+        "kind": {
+          "packages": "Paketregistrys",
+          "hosts": "Adressen"
+        },
+        "state": {
+          "ok": "Funktioniert",
+          "unreachable": "Nicht erreichbar",
+          "checking": "Wird geprüft"
+        },
+        "recheck": "Erneut prüfen",
+        "description": "Beschreibung für den Agenten",
+        "descriptionHint": "Der Agent liest dies vor der Arbeit: was der Proxy öffnet und wann er ihn nutzt.",
+        "title": "Titel",
+        "name": "Name",
+        "nameFixed": "Agenten verweisen auf den Namen",
+        "kindLabel": "Art",
+        "ecosystems": "Ökosysteme",
+        "ecosystem": "Ökosystem",
+        "private": "Private Registrys",
+        "addRegistry": "Registry hinzufügen",
+        "token": "Token",
+        "tokenSet": "gesetzt",
+        "result": "Was die Sandbox erhält",
+        "hosts": "Adressen",
+        "addHost": "Adresse hinzufügen",
+        "port": "Port",
+        "internal": "Interne Adresse",
+        "internalHint": "„Interne Adresse“ erlaubt Adressen im Firmennetz. Nur für eigene Registrys und Dienste markieren.",
+        "env": "Umgebungsvariablen",
+        "envName": "Variablenname",
+        "envValue": "Wert",
+        "addEnv": "Variable hinzufügen",
+        "secret": "Geheim",
+        "secretWarn": "Der Agent in der Sandbox sieht den Wert.",
+        "noEnv": "Keine",
+        "assigned": "Vergeben an",
+        "notAssigned": "Nicht vergeben",
+        "nextRun": "Adressen gelten innerhalb von 30 Sekunden, Variablen ab dem nächsten Start der Sandbox.",
+        "assignedTitle": "Der Proxy ist vergeben",
+        "deleteConfirm": "Proxy „{title}“ löschen? Sandboxen verlieren innerhalb von 30 Sekunden den Zugang zu seinen Adressen.",
+        "err": {
+          "invalid_name": "Der Name besteht aus Kleinbuchstaben, Ziffern und Bindestrichen, 2–40 Zeichen"
+        }
       }
     },
     "clients": {
@@ -1202,7 +1257,30 @@
     "preview_unavailable": "Die Vorschau ist nicht verfügbar.",
     "queue_full": "In der Warteschlange sind bereits {max} Nachrichten — warten Sie auf die Antworten oder brechen Sie einige ab",
     "message_started": "Der Agent beantwortet diese Nachricht bereits",
-    "not_running": "Die Antwort ist bereits beendet"
+    "not_running": "Die Antwort ist bereits beendet",
+    "wide_mask": "Die Maske ist zu weit: Domain ab der zweiten Ebene angeben, z. B. *.company.local",
+    "private_address": "Die Adresse liegt im Firmennetz: „Interne Adresse“ markieren",
+    "reserved_env": "Nabu verwendet diesen Variablennamen",
+    "invalid_host": "Das ist kein Hostname",
+    "invalid_env": "Ein Variablenname besteht aus A–Z, Ziffern und _, ohne Wiederholungen",
+    "invalid_port": "Der Port ist 1–65535",
+    "too_many": "Höchstens 50 Adressen und 30 Variablen",
+    "token_unsupported": "Ein Token für einen privaten Go-Proxy wird nicht unterstützt",
+    "unknown_proxy": "Diesen Proxy gibt es nicht",
+    "proxy_assigned": "Der Proxy ist Agenten zugewiesen: zuerst die Zuweisung entfernen",
+    "proxy_not_found": "Diesen Proxy gibt es nicht",
+    "invalid_kind": "Unbekannte Art des Proxys",
+    "invalid_ecosystem": "Das Ökosystem ist go, npm oder pypi",
+    "invalid_description": "Die Beschreibung hat höchstens 500 Zeichen",
+    "no_workspace": "Der Agent hat keine Nabu-Sandbox für eine Arbeitskopie",
+    "upload_not_found": "Die Arbeitskopie wurde nicht gefunden oder ist abgelaufen",
+    "upload_in_use": "Die Arbeitskopie ist bereits einem Lauf übergeben",
+    "run_not_finished": "Der Lauf ist noch nicht beendet",
+    "no_changes": "Der Agent hat keine Dateien geändert",
+    "no_files": "Der Lauf hat keine Arbeitskopie",
+    "bad_archive": "Das Archiv der Arbeitskopie ist beschädigt oder enthält Pfade außerhalb des Verzeichnisses",
+    "workspace_too_large": "Die Arbeitskopie überschreitet das Limit: {files, number} Dateien, {bytes, number} Bytes; höchstens {maxFiles, number} Dateien und {maxBytes, number} Bytes",
+    "expired": "Die Dateien des Laufs sind bereits gelöscht"
   },
   "comm": {
     "lead": "Was der Agent über Sie und Ihre Arbeitskorrespondenz weiß",

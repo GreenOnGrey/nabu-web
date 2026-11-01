@@ -27,10 +27,29 @@ const sandboxPackages = [
   pkg("pypi", "tensorflow", 3, 3, 2, { personal: 5 }, { status: "rejected", note: "Слишком тяжёлый", previousSignals: 7 }),
   pkg("pypi", "reqeusts", 1, 1, 0, { personal: 1 }, { new: true, previousSignals: 0, lookalike: "requests" }),
 ];
+// FTR.HMR.CMN-0007 R16, R21: the proxies of sandboxes
+const sandboxProxies = [
+  { name: "packages", kind: "packages", title: "Реестры пакетов", description: "npm, Go-модули и PyPI для сборки и тестов проекта.",
+    ecosystems: ["go", "npm", "pypi"], registries: [{ ecosystem: "npm", url: "https://npm.company.local", internal: true, tokenSet: true }],
+    allow: [{ host: "proxy.golang.org", port: 443, internal: false }, { host: "registry.npmjs.org", port: 443, internal: false },
+      { host: "pypi.org", port: 443, internal: false }, { host: "files.pythonhosted.org", port: 443, internal: false }, { host: "npm.company.local", port: 443, internal: true }],
+    env: [{ name: "GOPROXY", value: "https://proxy.golang.org", secret: false }, { name: "GOFLAGS", value: "-mod=mod", secret: false },
+      { name: "PIP_INDEX_URL", value: "https://pypi.org/simple", secret: false }, { name: "NPM_TOKEN", secret: true, set: true }],
+    state: "ok", checkedAt: T("10:00"), assigned: { personal: false, group: false, services: ["hammurapi-codegen", "hammurapi-review-update"] } },
+  { name: "corp-docs", kind: "hosts", title: "Вики компании", description: "Внутренняя вики: регламенты и шаблоны документов.",
+    allow: [{ host: "wiki.company.local", port: 443, internal: true }, { host: "*.docs.company.local", port: 443, internal: true }],
+    env: [{ name: "WIKI_TOKEN", secret: true, set: true }],
+    state: "unreachable", checkError: "dial tcp 10.0.4.12:443: i/o timeout", checkedAt: T("10:00"), assigned: { personal: true, group: false, services: [] } },
+];
+const proxyTemplates = { packages: {
+  go: { hosts: ["proxy.golang.org", "sum.golang.org"], env: ["GOPROXY=https://proxy.golang.org", "GOFLAGS=-mod=mod"] },
+  npm: { hosts: ["registry.npmjs.org"], env: [] },
+  pypi: { hosts: ["pypi.org", "files.pythonhosted.org"], env: ["PIP_INDEX_URL=https://pypi.org/simple"] } } };
 const prof = (name, kind, extra) => ({ name, kind, description: "", state: "ready", nodesReady: 1, nodesTotal: 1,
   assignedTo: { personal: false, group: false, services: [] }, baseVersion: "v0.5.0", ...extra });
 const sandboxProfiles = { customImages: true, prefixes: ["registry.company.local/nabu/"], currentVersion: "v0.5.0",
-  assignments: { personal: "company-tools", group: "documents", defaults: { personal: "documents", group: "documents", service: "base" } },
+  assignments: { personal: "company-tools", group: "documents", proxies: { personal: ["corp-docs"], group: [] },
+    defaults: { personal: "documents", group: "documents", service: "base" } },
   profiles: [
     prof("base", "builtin", { imageRef: "ghcr.io/greenongrey/nabu-sandbox-base:v0.5.0", assignedTo: { personal: false, group: false, services: ["memory-collector"] },
       inventory: { name: "base", kind: "builtin", tools: [{ group: "archives", name: "zip", version: "3.0" }, { group: "python", name: "python3", version: "3.13.5" }] } }),
@@ -157,6 +176,8 @@ function api(url, theme) {
     { text: "Найти и вырезать подписи на сканах договоров", profile: "documents", at: T("09:00", "10") }],
     daily: [3, 5, 1, 0, 6, 8, 4, 7, 11, 5, 9, 12, 9, 13].map((n, i) => ({ day: `2026-10-${String(i + 1).padStart(2, "0")}`, signals: n })), history: [] };
   if (p === "/admin/api/v1/sandbox/profiles") return sandboxProfiles;
+  if (p === "/admin/api/v1/proxies") return { items: sandboxProxies };
+  if (p === "/admin/api/v1/proxies/templates") return proxyTemplates;
   if (p === "/admin/api/v1/voice") return { configured: true, ok: true, url: "http://whisper.nabu.svc:9000" };
   if (p === "/admin/api/v1/users") return { items: url.searchParams.get("status") === "archived" ? [] : users };
   return { items: [], nextCursor: null };

@@ -6,7 +6,8 @@ import { useSandboxProfiles } from "../../api/queries";
 import type { AdminCatalogItem, Harness, List, ModelConnection, Run, ServiceAgent, ServiceClient } from "../../api/types";
 import { errorText } from "../../lib/errors";
 import { intlLocale } from "../../lib/i18n";
-import { dateTime } from "../../lib/format";
+import { bytes, dateTime } from "../../lib/format";
+import { ProxyChips } from "./SandboxProxies";
 import { Icon, Modal, Switch } from "@green-on-grey/ui-kit";
 
 /** Service agents (R15–R17, design §3.8): the table and the configuration form, the run log. */
@@ -118,7 +119,7 @@ function AgentForm({ agent, onClose }: { agent: ServiceAgent | null; onClose: ()
         <div style={{ marginTop: 8 }}><Switch on={f.acceptCallerMcp} onChange={(v) => set("acceptCallerMcp", v)} label={t("admin.service-agents.callerMcp")} /></div></div>
       <div className="field"><label>{t("admin.service-agents.workspace")}</label>
         <div className="mini-seg" style={{ display: "inline-flex" }}>
-          {(["none", "nabu", "external"] as const).map((w) => <button key={w} className={f.workspace === w ? "on" : ""} onClick={() => set("workspace", w)}>{t(`admin.service-agents.workspaces.${w}`)}</button>)}
+          {(["none", "nabu"] as const).map((w) => <button key={w} className={f.workspace === w ? "on" : ""} onClick={() => set("workspace", w)}>{t(`admin.service-agents.workspaces.${w}`)}</button>)}
         </div>
         <div className="hint">{t(`admin.service-agents.workspaceHints.${f.workspace}`)}</div></div>
       {f.workspace === "nabu" && (
@@ -131,6 +132,12 @@ function AgentForm({ agent, onClose }: { agent: ServiceAgent | null; onClose: ()
             ))}
           </select>
           <div className="hint">{t("admin.service-agents.profileHint")}</div></div>
+      )}
+      {f.workspace === "nabu" && (
+        // FTR.HMR.CMN-0007 R17, design §3.4: where the sandbox of the agent may go outside
+        <div className="field"><label>{t("admin.service-agents.proxies")}</label>
+          <ProxyChips selected={f.proxies ?? []} onChange={(v) => set("proxies", v)} />
+          <div className="hint">{t("admin.service-agents.proxiesHint")}</div></div>
       )}
       <div className="form-grid">
         <div className="field"><label htmlFor="sa-to">{t("admin.service-agents.timeout")}</label><input id="sa-to" type="number" min={60} className="inp" value={f.limits.timeoutSec} onChange={(e) => set("limits", { ...f.limits, timeoutSec: Number(e.target.value) })} /></div>
@@ -155,7 +162,10 @@ function Runs({ name, onClose }: { name: string; onClose: () => void }) {
               <td className="small">{dateTime(r.startedAt, intlLocale(i18n.language))}</td>
               <td>{r.clientName}{r.initiator && <div className="small muted">{r.initiator}</div>}</td>
               <td><span className={r.status === "succeeded" ? "ok-t" : r.status === "failed" ? "err-t" : "muted"}>{t(`admin.service-agents.status.${r.status}`, { defaultValue: r.status })}</span></td>
-              <td className="small t2">{r.errorText ?? r.summary?.slice(0, 160) ?? ""}</td>
+              <td className="small t2">{r.errorText ?? r.summary?.slice(0, 160) ?? ""}
+                {/* FTR.HMR.CMN-0007 R20, design §3.5 */}
+                {(r.proxies?.length ?? 0) > 0 && <div className="chips">{r.proxies!.map((p) => <span key={p} className="chip on">{p}</span>)}</div>}
+                {r.files && <div className="small muted">{t("admin.service-agents.runFiles", { files: r.files.files, size: bytes(r.files.bytes, i18n.language), changed: r.changes?.files ?? 0 })}</div>}</td>
             </tr>
           ))}
         </tbody>

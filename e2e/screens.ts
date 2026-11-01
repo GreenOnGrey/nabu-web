@@ -62,6 +62,13 @@ export const SCREENS: Screen[] = [
   // FTR.NAB.CMN-0008 design §3: the card of a package, the profiles
   { name: "admin-sandbox-package", path: "/admin/sandbox-images", only: "desktop", act: async (page) => { await page.getByText("opencv-python").first().click(); } },
   { name: "admin-sandbox-profiles", path: "/admin/sandbox-images", act: async (page) => { await page.getByRole("tab", { name: "Профили" }).click(); } },
+  // FTR.HMR.CMN-0007 design §3: the proxies, a proxy of package registries open
+  { name: "admin-sandbox-proxies", path: "/admin/sandbox-images", act: async (page) => { await page.getByRole("tab", { name: "Прокси" }).click(); } },
+  { name: "admin-sandbox-proxy-edit", path: "/admin/sandbox-images", only: "desktop", act: async (page) => {
+    await page.getByRole("tab", { name: "Прокси" }).click();
+    await page.getByRole("button", { name: "Изменить" }).first().click();
+    await page.getByRole("dialog").waitFor();
+  } },
   { name: "admin-clients-edit", path: "/admin/clients", act: click("Изменить") },
   { name: "admin-clients-delete", path: "/admin/clients", act: click("Удалить") },
   // FTR.NAB.CMN-0006 design §3: the tools of a checked item with its file argument open, and a new item before a check

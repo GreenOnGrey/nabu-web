@@ -9,13 +9,15 @@ import { intlLocale } from "../../lib/i18n";
 import { dateTime, relativeTime } from "../../lib/format";
 import { Empty, Icon, Modal, Tabs, useToast } from "@green-on-grey/ui-kit";
 import { adminPath } from "./paths";
+import { ProxiesTab, ProxyChips } from "./SandboxProxies";
 
-type Tab = "requests" | "profiles";
+type Tab = "requests" | "profiles" | "proxies";
 type Period = "7d" | "30d" | "90d";
 const KINDS = ["personal", "group", "service"] as const;
 
 /** Sandbox images (FTR.NAB.CMN-0008 R14–R17, R21–R27, design §3): requests of
- * libraries and the profiles of sandbox images. */
+ * libraries, the profiles of sandbox images and their proxies (FTR.HMR.CMN-0007
+ * R21, design §2). */
 export function SandboxImagesAdmin() {
   const { t } = useTranslation();
   const [tab, setTab] = useState<Tab>("requests");
@@ -24,8 +26,9 @@ export function SandboxImagesAdmin() {
       <h2 style={{ margin: 0 }}>{t("admin.sandbox-images.title")}</h2>
       <p className="lead">{t("admin.sandbox-images.lead")}</p>
       <Tabs label={t("admin.sandbox-images.title")} value={tab} onChange={setTab}
-        items={[{ key: "requests", label: t("admin.sandbox-images.tabRequests") }, { key: "profiles", label: t("admin.sandbox-images.tabProfiles") }]} />
-      <div style={{ marginTop: 16 }}>{tab === "requests" ? <Requests /> : <Profiles />}</div>
+        items={[{ key: "requests", label: t("admin.sandbox-images.tabRequests") }, { key: "profiles", label: t("admin.sandbox-images.tabProfiles") },
+          { key: "proxies", label: t("admin.sandbox-images.tabProxies") }]} />
+      <div style={{ marginTop: 16 }}>{tab === "requests" ? <Requests /> : tab === "profiles" ? <Profiles /> : <ProxiesTab />}</div>
     </>
   );
 }
@@ -342,8 +345,13 @@ function Profiles() {
   // a custom image is checked within minutes: follow its state
   const q = useSandboxProfiles(true);
   const assign = useMutation({
-    mutationFn: (body: Record<string, string>) => api.put("/admin/api/v1/sandbox/assignments", body),
-    onSuccess: () => { toast({ kind: "ok", title: t("admin.sandbox-images.assignSaved") }); qc.invalidateQueries({ queryKey: key }); },
+    mutationFn: (body: Record<string, string | { proxies: string[] }>) => api.put("/admin/api/v1/sandbox/assignments", body),
+    onSuccess: (_, body) => {
+      const proxies = Object.values(body).some((v) => typeof v === "object");
+      toast({ kind: "ok", title: t(proxies ? "admin.sandbox-images.proxiesSaved" : "admin.sandbox-images.assignSaved") });
+      qc.invalidateQueries({ queryKey: key });
+      qc.invalidateQueries({ queryKey: adminKeys.proxies });
+    },
     onError: (e) => toast({ kind: "error", title: errorText(t, e) }),
   });
   if (q.isLoading) return <p className="muted">{t("common.loading")}</p>;
@@ -354,6 +362,7 @@ function Profiles() {
     <>
       <div className="nb-sbx-assign">
         <b>{t("admin.sandbox-images.assignment")}</b>
+        <div className="nb-sbx-assign-row small muted"><span /><span>{t("admin.sandbox-images.assignProfile")}</span><span>{t("admin.sandbox-images.assignProxies")}</span></div>
         {(["personal", "group"] as const).map((target) => (
           <div key={target} className="nb-sbx-assign-row">
             <label htmlFor={`sbx-a-${target}`}>{t(`admin.sandbox-images.assign.${target}`)}</label>
@@ -361,10 +370,12 @@ function Profiles() {
               onChange={(e) => assign.mutate({ [target]: e.target.value })}>
               {ready.map((p) => <option key={p.name} value={p.name}>{p.name}</option>)}
             </select>
-            {d.assignments[target] === d.assignments.defaults[target] && <span className="small muted">{t("admin.sandbox-images.standDefault")}</span>}
+            {/* FTR.HMR.CMN-0007 R24, design §3.3: the proxies next to the profile */}
+            <ProxyChips selected={d.assignments.proxies?.[target] ?? []} disabled={assign.isPending}
+              onChange={(proxies) => assign.mutate({ [target]: { proxies } })} />
           </div>
         ))}
-        <div className="small muted">{t("admin.sandbox-images.assignService", { profile: d.assignments.defaults.service })}</div>
+        <div className="small muted">{t("admin.sandbox-images.serviceAssign", { profile: d.assignments.defaults.service })}</div>
       </div>
       <div className="nb-sbx-new-row">
         {d.customImages
