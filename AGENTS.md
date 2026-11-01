@@ -30,8 +30,6 @@ UI_KIT_SRC=../ui-kit npm run dev   # with the kit from its sources, to try a cha
 npm run build      # typecheck + production build
 ```
 
-CI runs lint, tests, `deploy/sync-ref.sh --check` and actionlint; a release also runs `deploy/kit-lag.sh`.
-
 ## Layout
 
 ```text
@@ -47,6 +45,17 @@ src/lib/          sse, i18n, format, errors, llm
 locales/*.json    en (default and fallback), ru, de, es, zh — shown as EN RU DE ES ZH
 e2e/              the screen comparison: mock.mjs (a fixed API), screens.ts, screens.spec.ts (Playwright), compare.mjs
 ```
+
+## Checks before a commit
+
+A change is ready when every job of `.github/workflows/ci.yml` passes locally at the versions the workflow pins, plus the
+matching lines below. Read the workflow for the exact commands. Install a missing tool outside the repository
+at the pinned version. Name any job you could not run in your report, with the reason.
+
+- Always: `npm run lint`, `npm test`, `npm run build`.
+- A changed screen: `npx playwright test -g <screen>` and look at the shots; a new screen or state goes into `e2e/screens.ts` with its data in `e2e/mock.mjs`, shaped like the real API answer.
+- `package-lock.json`, `Dockerfile`: `bash deploy/kit-lag.sh` (the release runs it) and scan the built image with `trivy image --timeout 40m --severity CRITICAL,HIGH --ignore-unfixed <image>`.
+- `.github/**`, `deploy/versions.env`: `actionlint`, `deploy/sync-ref.sh --check`. `DEPLOY_WORKFLOW_REF` and `CHART_VERSION` name tags that are already published.
 
 ## Rules
 
