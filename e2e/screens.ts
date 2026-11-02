@@ -41,7 +41,7 @@ export const SCREENS: Screen[] = [
   { name: "profile-menu", path: "/", act: click("Профиль") },
   { name: "sections", path: "/", only: "phone", act: click("Разделы") },
   // FTR.NAB.CMN-0005 design §4: in the administration the burger holds its sections
-  { name: "admin-sections", path: "/admin/audit", only: "phone", act: click("Разделы") },
+  { name: "admin-sections", path: "/admin/audit", only: "phone", act: click("Администрирование") },
   { name: "memory", path: "/memory" },
   { name: "memory-add", path: "/memory", act: async (page) => { await page.locator(".btn.primary.sm").first().click(); } },
   { name: "tasks", path: "/tasks" },
