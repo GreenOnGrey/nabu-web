@@ -92,6 +92,6 @@ at the pinned version. Name any job you could not run in your report, with the r
 
 A tag `vX.Y.Z` builds `ghcr.io/greenongrey/nabu-web` and deploys it through `deploy-component.yml`
 of the `nabu` repo pinned by `DEPLOY_WORKFLOW_REF` in `deploy/versions.env` (run
-`deploy/sync-ref.sh` after changing it); `CHART_VERSION` is the `hammurapi-infra` release with the
+`deploy/sync-ref.sh` after changing it); `CHART_VERSION` is the `installer` release with the
 chart `nabu-web`. The container writes `/config.json` with the API address at
 start (`deploy/05-nabu-config.sh`), so one image fits any domain.
