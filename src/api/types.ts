@@ -726,6 +726,9 @@ export interface Run {
   proxies?: string[];
   files?: { files: number; bytes: number } | null;
   changes?: { files: number } | null;
+  /** FTR.HMR.CMN-0008 R10; FTR.NAB.CMN-0010 R6. */
+  check?: { status: string; attempts: number; maxAttempts: number } | null;
+  stopReason?: string | null;
 }
 
 export interface ServiceClient {

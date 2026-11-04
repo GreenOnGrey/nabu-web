@@ -165,6 +165,9 @@ function Runs({ name, onClose }: { name: string; onClose: () => void }) {
               <td className="small t2">{r.errorText ?? r.summary?.slice(0, 160) ?? ""}
                 {/* FTR.HMR.CMN-0007 R20, design §3.5 */}
                 {(r.proxies?.length ?? 0) > 0 && <div className="chips">{r.proxies!.map((p) => <span key={p} className="chip on">{p}</span>)}</div>}
+                {/* FTR.HMR.CMN-0008 R10; FTR.NAB.CMN-0010 design §3 */}
+                {r.check && <div className="small muted">{t(`admin.service-agents.runCheck_${r.check.status}`, { defaultValue: r.check.status })}{r.check.attempts > 0 && <> · {t("admin.service-agents.runCheckAttempts", { attempts: r.check.attempts, max: r.check.maxAttempts })}</>}</div>}
+                {r.stopReason === "stalled" && <div className="small muted">{t("admin.service-agents.runStalled")}</div>}
                 {r.files && <div className="small muted">{t("admin.service-agents.runFiles", { files: r.files.files, size: bytes(r.files.bytes, i18n.language), changed: r.changes?.files ?? 0 })}</div>}</td>
             </tr>
           ))}

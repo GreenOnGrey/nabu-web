@@ -580,6 +580,12 @@
       "profileHint": "The image where the agent runs commands. See Sandbox images for its contents.",
       "proxies": "Proxies",
       "proxiesHint": "Where the agent’s sandbox may go outside. Without a proxy — nowhere.",
+      "runCheck_passed": "Check passed",
+      "runCheck_failed": "Check failed",
+      "runCheck_unavailable": "Could not check",
+      "runCheck_not_run": "Check did not run",
+      "runCheckAttempts": "{attempts} of {max} attempts",
+      "runStalled": "Stopped by the stall detector",
       "runFiles": "Working copy: {files, plural, one {# file} other {# files}}, {size} · {changed} changed"
     },
     "sandbox-images": {
@@ -1272,6 +1278,8 @@
     "invalid_kind": "Unknown kind of proxy",
     "invalid_ecosystem": "The ecosystem is go, npm or pypi",
     "invalid_description": "The description is at most 500 characters",
+    "invalid_check": "The readiness check is invalid",
+    "check_requires_workspace": "The agent has no Nabu sandbox for a readiness check",
     "no_workspace": "The agent has no Nabu sandbox for a working copy",
     "upload_not_found": "The working copy is not found or has expired",
     "upload_in_use": "The working copy is already given to a run",

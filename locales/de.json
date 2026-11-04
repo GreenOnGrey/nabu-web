@@ -580,6 +580,12 @@
       "profileHint": "Das Image, in dem der Agent Befehle ausführt. Inhalt unter Sandbox-Images.",
       "proxies": "Proxys",
       "proxiesHint": "Wohin die Sandbox des Agenten nach außen darf. Ohne Proxy — nirgendwohin.",
+      "runCheck_passed": "Prüfung bestanden",
+      "runCheck_failed": "Prüfung fehlgeschlagen",
+      "runCheck_unavailable": "Prüfung nicht möglich",
+      "runCheck_not_run": "Prüfung nicht gestartet",
+      "runCheckAttempts": "{attempts} von {max} Versuchen",
+      "runStalled": "Vom Schleifendetektor gestoppt",
       "runFiles": "Arbeitskopie: {files, plural, one {# Datei} other {# Dateien}}, {size} · {changed} geändert"
     },
     "sandbox-images": {
@@ -1272,6 +1278,8 @@
     "invalid_kind": "Unbekannte Art des Proxys",
     "invalid_ecosystem": "Das Ökosystem ist go, npm oder pypi",
     "invalid_description": "Die Beschreibung hat höchstens 500 Zeichen",
+    "invalid_check": "Die Bereitschaftsprüfung ist ungültig",
+    "check_requires_workspace": "Der Agent hat keine Nabu-Sandbox für eine Bereitschaftsprüfung",
     "no_workspace": "Der Agent hat keine Nabu-Sandbox für eine Arbeitskopie",
     "upload_not_found": "Die Arbeitskopie wurde nicht gefunden oder ist abgelaufen",
     "upload_in_use": "Die Arbeitskopie ist bereits einem Lauf übergeben",
