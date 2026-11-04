@@ -580,6 +580,12 @@
       "profileHint": "Образ, в котором агент выполняет команды. Состав — в разделе «Образы песочниц».",
       "proxies": "Прокси",
       "proxiesHint": "Куда песочница агента может ходить наружу. Без прокси — никуда.",
+      "runCheck_passed": "Проверка пройдена",
+      "runCheck_failed": "Проверка не пройдена",
+      "runCheck_unavailable": "Не удалось проверить",
+      "runCheck_not_run": "Проверка не запускалась",
+      "runCheckAttempts": "попыток: {attempts} из {max}",
+      "runStalled": "Остановлен детектором зацикливания",
       "runFiles": "Рабочая копия: {files, plural, one {# файл} few {# файла} many {# файлов} other {# файла}}, {size} · изменено {changed}"
     },
     "sandbox-images": {
@@ -1272,6 +1278,8 @@
     "invalid_kind": "Неизвестный вид прокси",
     "invalid_ecosystem": "Экосистема — go, npm или pypi",
     "invalid_description": "Описание — не больше 500 символов",
+    "invalid_check": "Неверная проверка готовности",
+    "check_requires_workspace": "У агента нет песочницы Nabu для проверки готовности",
     "no_workspace": "У агента нет песочницы Nabu для рабочей копии",
     "upload_not_found": "Рабочая копия не найдена или устарела",
     "upload_in_use": "Рабочая копия уже передана запуску",

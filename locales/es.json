@@ -580,6 +580,12 @@
       "profileHint": "La imagen donde el agente ejecuta comandos. Su contenido está en Imágenes de sandbox.",
       "proxies": "Proxies",
       "proxiesHint": "Adónde puede salir el sandbox del agente. Sin proxy, a ninguna parte.",
+      "runCheck_passed": "Comprobación superada",
+      "runCheck_failed": "Comprobación fallida",
+      "runCheck_unavailable": "No se pudo comprobar",
+      "runCheck_not_run": "La comprobación no se ejecutó",
+      "runCheckAttempts": "{attempts} de {max} intentos",
+      "runStalled": "Detenido por el detector de bucles",
       "runFiles": "Copia de trabajo: {files, plural, one {# archivo} other {# archivos}}, {size} · {changed} cambiados"
     },
     "sandbox-images": {
@@ -1272,6 +1278,8 @@
     "invalid_kind": "Tipo de proxy desconocido",
     "invalid_ecosystem": "El ecosistema es go, npm o pypi",
     "invalid_description": "La descripción tiene como máximo 500 caracteres",
+    "invalid_check": "La comprobación de preparación no es válida",
+    "check_requires_workspace": "El agente no tiene un sandbox de Nabu para la comprobación",
     "no_workspace": "El agente no tiene un sandbox de Nabu para la copia de trabajo",
     "upload_not_found": "La copia de trabajo no existe o ha caducado",
     "upload_in_use": "La copia de trabajo ya se entregó a una ejecución",

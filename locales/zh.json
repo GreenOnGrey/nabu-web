@@ -580,6 +580,12 @@
       "profileHint": "智能体执行命令的镜像，内容见“沙箱镜像”。",
       "proxies": "代理",
       "proxiesHint": "智能体的沙箱可以访问的外部地址。没有代理则无法访问。",
+      "runCheck_passed": "检查通过",
+      "runCheck_failed": "检查未通过",
+      "runCheck_unavailable": "无法检查",
+      "runCheck_not_run": "检查未运行",
+      "runCheckAttempts": "{attempts} / {max} 次尝试",
+      "runStalled": "已被循环检测器停止",
       "runFiles": "工作副本：{files} 个文件，{size} · 已更改 {changed}"
     },
     "sandbox-images": {
@@ -1272,6 +1278,8 @@
     "invalid_kind": "未知的代理类型",
     "invalid_ecosystem": "生态系统为 go、npm 或 pypi",
     "invalid_description": "描述最多 500 个字符",
+    "invalid_check": "就绪检查无效",
+    "check_requires_workspace": "该智能体没有用于就绪检查的 Nabu 沙箱",
     "no_workspace": "该智能体没有用于工作副本的 Nabu 沙箱",
     "upload_not_found": "未找到工作副本或已过期",
     "upload_in_use": "工作副本已交给某次运行",
