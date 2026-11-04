@@ -56,6 +56,7 @@ at the pinned version. Name any job you could not run in your report, with the r
 - A changed screen: `npx playwright test -g <screen>` and look at the shots; a new screen or state goes into `e2e/screens.ts` with its data in `e2e/mock.mjs`, shaped like the real API answer.
 - `package-lock.json`, `Dockerfile`: `bash deploy/kit-lag.sh` (the release runs it) and scan the built image with `trivy image --timeout 40m --severity CRITICAL,HIGH --ignore-unfixed <image>`.
 - `.github/**`, `deploy/versions.env`: `actionlint`, `deploy/sync-ref.sh --check`. `DEPLOY_WORKFLOW_REF` and `CHART_VERSION` name tags that are already published.
+- Always, after the checks pass: run the `code-review` skill on the diff to be committed. Fix each finding, or name it in your report with the reason it stays. Ask the user when you doubt a finding.
 
 ## Rules
 
