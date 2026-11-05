@@ -14,6 +14,7 @@ out next to Hammurapi; the specifications are `hammurapi-specs/specs/NAB/CMN/FTR
   `FTR.NAB.CMN-0001 R12`, `design §3`.
 - Deviations from a spec are written into the spec in the same piece of work.
 - Do not commit, tag or push unless asked.
+- English for code, comments, docs, CI, scripts, logs, test names, and the messages and tool descriptions that services return. Russian stays in the locale dictionary `locales/ru.json`, test data that exercises Russian text and the specifications in `hammurapi-specs`. Other Russian here is a leftover to translate.
 
 ## Stack
 
