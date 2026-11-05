@@ -1,6 +1,6 @@
-# Nabu web: только статика SPA. API — на отдельном домене (API_BASE_URL в
-# /config.json), маршрутизацию делает ingress. Используется, когда API_UPSTREAM
-# не задан (Kubernetes, FTR.NAB.CMN-0001).
+# Nabu web: only the static files of the SPA. The API is on a domain of its own (API_BASE_URL in
+# /config.json), and the ingress does routing. Used when API_UPSTREAM
+# is not set (Kubernetes, FTR.NAB.CMN-0001).
 server {
     listen 8080;
     server_name _;
@@ -9,28 +9,28 @@ server {
     add_header X-Content-Type-Options nosniff always;
     add_header Referrer-Policy strict-origin-when-cross-origin always;
 
-    # Служебная проверка готовности.
+    # The readiness check.
     location = /healthz {
         access_log off;
         default_type text/plain;
         return 200 "ok\n";
     }
 
-    # Конфигурация и точка входа — всегда свежие.
+    # The configuration and the entrypoint: always fresh.
     location = /config.json {
         add_header Cache-Control "no-cache" always;
         add_header X-Content-Type-Options nosniff always;
         try_files $uri =404;
     }
 
-    # Ассеты с хешем в имени — навсегда.
+    # Assets with a hash in the name: forever.
     location /assets/ {
         add_header Cache-Control "public, max-age=31536000, immutable" always;
         add_header X-Content-Type-Options nosniff always;
         try_files $uri =404;
     }
 
-    # SPA: любые пути отдают index.html.
+    # SPA: any path gives index.html.
     location / {
         add_header Cache-Control "no-cache" always;
         add_header X-Content-Type-Options nosniff always;

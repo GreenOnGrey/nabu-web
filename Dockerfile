@@ -1,8 +1,8 @@
-# Nabu web: React SPA на nginx (без root, порт 8080).
-#   API_BASE_URL  — адрес API в /config.json (пусто — тот же origin);
-#   API_UPSTREAM  — если задан, nginx проксирует /api, /admin/api, /hooks на этот
-#                   адрес (docker compose); без него отдаётся только статика, а
-#                   API — на своём домене (Kubernetes, FTR.NAB.CMN-0001).
+# Nabu web: React SPA on nginx (no root, port 8080).
+#   API_BASE_URL: the API address in /config.json (empty means the same origin);
+#   API_UPSTREAM: if set, nginx proxies /api, /admin/api, /hooks to this
+#                 address (docker compose); without it only static files are served, and
+#                 the API is on a domain of its own (Kubernetes, FTR.NAB.CMN-0001).
 FROM node:24-alpine AS build
 WORKDIR /src
 COPY package.json package-lock.json ./
@@ -17,7 +17,7 @@ RUN apk upgrade --no-cache
 COPY deploy/proxy.conf.template deploy/static.conf.template /etc/nginx/nabu/
 COPY --chmod=0755 deploy/05-nabu-config.sh /docker-entrypoint.d/05-nabu-config.sh
 COPY --from=build /src/dist /usr/share/nginx/html
-# Точка входа пишет config.json и выбирает шаблон nginx под пользователем nginx (101).
+# The entrypoint writes config.json and picks the nginx template as the user nginx (101).
 RUN mkdir -p /etc/nginx/templates && chown -R 101:101 /usr/share/nginx/html /etc/nginx/templates
 LABEL org.opencontainers.image.title="nabu-web" \
       org.opencontainers.image.version="${VERSION}" \
