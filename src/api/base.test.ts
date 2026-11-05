@@ -7,21 +7,21 @@ const jsonResponse = (body: unknown, ok = true) =>
 describe("apiUrl", () => {
   afterEach(() => setApiBase(""));
 
-  it("по умолчанию — относительный путь (API на том же origin)", () => {
+  it("by default a relative path (the API on the same origin)", () => {
     expect(apiUrl("/api/v1/config")).toBe("/api/v1/config");
   });
 
-  it("с apiBaseUrl из config.json — абсолютный адрес api.<домен>", async () => {
+  it("with apiBaseUrl from config.json an absolute address api.<domain>", async () => {
     await loadRuntimeConfig(async () => jsonResponse({ apiBaseUrl: "https://api.1-2-3-4.sslip.io/" }));
     expect(apiUrl("/api/v1/events")).toBe("https://api.1-2-3-4.sslip.io/api/v1/events");
   });
 
-  it("без config.json — остаётся относительный путь", async () => {
+  it("without config.json the path stays relative", async () => {
     await loadRuntimeConfig(async () => jsonResponse({}, false));
     expect(apiUrl("/api/v1/auth/login")).toBe("/api/v1/auth/login");
   });
 
-  it("сетевая ошибка при загрузке config.json не ломает запуск", async () => {
+  it("a network error while loading config.json does not break the start", async () => {
     await loadRuntimeConfig(async () => {
       throw new Error("offline");
     });

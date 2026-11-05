@@ -1,13 +1,13 @@
-# Сравнение экранов двух сборок (FTR.NAB.CMN-0005 qa §5): «было» — указанный
-# коммит, «стало» — ветка запуска. Обе сборки получают одни и те же данные от
-# e2e/mock.mjs и снимаются одним набором на одной машине; допуск — ноль пикселей.
-# Запускается вручную: при переходе на кит и перед обновлением его major-версии.
+# A comparison of screens of two builds (FTR.NAB.CMN-0005 qa §5): "before" is the given
+# commit, "after" is the branch of the run. Both builds get the same data from
+# e2e/mock.mjs and are captured by one suite on one machine; the tolerance is zero pixels.
+# Run by hand: when moving to the kit and before updating its major version.
 name: visual
 on:
   workflow_dispatch:
     inputs:
-      base: { description: "Коммит или тег «было»", required: true, type: string }
-      report_only: { description: "Только отчёт: отличия ожидаемы, их принимает человек", required: false, default: false, type: boolean }
+      base: { description: "Commit or tag of \"before\"", required: true, type: string }
+      report_only: { description: "Only a report: differences are expected, and a person accepts them", required: false, default: false, type: boolean }
 permissions: { contents: read }
 
 jobs:
@@ -18,21 +18,21 @@ jobs:
         with: { fetch-depth: 0 }
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with: { node-version: 24, cache: npm }
-      - name: Сборка «стало»
+      - name: Build "after"
         run: npm ci --no-audit --no-fund && npm run build
-      - name: Сборка «было»
+      - name: Build "before"
         env:
           BASE: ${{ inputs.base }}
         run: |
           git worktree add --detach ../before "$BASE"
           cd ../before && npm ci --no-audit --no-fund && npm run build
       - run: npx playwright install --with-deps chromium
-      # один и тот же набор снимает обе сборки: он ищет элементы по тому, что видит пользователь
-      - name: Снимки «было»
+      # one suite captures both builds: it finds elements by what the user sees
+      - name: Screenshots "before"
         run: DIST=../before/dist SHOTS_DIR=shots/before npx playwright test
-      - name: Снимки «стало»
+      - name: Screenshots "after"
         run: DIST=dist SHOTS_DIR=shots/after npx playwright test
-      - name: Сравнение
+      - name: Compare
         env:
           REPORT_ONLY: ${{ inputs.report_only }}
         run: |
