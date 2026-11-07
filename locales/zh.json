@@ -1357,9 +1357,7 @@
       "linked": "关联",
       "panel": "所选项的笔记",
       "showAll": "{count, plural, other {在表格中显示全部 # 条}}",
-      "minLinks": "{count, plural, other {显示至少 # 个关联}}",
-      "zoomIn": "放大",
-      "zoomOut": "缩小"
+      "minLinks": "{count, plural, other {显示至少 # 个关联}}"
     },
     "note": {
       "aria": "笔记",

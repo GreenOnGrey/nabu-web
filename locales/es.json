@@ -1357,9 +1357,7 @@
       "linked": "Vinculado con",
       "panel": "Notas de la selección",
       "showAll": "{count, plural, one {Mostrar # en la tabla} other {Mostrar los # en la tabla}}",
-      "minLinks": "{count, plural, one {Mostrar desde # vínculo} other {Mostrar desde # vínculos}}",
-      "zoomIn": "Acercar",
-      "zoomOut": "Alejar"
+      "minLinks": "{count, plural, one {Mostrar desde # vínculo} other {Mostrar desde # vínculos}}"
     },
     "note": {
       "aria": "Nota",

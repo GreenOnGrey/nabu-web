@@ -1357,9 +1357,7 @@
       "linked": "Linked with",
       "panel": "Notes of the selection",
       "showAll": "{count, plural, one {Show # in the table} other {Show all # in the table}}",
-      "minLinks": "{count, plural, one {Show from # link} other {Show from # links}}",
-      "zoomIn": "Zoom in",
-      "zoomOut": "Zoom out"
+      "minLinks": "{count, plural, one {Show from # link} other {Show from # links}}"
     },
     "note": {
       "aria": "Note",

@@ -39,7 +39,7 @@ src/app/          App (routes), Shell (navigation), ProfileMenu, session
 src/chat/         chat page: adapter.tsx (requests, events, API → the view types of the kit), ChatPage
                   (the layout around Chat and ConversationList of the kit), agent menu, tones, commitments
 src/pages/        Tasks, Memory, Space, Connections, Login; memory/ — the tabs of Memory (FTR.NAB.CMN-0003):
-                  Comm (table, note panel), Graph (d3-force), Commitments, MemoryTasks (cards, wizard);
+                  Comm (table, note panel, the graph — Graph of the kit), Commitments, MemoryTasks (cards, wizard);
                   admin/ — Administration (paths.ts):
                   Users (archive), Channels, GroupAgents, Settings, …
 src/lib/          sse, i18n, format, errors, llm
