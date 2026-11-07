@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -7,9 +7,8 @@ import { keys } from "../../api/queries";
 import type { CommGraph, CommNote, CommState, CommTag, List } from "../../api/types";
 import { errorText } from "../../lib/errors";
 import { intlLocale } from "../../lib/i18n";
-import { Empty, Icon, Modal, useToast } from "@green-on-grey/ui-kit";
+import { Empty, Graph, Icon, Modal, useToast, type GraphEdge, type GraphNode, type GraphSelection } from "@green-on-grey/ui-kit";
 import { CommitmentRow } from "./Commitments";
-import { Graph, type Picked } from "./Graph";
 import { TagChip, noteWhen, sourceIcon, sourceName, sourceTitle } from "./tags";
 
 export interface CommFilter {
@@ -42,7 +41,7 @@ export function CommTab({ state, filter, setFilter, view, setView, noteId, setNo
 }) {
   const { t, i18n } = useTranslation();
   const lng = intlLocale(i18n.language);
-  const [picked, setPicked] = useState<Picked>(null);
+  const [pick, setPicked] = useState<GraphSelection>(null);
   const [minLinks, setMinLinks] = useState(0);
   const key = JSON.stringify(filter);
   const notes = useQuery({
@@ -53,6 +52,8 @@ export function CommTab({ state, filter, setFilter, view, setView, noteId, setNo
     queryKey: keys.commGraph(`${key}:${minLinks}`), enabled: view === "graph",
     queryFn: () => api.get<CommGraph>(`/api/v1/comm/graph?minLinks=${minLinks}&${params(filter)}`),
   });
+  // a selection the new answer no longer holds (another filter or minLinks) is dropped
+  const picked = pick && graph.data && (pick.kind === "node" ? [pick.id] : [pick.source, pick.target]).every((id) => graph.data.nodes.some((n) => n.id === id)) ? pick : null;
   const pickTag = (tag: CommTag) => setFilter(tag.kind === "person" ? { person: tag.id } : { topic: tag.id });
   const active = [
     filter.person && people.find((p) => p.id === filter.person),
@@ -142,7 +143,7 @@ export function CommTab({ state, filter, setFilter, view, setView, noteId, setNo
             {graph.data && graph.data.nodes.length < 2 && (
               <Empty icon="graph" title={t("comm.graph.few")}><div style={{ marginTop: 10 }}><button className="btn sm" onClick={() => setView("table")}>{t("comm.view.table")}</button></div></Empty>
             )}
-            {graph.data && graph.data.nodes.length >= 2 && <Graph graph={graph.data} picked={picked} onPick={setPicked} />}
+            {graph.data && graph.data.nodes.length >= 2 && <PeopleGraph graph={graph.data} picked={picked} onPick={setPicked} />}
             <label className="gctl">
               {t("comm.graph.minLinks", { count: minLinks })}
               <input type="range" min={0} max={10} value={minLinks} onChange={(e) => setMinLinks(Number(e.target.value))} />
@@ -187,14 +188,25 @@ function CollectBanner({ state }: { state: CommState }) {
   return null;
 }
 
+/** The graph of people and topics (R19, design §3.5) on the graph of the kit: a node per
+ * tag sized by its notes, an edge per pair that meets in a note. */
+function PeopleGraph({ graph, picked, onPick }: { graph: CommGraph; picked: GraphSelection; onPick: (p: GraphSelection) => void }) {
+  const { t } = useTranslation();
+  const nodes = useMemo<GraphNode[]>(() => graph.nodes.map((n) => ({ id: n.id, label: n.label, group: n.kind === "person" ? 1 : 2, size: n.notes, hideLabel: n.notes < 5 })), [graph]);
+  const edges = useMemo<GraphEdge[]>(() => graph.edges.map((e) => ({ source: e.a, target: e.b, weight: e.notes })), [graph]);
+  return <Graph nodes={nodes} edges={edges} ariaLabel={t("comm.graph.aria")} selected={picked} onSelect={onPick}
+    legend={[{ group: 1, label: t("comm.people") }, { group: 2, label: t("comm.topics") }]}
+    nodeLabel={(n) => t("comm.graph.node", { label: n.label, count: n.size })} />;
+}
+
 /** The notes of a node or of an edge of the graph (design §3.5). */
 function PickedPanel({ picked, graph, filter, onClose, onNote, onAll }: {
-  picked: NonNullable<Picked>; graph: CommGraph; filter: CommFilter; onClose: () => void;
+  picked: NonNullable<GraphSelection>; graph: CommGraph; filter: CommFilter; onClose: () => void;
   onNote: (id: string) => void; onAll: (tags: CommTag[]) => void;
 }) {
   const { t, i18n } = useTranslation();
   const lng = intlLocale(i18n.language);
-  const ids = picked.kind === "node" ? [picked.id] : [picked.a, picked.b];
+  const ids = picked.kind === "node" ? [picked.id] : [picked.source, picked.target];
   const tags = ids.map((id) => graph.nodes.find((n) => n.id === id)).filter(Boolean) as CommGraph["nodes"];
   const extra: Record<string, string> = {};
   for (const n of tags) extra[n.kind] = n.id;

@@ -1357,9 +1357,7 @@
       "linked": "Verbunden mit",
       "panel": "Notizen der Auswahl",
       "showAll": "{count, plural, one {# in der Tabelle zeigen} other {Alle # in der Tabelle zeigen}}",
-      "minLinks": "{count, plural, one {Ab # Verbindung zeigen} other {Ab # Verbindungen zeigen}}",
-      "zoomIn": "Vergrößern",
-      "zoomOut": "Verkleinern"
+      "minLinks": "{count, plural, one {Ab # Verbindung zeigen} other {Ab # Verbindungen zeigen}}"
     },
     "note": {
       "aria": "Notiz",

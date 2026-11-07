@@ -4,6 +4,7 @@
 // The state of a request comes with its cookies, so screens are shot in parallel:
 //   mock-theme=light|dark   the theme of the profile
 //   mock-auth=0             a visitor: /api/v1/me answers 401 and the app shows sign-in
+//   mock-comm=1             the memory of communications is on, with people, topics and their graph
 import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
@@ -147,7 +148,19 @@ const userGroups = [
 ];
 const members = [{ id: "u1", email: "ada@example.com", name: "Ада Лавлейс" }, { id: "u2", email: "alan@example.com", name: "Алан Тьюринг" }];
 
-function api(url, theme) {
+// FTR.NAB.CMN-0003 R19: the memory of communications on, and the graph of its people and topics.
+const commOn = { ...commState, allowed: true, available: true, consentAt: T("09:00", "01"), collect: { ...commState.collect, status: "active" }, counts: { notes: 42, openCommitments: 3 } };
+const tag = (id, kind, label, notes, links) => ({ id, kind, label, notes, links });
+const commGraph = {
+  nodes: [tag("p1", "person", "Анна Петрова", 14, 4), tag("p2", "person", "Иван Соколов", 9, 3), tag("p3", "person", "Мария Ли", 3, 1),
+    tag("t1", "topic", "Релиз 2.4", 12, 3), tag("t2", "topic", "Бюджет", 6, 2), tag("t3", "topic", "Найм", 2, 1)],
+  edges: [{ a: "p1", b: "t1", notes: 6 }, { a: "p2", b: "t1", notes: 3 }, { a: "p1", b: "t2", notes: 2 }, { a: "p3", b: "t3", notes: 1 },
+    { a: "p2", b: "t2", notes: 1 }, { a: "p1", b: "p2", notes: 2 }],
+  totalNodes: 6,
+};
+const commTags = (kind) => ({ items: commGraph.nodes.filter((n) => n.kind === kind).map(({ id, kind: k, label, notes }) => ({ id, kind: k, label, notes })) });
+
+function api(url, theme, comm) {
   const p = url.pathname;
   if (p === "/api/v1/me") return me(theme);
   if (p === "/api/v1/config") return config;
@@ -163,7 +176,10 @@ function api(url, theme) {
   if (p === "/api/v1/space/files") return { items: files, nextCursor: null };
   if (p === "/api/v1/catalog") return { items: catalog };
   if (p === "/api/v1/channels") return { items: me().channels };
-  if (p === "/api/v1/comm/state") return commState;
+  if (p === "/api/v1/comm/state") return comm ? commOn : commState;
+  if (comm && p === "/api/v1/comm/people") return commTags("person");
+  if (comm && p === "/api/v1/comm/topics") return commTags("topic");
+  if (comm && p === "/api/v1/comm/graph") return commGraph;
   if (p === "/admin/api/v1/clients") return { items: clients };
   if (p === "/admin/api/v1/catalog") return { items: adminCatalog };
   if (p === "/admin/api/v1/groups") return { items: userGroups };
@@ -216,7 +232,7 @@ http.createServer((req, res) => {
     }
     if (url.pathname === "/api/v1/me" && cookie("mock-auth") === "0") { res.writeHead(401, { "content-type": "application/json" }); return res.end('{"error":{"code":"unauthenticated","message":"sign in"}}'); }
     res.writeHead(200, { "content-type": "application/json" });
-    return res.end(JSON.stringify(api(url, cookie("mock-theme"))));
+    return res.end(JSON.stringify(api(url, cookie("mock-theme"), cookie("mock-comm") === "1")));
   }
   let file = path.join(DIST, decodeURIComponent(url.pathname));
   if (!file.startsWith(DIST) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) file = path.join(DIST, "index.html");

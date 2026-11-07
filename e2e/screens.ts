@@ -8,6 +8,8 @@ export interface Screen {
   /** A visitor without a session: the sign-in screen. */
   visitor?: boolean;
   only?: "desktop" | "phone";
+  /** The memory of communications is on (mock-comm). */
+  comm?: boolean;
   /** What to do after the page has settled, before the shot. */
   act?: (page: Page) => Promise<void>;
 }
@@ -44,6 +46,12 @@ export const SCREENS: Screen[] = [
   { name: "admin-sections", path: "/admin/audit", only: "phone", act: click("Администрирование") },
   { name: "memory", path: "/memory" },
   { name: "memory-add", path: "/memory", act: async (page) => { await page.locator(".btn.primary.sm").first().click(); } },
+  // FTR.NAB.CMN-0003 R19: the graph of people and topics, at rest and with a pinned person
+  { name: "memory-graph", path: "/memory?tab=comm&view=graph", comm: true },
+  { name: "memory-graph-pinned", path: "/memory?tab=comm&view=graph", comm: true, act: async (page) => {
+    await page.getByRole("button", { name: /^Анна Петрова/ }).click();
+    await page.mouse.move(0, 0);
+  } },
   { name: "tasks", path: "/tasks" },
   { name: "space", path: "/space" },
   // FTR.NAB.CHAT-0001 R34: a file of the space opens in the preview
