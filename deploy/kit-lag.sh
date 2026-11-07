@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # FTR.NAB.CMN-0005 R26: at its release the product is at most one minor behind the
 # current @green-on-grey/ui-kit; a major behind is never allowed.
+# NAB-06 (FTR.NAB.CMN-0005 qa, R25): the version of the kit in package.json is exact, without ^ or ~.
 #   deploy/kit-lag.sh            compares the pinned version with the latest in the registry
 #   deploy/kit-lag.sh <latest>   the same against a given version (tests)
 set -euo pipefail
