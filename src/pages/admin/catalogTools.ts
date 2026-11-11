@@ -53,7 +53,7 @@ export function isFileArg(c: ToolChoice, tool: string, arg: string): boolean {
 
 const other = (tool: string, arg: string) => (f: FileArg) => !(f.tool === tool && f.arg === arg);
 
-/** Marks an argument as a file of the space; an argument is a file or a result path, not both (CHAT-0003 design §6). */
+/** Marks an argument as a file of the space; an argument is a file or a result path, not both (FTR.NAB.CHAT-0003 design §6). */
 export function toggleFileArg(c: ToolChoice, tool: string, arg: string, on: boolean): ToolChoice {
   const rest = c.fileArgs.filter(other(tool, arg));
   if (!on || !c.allowed.includes(tool) || isResultArg(c, tool, arg)) return { ...c, fileArgs: rest };
