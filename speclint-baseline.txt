@@ -1,0 +1,5 @@
+# Known errors of speclint (FTR.HMR.SPEC-0002); the file only shrinks.
+# UI-10 and UI-11 are test cases of FTR.NAB.CMN-0003, written outside Hammurapi: the index does not project
+# its test cases, so Hammurapi does not know them as cases of nabu-web.
+unknown-test-id src/pages/admin/catalogTools.test.ts UI-10
+unknown-test-id src/pages/admin/catalogTools.test.ts UI-11
