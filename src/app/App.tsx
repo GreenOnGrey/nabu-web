@@ -100,7 +100,15 @@ function Authenticated() {
         qc.invalidateQueries({ queryKey: keys.files });
       }),
       onEvent("conversation.unread", inv(["conversations"])),
-      onEvent("access.changed", inv(keys.channels)),
+      onEvent("access.changed", () => {
+        qc.invalidateQueries({ queryKey: keys.channels });
+        qc.invalidateQueries({ queryKey: ["admin", "catalog-usage"] });
+      }),
+      // FTR.NAB.CHAT-0005 R31: the report follows actions over the items of the catalog
+      onEvent("catalog.changed", () => {
+        qc.invalidateQueries({ queryKey: ["admin", "catalog"] });
+        qc.invalidateQueries({ queryKey: ["admin", "catalog-usage"] });
+      }),
       onEvent("connections.changed", () => {
         qc.invalidateQueries({ queryKey: keys.catalog });
         qc.invalidateQueries({ queryKey: keys.channels });

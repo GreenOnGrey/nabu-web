@@ -139,6 +139,54 @@ const adminCatalog = [
     newTools: ["get_page_thumbnail"] },
 ];
 
+// FTR.NAB.CHAT-0005 design §3.1–§3.8: the tab «Usage» of the catalog — the report,
+// the tiles, the candidates for review and the pins.
+const usageMeta = {
+  dataFrom: "2026-09-01", updatedAt: T("14:45"),
+  ready: { quick: true, hints: true, goal: false, observationDays: 40, observationLeft: 50 },
+  windows: { hintDays: 30, referenceDays: 90, goalDays: 90, drilldownDays: 31 },
+  thresholds: { unusedDays: 30, referenceDays: 90, pinDays: 90, singleUserMax: 1, errorsShare: 0.7, errorsMinCalls: 20,
+    authShare: 0.5, authMinCalls: 20, toolsCandidate: 10 },
+  goalMetric: { value: null, baseline: null, delta: null, verifiedManuallyAt: null },
+  windowClamped: false,
+};
+const usageRow = (over) => ({ itemId: "a1", itemName: "docling", itemType: "mcp", mode: "platform", published: true,
+  publishedAt: T("10:00", "01"), unpublishedAt: null, deletedAt: null, toolCount: 6, calls: 0, adminCalls: 0, serviceCalls: 0,
+  users: 0, sessions: 0, ok: 0, errorsByCode: {}, authCalls: 0, deniedCalls: 0, p50Ms: null, p95Ms: null, lastCallAt: null,
+  calls90: 0, availableDays: 30, hints: [], state: "active", confirmationsRejected: null,
+  groups: [{ groupId: "g-sales", groupName: "Продажи", builtin: null, calls: 0 }], ...over });
+const usageRows = [
+  usageRow({ hints: ["unused"], state: "unused" }),
+  usageRow({ itemId: "a2", itemName: "github", toolCount: 12, calls: 310, adminCalls: 12, serviceCalls: 40, users: 7,
+    sessions: 22, ok: 280, errorsByCode: { tool_error: 18, transport_error: 6, auth: 4, denied: 2 }, authCalls: 4, deniedCalls: 2,
+    p50Ms: 420, p95Ms: 2600, lastCallAt: T("11:00", "02"), calls90: 940 }),
+  usageRow({ itemId: "a3", itemName: "figma", mode: "personal", calls: 54, adminCalls: 2, users: 3, sessions: 9, ok: 20,
+    errorsByCode: { tool_error: 31, transport_error: 3 }, authCalls: 2, p50Ms: 1200, p95Ms: 8400, lastCallAt: T("16:20", "02"),
+    calls90: 120, hints: ["errors_only"], state: "errors_only" }),
+  usageRow({ itemId: "a4", itemName: "confluence", toolCount: 8, calls: 0, calls90: 21, availableDays: 30,
+    hints: ["unused", "dormant"], state: "dormant", lastCallAt: T("10:00", "01") }),
+  usageRow({ itemId: "a5", itemName: "go-service-conventions", itemType: "skill", mode: null, toolCount: null, calls: 5,
+    users: 2, sessions: 3, ok: 5, calls90: 5, lastCallAt: T("14:40", "05"), groups: [] }),
+  usageRow({ itemId: "00000000-0000-0000-0000-000000000000", itemName: "postgres-legacy", itemType: "unknown", mode: null,
+    published: false, toolCount: null, calls: 38, users: 3, sessions: 4, ok: 28, errorsByCode: { transport_error: 10 },
+    p50Ms: 2100, p95Ms: 9800, lastCallAt: T("03:10", "06"), calls90: 38, hints: [], state: "active", groups: [] }),
+];
+const usageTiles = {
+  deadShare: { value: null, dead: 6, total: 40, baseline: null, delta: null, verifiedManuallyAt: null, droppedOut: null },
+  publishedToolCount: { value: 168, trend: [{ day: "2026-09-01", value: 180 }, { day: "2026-10-01", value: 168 }] },
+  platformSuccess: { value: 0.91, denied: 34, auth: 120, trend: [{ day: "2026-09-01", value: 0.88 }, { day: "2026-10-01", value: 0.91 }] },
+  resolvedCandidates: { value: 0.33, resolved: 4, candidates: 12, target: 0.3, note: "not_goal" },
+  topCalls: [{ itemId: "a2", itemName: "github", calls: 310 }, { itemId: "a3", itemName: "figma", calls: 54 }],
+  topErrors: [{ itemId: "a3", itemName: "figma", code: "tool_error", calls: 31 }, { itemId: "a2", itemName: "github", code: "tool_error", calls: 18 }],
+  unusedCount: 9, pinnedUnused: 2,
+};
+const usageCandidates = [
+  { itemId: "a3", itemName: "figma", itemType: "mcp", reasons: ["many_auth", "tools_overlap"], lastOkAt: null, calls: 54, authShare: 0.6, tools: 6 },
+  { itemId: "a1", itemName: "docling", itemType: "mcp", reasons: ["not_granted", "tools_many"], lastOkAt: T("11:42"), calls: 0, authShare: null, tools: 14 },
+  { itemId: "a6", itemName: "kubernetes", itemType: "mcp", reasons: ["unavailable"], lastOkAt: T("10:00", "14"), calls: 3, authShare: null, tools: 8 },
+];
+const usagePins = { items: [], nextCursor: null };
+
 // FTR.NAB.CMN-0007 design §3.1–3.2: the built-in groups and an ordinary one with its members.
 const grants = { models: [{ connectionId: "c1", model: "sonnet" }], defaultModel: { connectionId: "c1", model: "sonnet" }, channels: ["telegram"], catalogItems: ["a1"] };
 const userGroups = [
@@ -182,6 +230,11 @@ function api(url, theme, comm) {
   if (comm && p === "/api/v1/comm/graph") return commGraph;
   if (p === "/admin/api/v1/clients") return { items: clients };
   if (p === "/admin/api/v1/catalog") return { items: adminCatalog };
+  // FTR.NAB.CHAT-0005: the report of the tab «Usage»
+  if (p === "/admin/api/v1/catalog/usage") return { items: usageRows, nextCursor: null, meta: usageMeta };
+  if (p === "/admin/api/v1/catalog/usage/summary") return { tiles: usageTiles, meta: usageMeta };
+  if (p === "/admin/api/v1/catalog/usage/candidates") return { items: usageCandidates, nextCursor: null, meta: usageMeta };
+  if (p === "/admin/api/v1/catalog/usage/pins") return usagePins;
   if (p === "/admin/api/v1/groups") return { items: userGroups };
   if (/^\/admin\/api\/v1\/groups\/[^/]+\/members$/.test(p)) return { items: members, nextCursor: null };
   if (p === "/admin/api/v1/harnesses") return { items: [{ name: "pi", version: "1.3.0", status: "ok" }] };

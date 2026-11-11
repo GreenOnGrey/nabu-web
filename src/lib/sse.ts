@@ -15,6 +15,8 @@ export const EVENT_TYPES = [
   "agent.state",
   // FTR.NAB.CMN-0003 tech §3.5: the memory of communications
   "comm.changed", "commitments.changed", "comm.collect",
+  // FTR.NAB.CHAT-0005 tech §«Событие в админке»: a withdrawal, a publication or a grant revocation
+  "catalog.changed",
 ] as const;
 export type EventType = (typeof EVENT_TYPES)[number];
 

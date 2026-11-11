@@ -85,6 +85,8 @@ export const SCREENS: Screen[] = [
     await page.getByRole("button", { name: /^Аргументы/ }).first().click();
   } },
   { name: "admin-catalog-new", path: "/admin/catalog", act: click("Добавить MCP") },
+  // FTR.NAB.CHAT-0005 design §3.1: the tab «Usage» of the catalog
+  { name: "admin-catalog-usage", path: "/admin/catalog", act: click("Использование") },
   // FTR.NAB.CMN-0007 design §3.2: the card of an ordinary group
   { name: "admin-groups-card", path: "/admin/groups", act: async (page) => { await page.getByText("Продажи", { exact: true }).click(); } },
 ];
