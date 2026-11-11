@@ -113,7 +113,7 @@ const users = [{ id: "u1", email: "ada@example.com", name: "Ада Лавлей�
   { id: "u3", email: "grace@example.com", name: "Грейс Хоппер", isAdmin: false, status: "blocked", lastSeenAt: T("10:00", "04"), createdAt: T("09:00", "02"), channels: [] }];
 const commState = { allowed: false, available: false, consentAt: null, retentionDays: 90, semantic: false, sources: [], collect: { status: "off", pauseKind: null, nextRunAt: null, backfill: null, budgetUsedPct: 0 }, counts: { notes: 0, openCommitments: 0 } };
 
-// A service client with an address: the edit and the delete dialogs open from its card (SVC-10, SVC-11).
+// A service client with an address: the edit and the delete dialogs open from its card (FTR.NAB.CMN-0001 SVC-10, SVC-11).
 const clients = [
   { id: "c1", name: "billing", url: "https://billing.example.org", clientId: "billing", agents: [], canDelegate: true, canImport: false,
     canArchive: false, canRestore: false, enabled: true, prevSecretExpiresAt: null, createdAt: "2026-01-12T09:00:00Z" },
