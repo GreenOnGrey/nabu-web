@@ -141,6 +141,10 @@ const adminCatalog = [
 
 // FTR.NAB.CHAT-0005 design §3.1–§3.8: the tab «Usage» of the catalog — the report,
 // the tiles, the candidates for review and the pins.
+// The fixture is one answer of the server, not a bag of pretty numbers: the tiles are derived
+// from the rows below (R16) and no row or candidate encodes a state the rules forbid
+// (R8, R10, R11, R13, R15, R20). `assertUsageFixture` keeps both promises when the mock
+// starts: a shot of the tab on a mock that contradicts itself proves nothing.
 const usageMeta = {
   dataFrom: "2026-09-01", updatedAt: T("14:45"),
   ready: { quick: true, hints: true, goal: false, observationDays: 40, observationLeft: 50 },
@@ -150,42 +154,170 @@ const usageMeta = {
   goalMetric: { value: null, baseline: null, delta: null, verifiedManuallyAt: null },
   windowClamped: false,
 };
+// The tab opens on the last 30 days (R2) and the first day of data is the first of September
+// (R6): an item published then is available in every day of that period, is older than the
+// 30-day hint window (R8) and is not «young» (R13). A date inside the period would leave
+// `availableDays` below the window and forbid the very hint the row carries.
+const PERIOD_DAYS = 30;
 const usageRow = (over) => ({ itemId: "a1", itemName: "docling", itemType: "mcp", mode: "platform", published: true,
-  publishedAt: T("10:00", "01"), unpublishedAt: null, deletedAt: null, toolCount: 6, calls: 0, adminCalls: 0, serviceCalls: 0,
+  publishedAt: "2026-09-01T10:00:00Z", unpublishedAt: null, deletedAt: null, toolCount: 3, calls: 0, adminCalls: 0, serviceCalls: 0,
   users: 0, sessions: 0, ok: 0, errorsByCode: {}, authCalls: 0, deniedCalls: 0, p50Ms: null, p95Ms: null, lastCallAt: null,
-  calls90: 0, availableDays: 30, hints: [], state: "active", confirmationsRejected: null,
+  calls90: 0, availableDays: PERIOD_DAYS, hints: [], state: "active", confirmationsRejected: null,
   groups: [{ groupId: "g-sales", groupName: "Продажи", builtin: null, calls: 0 }], ...over });
 const usageRows = [
+  // R8: an explicit grant and 0 calls over 30 available days
   usageRow({ hints: ["unused"], state: "unused" }),
   usageRow({ itemId: "a2", itemName: "github", toolCount: 12, calls: 310, adminCalls: 12, serviceCalls: 40, users: 7,
-    sessions: 22, ok: 280, errorsByCode: { tool_error: 18, transport_error: 6, auth: 4, denied: 2 }, authCalls: 4, deniedCalls: 2,
+    sessions: 22, ok: 302, errorsByCode: { tool_error: 4, transport_error: 2, denied: 2 }, authCalls: 0, deniedCalls: 2,
     p50Ms: 420, p95Ms: 2600, lastCallAt: T("11:00", "02"), calls90: 940 }),
-  usageRow({ itemId: "a3", itemName: "figma", mode: "personal", calls: 54, adminCalls: 2, users: 3, sessions: 9, ok: 20,
-    errorsByCode: { tool_error: 31, transport_error: 3 }, authCalls: 2, p50Ms: 1200, p95Ms: 8400, lastCallAt: T("16:20", "02"),
-    calls90: 120, hints: ["errors_only"], state: "errors_only" }),
-  usageRow({ itemId: "a4", itemName: "confluence", toolCount: 8, calls: 0, calls90: 21, availableDays: 30,
-    hints: ["unused", "dormant"], state: "dormant", lastCallAt: T("10:00", "01") }),
+  // R9, R10: 36 of 60 calls ended with an auth error — «many auth» without «only errors»:
+  // auth stays out of the denominator of the success share, the remaining 14 of 24 are below 70 %
+  usageRow({ itemId: "a3", itemName: "figma", mode: "personal", toolCount: 6, calls: 60, adminCalls: 2, users: 3, sessions: 9, ok: 14,
+    errorsByCode: { tool_error: 8, transport_error: 2, auth: 36 }, authCalls: 36, p50Ms: 1200, p95Ms: 8400,
+    lastCallAt: T("16:20", "02"), calls90: 120, hints: ["errors_only"], state: "errors_only" }),
+  // R11: no calls in the 30-day window, but calls in the 90-day reference
+  usageRow({ itemId: "a4", itemName: "confluence", toolCount: 8, calls: 0, calls90: 21,
+    lastCallAt: "2026-09-05T10:00:00Z", hints: ["unused", "dormant"], state: "dormant" }),
+  // R24: a skill counts explicit activations and sessions and never gets «unused»
   usageRow({ itemId: "a5", itemName: "go-service-conventions", itemType: "skill", mode: null, toolCount: null, calls: 5,
     users: 2, sessions: 3, ok: 5, calls90: 5, lastCallAt: T("14:40", "05"), groups: [] }),
+  // R15: a failed check means «unavailable» and no hint; the last successful one was two days ago
+  usageRow({ itemId: "a6", itemName: "kubernetes", toolCount: 8, calls: 3, users: 1, sessions: 1, ok: 1,
+    errorsByCode: { tool_error: 2 }, p50Ms: 900, p95Ms: 3000, lastCallAt: T("10:00", "09"), calls90: 3,
+    state: "unavailable", groups: [{ groupId: "g-sales", groupName: "Продажи", builtin: null, calls: 3 }] }),
+  // R23: calls of a server that is not in the catalog — no groups, no publication, outside the tops
   usageRow({ itemId: "00000000-0000-0000-0000-000000000000", itemName: "postgres-legacy", itemType: "unknown", mode: null,
-    published: false, toolCount: null, calls: 38, users: 3, sessions: 4, ok: 28, errorsByCode: { transport_error: 10 },
-    p50Ms: 2100, p95Ms: 9800, lastCallAt: T("03:10", "06"), calls90: 38, hints: [], state: "active", groups: [] }),
+    published: false, publishedAt: null, toolCount: null, calls: 20, users: 3, sessions: 4, ok: 2,
+    errorsByCode: { transport_error: 18 }, p50Ms: 2100, p95Ms: 9800, lastCallAt: T("03:10", "06"), calls90: 20,
+    availableDays: 0, hints: [], state: "active", groups: [] }),
 ];
 const usageTiles = {
-  deadShare: { value: null, dead: 6, total: 40, baseline: null, delta: null, verifiedManuallyAt: null, droppedOut: null },
-  publishedToolCount: { value: 168, trend: [{ day: "2026-09-01", value: 180 }, { day: "2026-10-01", value: 168 }] },
-  platformSuccess: { value: 0.91, denied: 34, auth: 120, trend: [{ day: "2026-09-01", value: 0.88 }, { day: "2026-10-01", value: 0.91 }] },
-  resolvedCandidates: { value: 0.33, resolved: 4, candidates: 12, target: 0.3, note: "not_goal" },
-  topCalls: [{ itemId: "a2", itemName: "github", calls: 310 }, { itemId: "a3", itemName: "figma", calls: 54 }],
-  topErrors: [{ itemId: "a3", itemName: "figma", code: "tool_error", calls: 31 }, { itemId: "a2", itemName: "github", code: "tool_error", calls: 18 }],
-  unusedCount: 9, pinnedUnused: 2,
+  // R14: the goal needs 90 days of data — until then the tile is a progress of the observation
+  deadShare: { value: null, dead: null, total: null, baseline: null, delta: null, verifiedManuallyAt: null, droppedOut: null },
+  // R17: the tools of the published positions — docling has three allowed tools in the catalog
+  publishedToolCount: { value: 37, trend: [{ day: "2026-09-01", value: 37 }, { day: "2026-10-01", value: 37 }] },
+  // R16: sum(ok) / (sum(calls) − sum(authCalls) − sum(deniedCalls)) over the rows above,
+  // «outside the catalog» included: 324 / (398 − 36 − 2)
+  platformSuccess: { value: 0.9, denied: 2, auth: 36, trend: [{ day: "2026-09-01", value: 0.88 }, { day: "2026-10-01", value: 0.9 }] },
+  resolvedCandidates: { value: 0.33, resolved: 1, candidates: 3, target: 0.3, note: "not_goal" },
+  topCalls: [{ itemId: "a2", itemName: "github", calls: 310 }, { itemId: "a3", itemName: "figma", calls: 60 }],
+  topErrors: [{ itemId: "a3", itemName: "figma", code: "tool_error", calls: 8 }, { itemId: "a2", itemName: "github", code: "tool_error", calls: 4 }],
+  unusedCount: 2, pinnedUnused: 0,
 };
 const usageCandidates = [
-  { itemId: "a3", itemName: "figma", itemType: "mcp", reasons: ["many_auth", "tools_overlap"], lastOkAt: null, calls: 54, authShare: 0.6, tools: 6 },
-  { itemId: "a1", itemName: "docling", itemType: "mcp", reasons: ["not_granted", "tools_many"], lastOkAt: T("11:42"), calls: 0, authShare: null, tools: 14 },
-  { itemId: "a6", itemName: "kubernetes", itemType: "mcp", reasons: ["unavailable"], lastOkAt: T("10:00", "14"), calls: 3, authShare: null, tools: 8 },
+  // R10: 36 auth calls of 60 — the share and the minimum of calls are both met
+  { itemId: "a3", itemName: "figma", itemType: "mcp", reasons: ["many_auth", "tools_overlap"], lastOkAt: null, calls: 60, authShare: 0.6, tools: 6 },
+  // R20: 12 tools of the position is over the threshold of 10
+  { itemId: "a2", itemName: "github", itemType: "mcp", reasons: ["tools_many", "tools_overlap"], lastOkAt: null, calls: 310, authShare: 0, tools: 12 },
+  // R15: the date of the last successful check, never later than the report itself
+  { itemId: "a6", itemName: "kubernetes", itemType: "mcp", reasons: ["unavailable"], lastOkAt: T("10:00", "09"), calls: 3, authShare: null, tools: 8 },
 ];
 const usagePins = { items: [], nextCursor: null };
+
+// ─── the rules the fixture may not break (R8, R10, R11, R13, R15, R16, R20) ───
+/** The seven reasons of «candidates for review» (R20, design §3.2). */
+const CANDIDATE_REASONS = ["not_granted", "tools_overlap", "tools_many", "new_position", "service_only", "many_auth", "unavailable"];
+/** The states that are also a hint of the table (R8–R11). */
+const HINT_STATES = ["unused", "dormant", "single_user", "errors_only"];
+
+function assertUsageFixture() {
+  const fail = (what) => { throw new Error(`e2e/mock.mjs: ${what}`); };
+  const at = (iso) => Date.parse(iso);
+  const meta = usageMeta;
+  const t = meta.thresholds;
+  const updated = at(meta.updatedAt);
+  const sum = (list, f) => list.reduce((n, x) => n + f(x), 0);
+  const outside = (r) => r.itemType === "unknown";
+  const items = usageRows.filter((r) => !outside(r));
+
+  // R16: the tile is exactly the formula of the tech spec over the rows, «outside the catalog» included
+  const calls = sum(usageRows, (r) => r.calls);
+  const auth = sum(usageRows, (r) => r.authCalls);
+  const denied = sum(usageRows, (r) => r.deniedCalls);
+  const share = Math.round((sum(usageRows, (r) => r.ok) / (calls - auth - denied)) * 1000) / 1000;
+  if (usageTiles.platformSuccess.value !== share) fail(`platformSuccess.value ${usageTiles.platformSuccess.value} is not ${share} (R16)`);
+  if (usageTiles.platformSuccess.auth !== auth || usageTiles.platformSuccess.denied !== denied) fail("platformSuccess.auth/denied differ from the rows (R16)");
+
+  for (const r of usageRows) {
+    const errors = sum(Object.values(r.errorsByCode), (n) => n);
+    if (r.ok + errors !== r.calls) fail(`${r.itemName}: ok + errorsByCode is not calls (${r.ok} + ${errors} ≠ ${r.calls})`);
+    if ((r.errorsByCode.auth ?? 0) !== r.authCalls) fail(`${r.itemName}: authCalls is not errorsByCode.auth`);
+    if ((r.errorsByCode.denied ?? 0) !== r.deniedCalls) fail(`${r.itemName}: deniedCalls is not errorsByCode.denied`);
+    if (r.adminCalls > r.calls || r.serviceCalls > r.calls) fail(`${r.itemName}: adminCalls/serviceCalls exceed calls`);
+    if (r.calls90 < r.calls) fail(`${r.itemName}: calls90 is below calls`);
+    // R17: «tools of the position» is the list of the allowed tools the catalog holds
+    const item = adminCatalog.find((i) => i.id === r.itemId);
+    if (item && r.toolCount !== (item.allowedTools?.length ?? 0)) fail(`${r.itemName}: toolCount ${r.toolCount} differs from the allowed tools of the catalog (${item.allowedTools?.length ?? 0})`);
+    for (const iso of [r.publishedAt, r.unpublishedAt, r.lastCallAt]) {
+      if (iso !== null && at(iso) > updated) fail(`${r.itemName}: ${iso} is later than meta.updatedAt (R13, R15)`);
+    }
+    // R13: the available days come from the publication intervals; the tab shows 30 of them at most
+    if (r.availableDays > PERIOD_DAYS) fail(`${r.itemName}: availableDays ${r.availableDays} exceeds the period of the tab`);
+    if (!r.published && (r.availableDays !== 0 || r.publishedAt !== null)) fail(`${r.itemName}: an unpublished item has available days (R13)`);
+    // R8, R13: «unused» needs 0 calls and the whole hint window of availability; «young» forbids it
+    const ageDays = r.publishedAt === null ? 0 : Math.floor((updated - at(r.publishedAt)) / 86_400_000);
+    if (r.hints.includes("unused")) {
+      if (r.itemType === "skill") fail(`${r.itemName}: a skill never gets «unused» (R24)`);
+      if (r.state === "unavailable") fail(`${r.itemName}: an unavailable item never gets «unused» (R15)`);
+      if (r.calls !== 0 || r.adminCalls !== 0) fail(`${r.itemName}: «unused» with calls (R8)`);
+      if (ageDays < t.unusedDays || r.availableDays < t.unusedDays) fail(`${r.itemName}: «unused» before the hint window is filled (R8, R13)`);
+    }
+    if (HINT_STATES.includes(r.state) && !r.hints.includes(r.state)) fail(`${r.itemName}: the state ${r.state} without its hint`);
+    // R11: «затихла» — no calls in the hint window, at least one in the reference window
+    if (r.state === "dormant" && !(r.calls === 0 && r.calls90 > 0)) fail(`${r.itemName}: «dormant» contradicts the calls (R11)`);
+    // R9: «только ошибки» — the success share below the threshold at enough actual calls
+    if (r.state === "errors_only") {
+      const actual = r.calls - r.authCalls - r.deniedCalls;
+      if (!(r.ok / actual < t.errorsShare && actual >= t.errorsMinCalls)) fail(`${r.itemName}: «errors_only» contradicts the thresholds (R9)`);
+    }
+    if (r.state === "unavailable" && r.hints.length > 0) fail(`${r.itemName}: an unavailable item carries hints (R15)`);
+  }
+
+  // R20, R10, R15: every reason of a candidate follows from its row and the thresholds
+  for (const c of usageCandidates) {
+    const row = usageRows.find((r) => r.itemId === c.itemId);
+    if (!row) fail(`candidate ${c.itemName} is not among the rows of the report`);
+    if (c.calls !== row.calls) fail(`candidate ${c.itemName}: calls ${c.calls} differ from the row (${row.calls})`);
+    if (c.tools !== row.toolCount) fail(`candidate ${c.itemName}: tools ${c.tools} differ from the toolCount of the row (${row.toolCount})`);
+    // a static reason is not a hint: an item of the panel never says «unused» in the table (R20, CST-02)
+    if (row.hints.includes("unused")) fail(`candidate ${c.itemName}: an item of the panel carries the hint «unused» (R20)`);
+    if (c.lastOkAt !== null && at(c.lastOkAt) > updated) fail(`candidate ${c.itemName}: lastOkAt is later than meta.updatedAt (R15)`);
+    for (const reason of c.reasons) {
+      if (!CANDIDATE_REASONS.includes(reason)) fail(`candidate ${c.itemName}: unknown reason ${reason}`);
+      if (reason === "not_granted" && row.groups.length > 0) fail(`candidate ${c.itemName}: «not_granted» of an item with a granted group (R20)`);
+      if (reason === "tools_many" && !(c.tools !== null && c.tools >= t.toolsCandidate)) fail(`candidate ${c.itemName}: «tools_many» below ${t.toolsCandidate} (R20)`);
+      if (reason === "unavailable" && row.state !== "unavailable") fail(`candidate ${c.itemName}: «unavailable» of an available item (R15)`);
+      if (reason === "many_auth" && !(c.authShare !== null && c.authShare >= t.authShare && c.calls >= t.authMinCalls)) fail(`candidate ${c.itemName}: «many_auth» below the thresholds (R10)`);
+    }
+    if (c.authShare !== null && row.calls > 0 && c.authShare !== row.authCalls / row.calls) fail(`candidate ${c.itemName}: authShare ${c.authShare} differs from the row (${row.authCalls / row.calls})`);
+  }
+  if (usageTiles.resolvedCandidates.candidates !== usageCandidates.length) fail("resolvedCandidates.candidates differ from the panel (R16)");
+  if (usageTiles.resolvedCandidates.value !== Math.round((usageTiles.resolvedCandidates.resolved / usageCandidates.length) * 100) / 100) fail("resolvedCandidates.value is not resolved/candidates (R16)");
+
+  // R16: the other tiles count the same rows; out-of-catalog rows stay outside the tops (R23)
+  if (usageTiles.unusedCount !== usageRows.filter((r) => r.hints.includes("unused")).length) fail("unusedCount differs from the rows with the hint");
+  if (usageTiles.pinnedUnused !== usagePins.items.filter((p) => p.effective).length) fail("pinnedUnused differs from the effective pins");
+  if (usageTiles.publishedToolCount.value !== sum(items.filter((r) => r.published && r.itemType === "mcp"), (r) => r.toolCount ?? 0)) fail("publishedToolCount differs from the tools of the published items");
+  const topCalls = [...items].filter((r) => r.calls > 0).sort((a, b) => b.calls - a.calls).slice(0, usageTiles.topCalls.length);
+  const key = (x) => `${x.itemId}:${x.calls}`;
+  if (usageTiles.topCalls.map(key).join() !== topCalls.map(key).join()) fail(`topCalls ${usageTiles.topCalls.map(key)} differ from the rows ${topCalls.map(key)}`);
+  const codes = items
+    .flatMap((r) => Object.entries(r.errorsByCode)
+      .filter(([code, n]) => code !== "auth" && code !== "denied" && n > 0)
+      .map(([code, n]) => ({ itemId: r.itemId, code, calls: n })))
+    .sort((a, b) => b.calls - a.calls).slice(0, usageTiles.topErrors.length);
+  const codeKey = (x) => `${x.itemId}:${x.code}:${x.calls}`;
+  if (usageTiles.topErrors.map(codeKey).join() !== codes.map(codeKey).join()) fail(`topErrors ${usageTiles.topErrors.map(codeKey)} differ from the rows ${codes.map(codeKey)}`);
+  if (!meta.ready.goal && (usageTiles.deadShare.value !== null || usageTiles.deadShare.dead !== null)) fail("deadShare before the goal window is filled (R6, R14)");
+
+  // R6, R7: the readiness of the meta follows the observation and the windows
+  const observed = Math.floor((updated - at(`${meta.dataFrom}T00:00:00Z`)) / 86_400_000);
+  if (meta.ready.observationDays !== observed) fail(`observationDays ${meta.ready.observationDays} differ from ${observed}`);
+  if (meta.ready.observationLeft !== meta.windows.goalDays - observed) fail("observationLeft is not the rest of the goal window");
+  if (meta.ready.hints !== (observed >= t.unusedDays)) fail("ready.hints contradicts the hint window (R6)");
+  if (meta.ready.goal !== (observed >= meta.windows.goalDays)) fail("ready.goal contradicts the goal window (R6)");
+}
+assertUsageFixture();
 
 // FTR.NAB.CMN-0007 design §3.1–3.2: the built-in groups and an ordinary one with its members.
 const grants = { models: [{ connectionId: "c1", model: "sonnet" }], defaultModel: { connectionId: "c1", model: "sonnet" }, channels: ["telegram"], catalogItems: ["a1"] };
