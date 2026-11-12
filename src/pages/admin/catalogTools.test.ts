@@ -50,7 +50,7 @@ describe("FTR.NAB.CMN-0006 tools of an item", () => {
 });
 
 describe("FTR.NAB.CHAT-0003 result paths", () => {
-  it("UI-10: an argument is a space file or a result path, not both", () => {
+  it("UI-03: an argument is a space file or a result path, not both", () => {
     let c = toggleTool(none, "convert", true);
     c = toggleFileArg(c, "convert", "source", true);
     expect(toggleResultArg(c, "convert", "source", true).resultArgs).toEqual([]);
@@ -58,7 +58,7 @@ describe("FTR.NAB.CHAT-0003 result paths", () => {
     expect(c.resultArgs).toEqual([{ tool: "convert", arg: "dest" }]);
     expect(toggleFileArg(c, "convert", "dest", true).fileArgs).toEqual([{ tool: "convert", arg: "source" }]);
   });
-  it("UI-11: «writes only to the space» needs a result path and goes with the last one", () => {
+  it("UI-04: «writes only to the space» needs a result path and goes with the last one", () => {
     let c = toggleTool(none, "convert", true);
     expect(toggleSpaceOnly(c, "convert", true).spaceOnly).toEqual([]);
     c = toggleSpaceOnly(toggleResultArg(c, "convert", "dest", true), "convert", true);
