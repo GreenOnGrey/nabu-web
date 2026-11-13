@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -169,7 +169,64 @@ function CollectSettingsForm({ state, value, disabled, onChange }: {
       <div className="kvrow"><span className="muted">{t("comm.tasks.hours")}</span>
         <Switch on={value.roundTheClock} disabled={disabled} onChange={(on) => onChange({ roundTheClock: on })} label={t("comm.tasks.roundTheClock")} /></div>
       <Exclusions value={value.exclusions} disabled={disabled} onChange={(exclusions) => onChange({ exclusions })} />
+      {/* one list of returned groups: a chat of VK Teams is the same whatever item reads it */}
+      {value.sources.find((s) => s.source === "vkteams") && (
+        <MutedGroups itemId={value.sources.find((s) => s.source === "vkteams")!.itemId} value={value.includeMuted ?? []} disabled={disabled}
+          onChange={(includeMuted) => onChange({ includeMuted })} />
+      )}
     </>
+  );
+}
+
+/** The muted groups of VK Teams returned to the collection (FTR.NAB.ADM-0001
+ * R8, design §3.2): muted groups are skipped unless the user returns them. */
+function MutedGroups({ itemId, value, disabled, onChange }: { itemId: string; value: string[]; disabled: boolean; onChange: (v: string[]) => void }) {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  const [text, setText] = useState("");
+  const [q, setQ] = useState("");
+  const [names, setNames] = useState<Record<string, string>>({});
+  // every search is a call to the source: it waits for a pause in typing
+  useEffect(() => {
+    const id = setTimeout(() => setQ(text.trim()), 400);
+    return () => clearTimeout(id);
+  }, [text]);
+  const found = useQuery({
+    queryKey: ["comm", "muted-groups", itemId, q],
+    queryFn: () => api.get<{ items: { chatSn: string; name: string }[] }>(`/api/v1/comm/sources/${itemId}/muted-groups?q=${encodeURIComponent(q)}`),
+    enabled: open || value.length > 0, // the names of the returned groups come from the same list
+    placeholderData: (prev) => prev,
+    staleTime: 60_000,
+  });
+  const nameOf = (sn: string) => names[sn] ?? found.data?.items.find((g) => g.chatSn === sn)?.name ?? sn;
+  return (
+    <div className="kvrow top"><span className="muted">{t("comm.tasks.muted.title")}</span>
+      <span className="stack">
+        {value.length > 0 && <span className="small muted">{t("comm.tasks.muted.included")}</span>}
+        <span className="chips">
+          {value.map((sn) => (
+            <span className="chip" key={sn}>{nameOf(sn)}
+              <button type="button" className="tg-x" disabled={disabled} aria-label={t("common.remove")} onClick={() => onChange(value.filter((x) => x !== sn))}><Icon name="x" size={11} /></button>
+            </span>
+          ))}
+        </span>
+        {open ? (
+          <>
+            <input className="inp" value={text} maxLength={100} onChange={(e) => setText(e.target.value)} placeholder={t("comm.tasks.muted.search")} aria-label={t("comm.tasks.muted.search")} />
+            {found.isError ? <span className="small err-t">{t("comm.tasks.muted.error")} <Link to="/connections">{t("nav.connections")}</Link></span>
+              : found.isLoading ? <span className="small muted">…</span>
+              : (found.data?.items ?? []).filter((g) => !value.includes(g.chatSn)).length === 0 ? <span className="small muted">{t("comm.tasks.muted.none")}</span>
+              : <span className="chips">
+                  {(found.data?.items ?? []).filter((g) => !value.includes(g.chatSn)).map((g) => (
+                    <button type="button" key={g.chatSn} className="chip" disabled={disabled}
+                      onClick={() => { setNames({ ...names, [g.chatSn]: g.name }); onChange([...value, g.chatSn]); }}><Icon name="plus" size={11} />{g.name}</button>
+                  ))}
+                </span>}
+          </>
+        ) : (
+          <button type="button" className="btn ghost sm" disabled={disabled} onClick={() => setOpen(true)}>{t("comm.tasks.muted.add")}</button>
+        )}
+      </span></div>
   );
 }
 

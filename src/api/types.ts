@@ -328,6 +328,8 @@ export interface CollectSettings {
   interval: "15m" | "1h" | "4h" | "1d";
   roundTheClock: boolean;
   exclusions: { senders: string[]; folders: string[]; chats: string[] };
+  /** FTR.NAB.ADM-0001 R8: the muted groups of VK Teams collected all the same. */
+  includeMuted?: string[];
 }
 
 export interface DigestSettings {
@@ -661,7 +663,9 @@ export interface AdminCatalogItem {
   description: string;
   source: { kind: string; url?: string; repo?: string; path?: string; ref?: string };
   mode: "personal" | "platform" | null;
-  personalAuth: { kind: string; authorizeUrl?: string; tokenUrl?: string; clientId?: string; scopes?: string[]; audience?: string; hasSecret?: boolean } | null;
+  personalAuth: { kind: string; authorizeUrl?: string; tokenUrl?: string; clientId?: string; scopes?: string[]; audience?: string; hasSecret?: boolean;
+    /** FTR.NAB.ADM-0001 tech §3.1: what the discovery of OAuth MCP found, and why it failed. */
+    issuer?: string; resource?: string; registeredAt?: string; error?: { code: string; detail: string } } | null;
   platformAuth: Record<string, string>;
   readOnly: boolean;
   exposure: string;

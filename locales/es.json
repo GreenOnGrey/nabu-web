@@ -192,7 +192,10 @@
       "collected": "Mensajes: {messages}, notas nuevas: {notes}",
       "items": "{count, plural, one {# punto} other {# puntos}}",
       "nothing": "Nada que recordar",
-      "nothingNew": "Nada nuevo"
+      "nothingNew": "Nada nuevo",
+      "truncated": "No leído por el volumen: {chats}",
+      "truncatedChat": "{chat}: leídos los últimos {count}",
+      "rateLimited": "La fuente limita la frecuencia de solicitudes: la próxima ejecución repetirá la recopilación"
     }
   },
   "memory": {
@@ -493,7 +496,8 @@
       "auth": {
         "oauth": "OAuth",
         "token": "Token personal",
-        "delegation": "Delegación"
+        "delegation": "Delegación",
+        "mcp_oauth": "OAuth MCP (automático)"
       },
       "audience": "Audiencia",
       "delegationHint": "Nabu firma un token para esta audiencia y pasa el correo del usuario; el producto verifica la firma con las claves de Nabu.",
@@ -538,7 +542,19 @@
       "checkedNew": "{count, plural, one {# nueva} other {# nuevas}}",
       "checkFailed": "{name}: {reason}",
       "synced": "{name} sincronizado · {count, plural, one {# skill} other {# skills}}",
-      "syncing": "Sincronizando…"
+      "syncing": "Sincronizando…",
+      "mcpOAuth": {
+        "hint": "Nabu encuentra el servidor de autorización y registra su cliente por sí mismo.",
+        "pending": "El cliente se registra al guardar",
+        "saving": "Registrando el cliente…",
+        "issuer": "Servidor de autorización",
+        "client": "Cliente",
+        "registered": "registrado el {date}",
+        "reregister": "Volver a registrar el cliente",
+        "confirm": "Las conexiones de los usuarios se restablecerán: deberán volver a conectarse y, hasta entonces, su recopilación de comunicaciones se pausa.",
+        "done": "El cliente se registró de nuevo",
+        "manual": "Rellenar manualmente"
+      }
     },
     "service-agents": {
       "title": "Agentes de servicio",
@@ -1288,7 +1304,13 @@
     "no_files": "La ejecución no tiene copia de trabajo",
     "bad_archive": "El archivo de la copia de trabajo está dañado o tiene rutas fuera de su directorio",
     "workspace_too_large": "La copia de trabajo supera el límite: {files, number} archivos, {bytes, number} bytes; como máximo {maxFiles, number} archivos y {maxBytes, number} bytes",
-    "expired": "Los archivos de la ejecución ya se eliminaron"
+    "expired": "Los archivos de la ejecución ya se eliminaron",
+    "mcp_oauth_discovery_failed": "El servidor no ofrece metadatos de su autorización.",
+    "mcp_oauth_registration_unsupported": "El servidor no admite el registro automático de un cliente.",
+    "mcp_oauth_registration_failed": "El servidor de autorización rechazó registrar el cliente.",
+    "mcp_oauth_only": "Solo un elemento con OAuth MCP registra su cliente.",
+    "source_access": "Sin acceso a la fuente. Vuelva a conectarla en Conexiones.",
+    "source_unavailable": "La fuente no respondió."
   },
   "comm": {
     "lead": "Lo que el agente sabe de usted y de su correspondencia de trabajo",
@@ -1507,7 +1529,15 @@
       "collectedText": "Notas: {notes}, compromisos abiertos: {commitments} · se conserva {days} días",
       "deleteAll": "Eliminar lo recopilado",
       "deleteAllTitle": "¿Eliminar todo lo recopilado?",
-      "deleteAllText": "Se eliminan las notas ({notes}), los compromisos ({commitments}), las personas y los temas, y se desactivan las tareas de memoria. Los hechos se conservan."
+      "deleteAllText": "Se eliminan las notas ({notes}), los compromisos ({commitments}), las personas y los temas, y se desactivan las tareas de memoria. Los hechos se conservan.",
+      "muted": {
+        "title": "Los grupos silenciados no se recopilan",
+        "add": "Devolver un grupo",
+        "search": "Nombre de un grupo silenciado",
+        "included": "Se recopilan aunque estén silenciados",
+        "none": "No se encontraron grupos silenciados",
+        "error": "No se pudo leer la lista de grupos: vuelva a conectar VK WorkSpace"
+      }
     }
   },
   "models": {

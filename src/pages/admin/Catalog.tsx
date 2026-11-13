@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { api, request } from "../../api/client";
 import type { AdminCatalogItem } from "../../api/types";
 import { errorText } from "../../lib/errors";
+import { dateTime } from "../../lib/format";
 import { Icon, Modal, Switch, useToast } from "@green-on-grey/ui-kit";
 import { ToolsBlock, type ToolsValue } from "./CatalogTools";
 import { actionResult, allowedCount, allowedOf, bytesToMb, DEFAULT_FILE_MAX_BYTES, DEFAULT_RESULT_MAX_BYTES, mbToBytes, readOnlyPreset, type ToolChoice } from "./catalogTools";
@@ -111,7 +112,8 @@ function EditItem({ item: initial, type, onClose }: { item: AdminCatalogItem | n
   const [path, setPath] = useState(item?.source.path ?? "agent/skills");
   const [ref, setRef] = useState(item?.source.ref ?? "main");
   const [mode, setMode] = useState<"personal" | "platform">(item?.mode ?? "personal");
-  const [authKind, setAuthKind] = useState(item?.personalAuth?.kind ?? "oauth");
+  // FTR.NAB.ADM-0001 design §3.1: OAuth MCP is the first way, and the default of a new item
+  const [authKind, setAuthKind] = useState(item?.personalAuth?.kind ?? "mcp_oauth");
   const [authorizeUrl, setAuthorizeUrl] = useState(item?.personalAuth?.authorizeUrl ?? "");
   const [tokenUrl, setTokenUrl] = useState(item?.personalAuth?.tokenUrl ?? "");
   const [clientId, setClientId] = useState(item?.personalAuth?.clientId ?? "");
@@ -136,7 +138,8 @@ function EditItem({ item: initial, type, onClose }: { item: AdminCatalogItem | n
         } else {
           body.readOnly = tools.readOnly;
         }
-        if (mode === "personal") body.personalAuth = { kind: authKind, authorizeUrl, tokenUrl, clientId, clientSecret, scopes: scopes.split(/\s+/).filter(Boolean), audience };
+        if (mode === "personal") body.personalAuth = authKind === "mcp_oauth" ? { kind: authKind }
+          : { kind: authKind, authorizeUrl, tokenUrl, clientId, clientSecret, scopes: scopes.split(/\s+/).filter(Boolean), audience };
         else body.platformAuth = Object.fromEntries(headers.filter((h) => h.k.trim()).map((h) => [h.k.trim(), h.v]));
       }
       const saved = item ? await api.patch<AdminCatalogItem>(`/admin/api/v1/catalog/${item.id}`, body)
@@ -145,9 +148,19 @@ function EditItem({ item: initial, type, onClose }: { item: AdminCatalogItem | n
       if (f && srcKind === "upload") await request("POST", `/admin/api/v1/catalog/${saved.id}/upload`, f);
       return saved;
   };
+  // the save registers a client when there is none yet or the address changed (FTR.NAB.ADM-0001 tech §3.1)
+  const registers = type === "mcp" && mode === "personal" && authKind === "mcp_oauth"
+    && (item?.personalAuth?.kind !== "mcp_oauth" || !item.personalAuth.clientId || item.source.url !== url);
   const save = useMutation({
     mutationFn: toSave,
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin", "catalog"] }); onClose(); },
+    onSuccess: (saved) => {
+      qc.invalidateQueries({ queryKey: ["admin", "catalog"] });
+      // a failed discovery keeps the form open with its reason (FTR.NAB.ADM-0001 design §3.1)
+      if (saved.personalAuth?.error) {
+        setItem(saved);
+        setTools((v) => ({ ...v, choice: initialChoice(saved), readOnly: saved.readOnly }));
+      } else onClose();
+    },
   });
   // "Check" and "Save and check" keep the form open with the tools of the check
   const check = useMutation({
@@ -165,7 +178,8 @@ function EditItem({ item: initial, type, onClose }: { item: AdminCatalogItem | n
     <Modal wide title={item ? item.title || item.name : type === "mcp" ? t("admin.catalog.addMcp") : t("admin.catalog.addSkill")} onClose={onClose} footer={<>
       <button className="btn ghost" onClick={onClose}>{t("common.cancel")}</button>
       <button className="btn primary" disabled={!name || save.isPending || (choice.fileArgs.length > 0 && fileMaxBytes === null)
-        || (choice.resultArgs.length > 0 && resultMaxBytes === null)} onClick={() => save.mutate()}>{t("common.save")}</button>
+        || (choice.resultArgs.length > 0 && resultMaxBytes === null)} onClick={() => save.mutate()}>
+        {save.isPending && registers ? t("admin.catalog.mcpOAuth.saving") : t("common.save")}</button>
     </>}>
       <div className="form-grid">
         <div className="field"><label htmlFor="ci-name">{t("admin.catalog.name")}</label><input id="ci-name" className="inp mono" disabled={!!item} value={name} onChange={(e) => setName(e.target.value)} placeholder="jira" /></div>
@@ -205,7 +219,7 @@ function EditItem({ item: initial, type, onClose }: { item: AdminCatalogItem | n
             <>
               <div className="field"><label>{t("admin.catalog.authKind")}</label>
                 <div className="mini-seg" style={{ display: "inline-flex" }}>
-                  {["oauth", "token", "delegation"].map((k) => <button key={k} className={authKind === k ? "on" : ""} onClick={() => { setAuthKind(k); if (!item && k === "delegation") setTools((v) => ({ ...v, readOnly: false })); }}>{t(`admin.catalog.auth.${k}`)}</button>)}
+                  {["mcp_oauth", "oauth", "token", "delegation"].map((k) => <button key={k} className={authKind === k ? "on" : ""} onClick={() => { setAuthKind(k); if (!item && k === "delegation") setTools((v) => ({ ...v, readOnly: false })); }}>{t(`admin.catalog.auth.${k}`)}</button>)}
                 </div>
               </div>
               {authKind === "oauth" && (
@@ -216,6 +230,15 @@ function EditItem({ item: initial, type, onClose }: { item: AdminCatalogItem | n
                   <div className="field"><label htmlFor="o-s">Client secret</label><input id="o-s" type="password" autoComplete="off" className="inp" value={clientSecret} placeholder={item?.personalAuth?.hasSecret ? "••••••" : ""} onChange={(e) => setClientSecret(e.target.value)} /></div>
                   <div className="field"><label htmlFor="o-sc">Scopes</label><input id="o-sc" className="inp mono" value={scopes} onChange={(e) => setScopes(e.target.value)} /></div>
                 </div>
+              )}
+              {authKind === "mcp_oauth" && (
+                <MCPOAuthBlock item={item?.personalAuth?.kind === "mcp_oauth" ? item : null} onChanged={setItem} onManual={() => {
+                  // what the discovery found stays in the fields of the manual kind
+                  const pa = item?.personalAuth;
+                  if (pa?.authorizeUrl) setAuthorizeUrl(pa.authorizeUrl);
+                  if (pa?.tokenUrl) setTokenUrl(pa.tokenUrl);
+                  setAuthKind("oauth");
+                }} />
               )}
               {authKind === "delegation" && (
                 <div className="field"><label htmlFor="o-aud">{t("admin.catalog.audience")}</label><input id="o-aud" className="inp mono" value={audience} onChange={(e) => setAudience(e.target.value)} placeholder="product" />
@@ -247,4 +270,56 @@ function EditItem({ item: initial, type, onClose }: { item: AdminCatalogItem | n
       {save.error && <div className="err-text">{errorText(t, save.error)}</div>}
     </Modal>
   );
+}
+
+/** OAuth MCP of an item (FTR.NAB.ADM-0001 R1, R3, design §3.1): what the
+ * discovery found, why it failed, and the registration again. */
+function MCPOAuthBlock({ item, onManual, onChanged }: { item: AdminCatalogItem | null; onManual: () => void; onChanged: (it: AdminCatalogItem) => void }) {
+  const { t, i18n } = useTranslation();
+  const toast = useToast();
+  const qc = useQueryClient();
+  const [confirm, setConfirm] = useState(false);
+  const pa = item?.personalAuth;
+  const again = useMutation({
+    mutationFn: () => api.post<{ clientId: string; registeredAt: string; disconnectedUsers: number }>(`/admin/api/v1/catalog/${item?.id}/oauth/register`),
+    onSuccess: (r) => {
+      setConfirm(false);
+      qc.invalidateQueries({ queryKey: ["admin", "catalog"] });
+      if (item && pa) onChanged({ ...item, personalAuth: { ...pa, clientId: r.clientId, registeredAt: r.registeredAt, error: undefined } });
+      toast({ kind: "ok", title: t("admin.catalog.mcpOAuth.done") });
+    },
+    onError: (e) => toast({ kind: "error", title: errorText(t, e) }),
+  });
+  return (
+    <div className="field">
+      <div className="hint">{t("admin.catalog.mcpOAuth.hint")}</div>
+      {pa?.error ? (
+        <div className="err-text">{errorOf(t, pa.error)}{" "}
+          <button type="button" className="btn ghost sm" onClick={onManual}>{t("admin.catalog.mcpOAuth.manual")}</button></div>
+      ) : pa?.clientId ? (
+        <>
+          <div className="webhook">{t("admin.catalog.mcpOAuth.issuer")}: {pa.issuer}{"\n"}{t("admin.catalog.mcpOAuth.client")}: {pa.clientId}
+            {pa.registeredAt ? " · " + t("admin.catalog.mcpOAuth.registered", { date: dateTime(pa.registeredAt, i18n.language) }) : ""}</div>
+          {confirm ? (
+            <div className="row" style={{ gap: 6, flexWrap: "wrap" }}>
+              <span className="small">{t("admin.catalog.mcpOAuth.confirm")}</span>
+              <button type="button" className="btn sm danger" disabled={again.isPending} onClick={() => again.mutate()}>{t("admin.catalog.mcpOAuth.reregister")}</button>
+              <button type="button" className="btn ghost sm" onClick={() => setConfirm(false)}>{t("common.cancel")}</button>
+            </div>
+          ) : (
+            <button type="button" className="btn ghost sm" onClick={() => setConfirm(true)}>{t("admin.catalog.mcpOAuth.reregister")}</button>
+          )}
+        </>
+      ) : (
+        <div className="small muted">{t("admin.catalog.mcpOAuth.pending")}</div>
+      )}
+    </div>
+  );
+}
+
+/** The reason of a failed discovery: the text of its code with the detail of the server, or the detail alone. */
+function errorOf(t: (k: string, o?: Record<string, unknown>) => string, e: { code: string; detail: string }): string {
+  const text = t(`errors.${e.code}`, { defaultValue: "" });
+  if (!text) return e.detail || e.code;
+  return e.detail ? `${text} (${e.detail})` : text;
 }

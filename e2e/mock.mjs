@@ -100,7 +100,11 @@ const messages = {
 };
 const confirmations = [{ id: "c1", conversationId: "t2", server: "mail", tool: "send", summary: "отправить письмо поставщику", argsPreview: '{ "to": "sales@example.com", "subject": "Re: Счёт №42" }', status: "pending", createdAt: T("08:33"), expiresAt: T("09:33") }];
 const tasks = [{ id: "k1", title: "Утренняя сводка", instruction: "Собери почту и календарь", schedule: { kind: "daily", time: "09:00" }, channel: "telegram", status: "active", nextRunAt: T("06:00", "12"), failures: 0, pauseReason: null,
-  lastRun: { at: T("06:00"), status: "ok", summary: "Сводка отправлена" }, createdAt: T("09:00", "01"), kind: "agent", pauseKind: null }];
+  lastRun: { at: T("06:00"), status: "ok", summary: "Сводка отправлена" }, createdAt: T("09:00", "01"), kind: "agent", pauseKind: null },
+  // FTR.NAB.ADM-0001 R10: a run of the collection that stopped at the limit of a chat
+  { id: "k2", title: "", instruction: "", schedule: { kind: "cron", cron: "17 8-19 * * *" }, channel: "web", status: "active", nextRunAt: T("14:17"), failures: 0, pauseReason: null,
+    lastRun: { at: T("13:17"), status: "ok", summary: "messages:42 notes:7\ntruncated:{\"tech-devs\":1000}" }, createdAt: T("09:00", "01"), kind: "memory_collect", pauseKind: null,
+    settings: { interval: "1h", roundTheClock: false } }];
 const memories = [{ id: "y1", text: "Предпочитает краткие ответы.", source: "agent", pinned: true, createdAt: T("09:00", "02"), updatedAt: T("09:00", "02") },
   { id: "y2", text: "Работает в часовом поясе Москвы.", source: "user", pinned: false, createdAt: T("09:00", "03"), updatedAt: T("09:00", "03") }];
 const space = { state: "running", usedBytes: 1200000, quotaBytes: 100000000, files: 2, lastActivityAt: T("13:00"), enabled: true };
@@ -137,6 +141,14 @@ const adminCatalog = [
     allowedTools: ["convert_document_into_docling_document", "export_docling_document_to_markdown", "get_overview_of_document_anchors"],
     fileArgs: [{ tool: "convert_document_into_docling_document", arg: "source" }], fileMaxBytes: 20971520,
     newTools: ["get_page_thumbnail"] },
+  // FTR.NAB.ADM-0001 design §3.1: OAuth MCP found by the discovery
+  { id: "a2", type: "mcp", name: "vk-workspace", title: "VK WorkSpace", description: "Почта и VK Teams.",
+    source: { kind: "url", url: "https://ai.workspace.vk.ru/mcp" }, mode: "personal",
+    personalAuth: { kind: "mcp_oauth", issuer: "https://ai.workspace.vk.ru", authorizeUrl: "https://ai.workspace.vk.ru/oauth/authorize",
+      tokenUrl: "https://ai.workspace.vk.ru/oauth/token", resource: "https://ai.workspace.vk.ru/mcp", clientId: "nabu-7f3c2a", registeredAt: T("10:15", "13") },
+    platformAuth: {}, readOnly: true, exposure: "deferred", published: true, inDevelopment: false,
+    status: null, statusReason: null, skills: [], syncedAt: null, checkedAt: null, tools: [], allowedTools: null, fileArgs: [], fileMaxBytes: 20971520, newTools: [],
+    callbackUrl: "https://nabu.example/api/v1/oauth/callback/a2" },
 ];
 
 // FTR.NAB.CMN-0007 design §3.1–3.2: the built-in groups and an ordinary one with its members.
