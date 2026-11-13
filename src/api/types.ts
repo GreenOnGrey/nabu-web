@@ -774,6 +774,18 @@ export interface AuditEntry {
   error: string | null;
 }
 
+/** An action of an administrator (FTR.NAB.CMN-0007 tech §2; the items of this feature — FTR.NAB.CHAT-0005 R31). */
+export interface AdminLogEntry {
+  id: number;
+  at: string;
+  actorEmail: string;
+  action: string;
+  target: string;
+  before: Record<string, unknown> | null;
+  /** The reason of the action and the numbers of its cascade live here. */
+  after: (Record<string, unknown> & { reason?: string }) | null;
+}
+
 // ─── FTR.NAB.CMN-0007: groups of users and access ───────────────────
 
 export interface GroupGrants {
@@ -894,4 +906,213 @@ export interface PackageCard extends PackageRow {
   reasons: { text: string; profile: string; at: string }[];
   daily: { day: string; signals: number }[];
   history: { status: PackageStatus; profile?: string; version?: string; note?: string; by?: string; at: string }[];
+}
+
+// ─── FTR.NAB.CHAT-0005: the use of the catalog in the administration ─────────
+// Types mirror the admin API of nabu-core (tech §«API», contract 1.3.0).
+
+export type UsageStep = "day" | "week" | "month";
+export type UsageHint = "unused" | "single_user" | "errors_only" | "dormant";
+export type UsageState =
+  | "active" | "unused" | "dormant" | "single_user" | "errors_only" | "service_only"
+  | "not_granted" | "young" | "unpublished" | "unavailable" | "pinned";
+export type UsageMode = "personal" | "platform";
+export type UsageCallerKind = "personal" | "service" | "client";
+
+/** The thresholds and windows of the server (R7): the screen shows them, it never edits them. */
+export interface UsageThresholds {
+  unusedDays: number;
+  referenceDays: number;
+  pinDays: number;
+  singleUserMax: number;
+  errorsShare: number;
+  errorsMinCalls: number;
+  authShare: number;
+  authMinCalls: number;
+  toolsCandidate: number;
+}
+
+/** The envelope of every report answer (tech §«API»): readiness, windows and thresholds are the server's. */
+export interface UsageMeta {
+  dataFrom: string;
+  updatedAt: string;
+  ready: { quick: boolean; hints: boolean; goal: boolean; observationDays: number; observationLeft: number };
+  windows: { hintDays: number; referenceDays: number; goalDays: number; drilldownDays: number };
+  thresholds: UsageThresholds;
+  goalMetric: { value: number | null; baseline: number | null; delta: number | null; verifiedManuallyAt: string | null };
+  windowClamped: boolean;
+}
+
+export interface UsageGroupSlice {
+  groupId: string;
+  groupName: string;
+  builtin: "all" | "admins" | null;
+  calls: number;
+  users?: number;
+  ok?: number;
+}
+
+/** A row of the flat table «item × period» (R17–R19, R23). */
+export interface UsageRow {
+  itemId: string;
+  itemName: string;
+  itemType: "mcp" | "skill" | "unknown";
+  mode: UsageMode | null;
+  published: boolean;
+  publishedAt: string | null;
+  unpublishedAt: string | null;
+  deletedAt: string | null;
+  toolCount: number | null;
+  calls: number;
+  adminCalls: number;
+  serviceCalls: number;
+  users: number;
+  sessions: number;
+  ok: number;
+  errorsByCode: Record<string, number>;
+  authCalls: number;
+  deniedCalls: number;
+  p50Ms: number | null;
+  p95Ms: number | null;
+  lastCallAt: string | null;
+  calls90: number;
+  availableDays: number;
+  hints: UsageHint[];
+  state: UsageState;
+  /** null — «нет данных», not zero (R17). */
+  confirmationsRejected: number | null;
+  groups: UsageGroupSlice[];
+}
+
+/** The summary tiles (R16, R14). */
+export interface UsageTiles {
+  deadShare: {
+    value: number | null; dead: number | null; total: number | null; baseline: number | null; delta: number | null;
+    verifiedManuallyAt: string | null; droppedOut: { total: number; withCalls: number } | null;
+  };
+  publishedToolCount: { value: number; trend: { day: string; value: number }[] };
+  platformSuccess: { value: number | null; denied: number; auth: number; trend: { day: string; value: number }[] };
+  resolvedCandidates: { value: number; resolved: number; candidates: number; target: number; note: string };
+  topCalls: { itemId: string; itemName: string; calls: number }[];
+  topErrors: { itemId: string; itemName: string; code: string; calls: number }[];
+  unusedCount: number;
+  pinnedUnused: number;
+}
+
+/** An interval of publication (R13). */
+export interface UsageInterval {
+  publishedAt: string;
+  unpublishedAt: string | null;
+  estimated?: boolean;
+  availableDays?: number;
+  removedDays?: number;
+  windowIncomplete?: boolean;
+}
+
+/** A pin of an item (R12). */
+export interface UsagePin {
+  id: string;
+  itemId: string;
+  reason: string;
+  pinnedBy: string | null;
+  pinnedAt: string;
+  reviewAt: string;
+  releasedAt: string | null;
+  effective: boolean;
+}
+
+/** An item of the panel «candidates for review» (R20). */
+export interface UsageCandidate {
+  itemId: string;
+  itemName: string;
+  itemType: "mcp" | "skill";
+  reasons: string[];
+  lastOkAt: string | null;
+  calls: number;
+  authShare: number | null;
+  tools: number | null;
+}
+
+/** A tool of the drill-down (R21). */
+export interface UsageToolRow {
+  tool: string;
+  calls: number;
+  ok: number;
+  errors: number;
+  authCalls: number;
+  p50Ms: number | null;
+  p95Ms: number | null;
+}
+
+/** The card of an item (R2, R11–R15, R21, R22). */
+export interface UsageItemCard {
+  itemId: string;
+  itemName: string;
+  itemTitle: string;
+  itemType: "mcp" | "skill";
+  mode: UsageMode | null;
+  status: string | null;
+  published: boolean;
+  publishedAt: string | null;
+  unpublishedAt: string | null;
+  publishedEstimated: boolean;
+  /** any outcome */
+  lastCheckAt: string | null;
+  /** the last successful check */
+  lastOkAt: string | null;
+  toolCount: number | null;
+  calls: number;
+  adminCalls: number;
+  serviceCalls: number;
+  users: number;
+  sessions: number;
+  ok: number;
+  authCalls: number;
+  deniedCalls: number;
+  p50Ms: number | null;
+  p95Ms: number | null;
+  lastCallAt: string | null;
+  calls90: number;
+  availableDays: number;
+  hints: UsageHint[];
+  states: UsageState[];
+  skillActivations: number | null;
+  skillSessions: number | null;
+  unresolvedTasks: { taskId: string; title: string; userEmail?: string; agentName?: string }[];
+}
+
+/** The preview of an action (R27, R28); nothing is changed by it. */
+export interface UsageImpact {
+  item: { id: string; name: string; type: "mcp" | "skill"; mode: UsageMode | null; published: boolean };
+  grants: { groupId: string; groupName: string; builtin: "all" | "admins" | null; users: number }[];
+  users: number;
+  connections: number;
+  collectionTasks: { taskId: string; userEmail: string; title: string }[];
+  serviceAgents: { name: string; tasks: { taskId: string; title: string }[] }[];
+  serviceClients: { clientId: string; name: string; agents: string[] }[];
+  calls90: number;
+  lastCallAt: string | null;
+  publication: UsageInterval;
+}
+
+/** A page of the report lists (tech §«API»: cursor lists, limit up to 200). */
+export interface UsagePage<T> {
+  items: T[];
+  nextCursor: string | null;
+  meta?: UsageMeta;
+}
+
+export interface UsageItemAnswer {
+  item: UsageItemCard;
+  groups: UsageGroupSlice[];
+  publications: UsageInterval[];
+  overlap: { itemId: string; itemName: string; tools: string[] }[];
+  pins: UsagePin[];
+  states: UsageState[];
+  meta: UsageMeta;
+}
+
+export interface UsageSummaryAnswer {
+  tiles: UsageTiles;
+  meta: UsageMeta;
 }

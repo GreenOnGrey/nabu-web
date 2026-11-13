@@ -1,4 +1,4 @@
-import type { Page } from "@playwright/test";
+import { expect, type Page } from "@playwright/test";
 
 // The screens of the comparison (FTR.NAB.CMN-0005 qa §5): every route and the
 // states that appear after a click. `only` limits a screen to one width.
@@ -10,6 +10,8 @@ export interface Screen {
   only?: "desktop" | "phone";
   /** The memory of communications is on (mock-comm). */
   comm?: boolean;
+  /** A scenario of the report of the catalog: its goal window (TIL-01) or its administration log (ACT-16). */
+  usage?: "goal" | "events";
   /** What to do after the page has settled, before the shot. */
   act?: (page: Page) => Promise<void>;
 }
@@ -85,6 +87,59 @@ export const SCREENS: Screen[] = [
     await page.getByRole("button", { name: /^Аргументы/ }).first().click();
   } },
   { name: "admin-catalog-new", path: "/admin/catalog", act: click("Добавить MCP") },
+  // FTR.NAB.CHAT-0005 design §3.1: the tab «Usage» of the catalog
+  { name: "admin-catalog-usage", path: "/admin/catalog", act: click("Использование") },
+  // FTR.NAB.CHAT-0005 qa ACT-06 (R27, R23): after a withdrawal the item is hidden by default and
+  // comes back under «включая снятые» with the date of the withdrawal and without hints
+  { name: "admin-catalog-usage-ACT-06", path: "/admin/catalog", act: async (page) => {
+    await click("Использование")(page);
+    await expect(page.getByRole("row", { name: /github/ })).toBeVisible();
+    await expect(page.getByText("yandex-mail", { exact: true })).toHaveCount(0);
+    await page.getByLabel("Включая снятые").check();
+    const row = page.getByRole("row", { name: /yandex-mail/ });
+    await expect(row).toBeVisible();
+    await expect(row).toContainText("снята");
+    await expect(row.locator(".nb-cu-chip")).toHaveCount(0);
+  } },
+  // FTR.NAB.CHAT-0005 qa ACT-16 (R31): the administration log carries the three catalog actions
+  // after a withdrawal, a publication and a grant revocation, each with its reason and author
+  { name: "admin-audit-ACT-16", path: "/admin/audit", usage: "events", act: async (page) => {
+    const log = page.locator(".nb-adm-log");
+    await expect(log).toBeVisible();
+    await expect(log).toContainText("catalog.unpublish");
+    await expect(log).toContainText("catalog.publish");
+    await expect(log).toContainText("catalog.grant.revoke");
+    await expect(log).toContainText("переходим на Jira");
+    await expect(log).toContainText("evgeny@example.com");
+  } },
+  // FTR.NAB.CHAT-0005 qa SEC-01 (R26): a filter by a group of two people shows numbers only — no names or lists
+  { name: "admin-catalog-usage-SEC-01", path: "/admin/catalog", act: async (page) => {
+    await click("Использование")(page);
+    await expect(page.getByRole("row", { name: /github/ })).toBeVisible();
+    await page.getByLabel("Группа").selectOption({ label: "Продажи" });
+    // the filter reaches the answer: «docling» is granted to «Все пользователи» only
+    await expect(page.getByText("docling", { exact: true })).toHaveCount(0);
+    const report = page.locator(".nb-cu");
+    await expect(report).not.toContainText("Ада Лавлейс");
+    await expect(report).not.toContainText("Алан Тьюринг");
+    await expect(report).not.toContainText("@example.com");
+    await expect(page.getByRole("row", { name: /github/ })).toContainText("310");
+  } },
+  // FTR.NAB.CHAT-0005 qa TIL-01 (R16): ninety days of data — the goal tile shows its value,
+  // the tools and the success share carry their trends, the tops are filled
+  { name: "admin-catalog-usage-TIL-01", path: "/admin/catalog", usage: "goal", act: async (page) => {
+    await click("Использование")(page);
+    const tiles = page.locator(".nb-cu-tiles");
+    await expect(tiles).toContainText("доля мёртвых");
+    await expect(tiles).toContainText("инструментов в опубликованных позициях");
+    await expect(tiles).toContainText("доля успешных вызовов");
+    await expect(tiles).toContainText("топ вызовов");
+    await expect(tiles).toContainText("топ ошибок");
+    const dead = tiles.locator(".nb-cu-tile").filter({ hasText: "доля мёртвых" });
+    await expect(dead.locator(".v")).toContainText("15");
+    await expect(dead).toContainText("6 из 40");
+    await expect(tiles).toContainText("тренд от 2 точек");
+  } },
   // FTR.NAB.CMN-0007 design §3.2: the card of an ordinary group
   { name: "admin-groups-card", path: "/admin/groups", act: async (page) => { await page.getByText("Продажи", { exact: true }).click(); } },
 ];

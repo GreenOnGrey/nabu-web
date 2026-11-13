@@ -43,6 +43,7 @@ for (const theme of ["light", "dark"] as const) {
         { name: "mock-theme", value: theme, url: baseURL! },
         { name: "mock-auth", value: s.visitor ? "0" : "1", url: baseURL! },
         { name: "mock-comm", value: s.comm ? "1" : "0", url: baseURL! },
+        { name: "mock-usage", value: s.usage ?? "default", url: baseURL! },
       ]);
       await page.addInitScript((t) => { try { localStorage.setItem("nabu-theme", t); } catch { /* blocked */ } }, theme);
       await page.goto(s.path);

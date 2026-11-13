@@ -1,11 +1,11 @@
 import type { TFunction } from "i18next";
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { apiUrl } from "../../api/base";
 import { api, qs } from "../../api/client";
-import type { AuditEntry, List } from "../../api/types";
+import type { AdminLogEntry, AuditEntry, List } from "../../api/types";
 import { intlLocale } from "../../lib/i18n";
 import { dateTime } from "../../lib/format";
 import { Icon } from "@green-on-grey/ui-kit";
@@ -46,8 +46,14 @@ export function AuditAdmin() {
     queryFn: ({ pageParam }) => api.get<List<AuditEntry>>(`/admin/api/v1/audit${query}&limit=100${pageParam ? `&cursor=${pageParam}` : ""}`),
     getNextPageParam: (l) => l.nextCursor ?? undefined,
   });
+  // R31: the actions over the items of the catalog — a withdrawal, a publication, a grant revocation.
+  const log = useQuery({
+    queryKey: ["admin", "admin-log"],
+    queryFn: () => api.get<List<AdminLogEntry>>("/admin/api/v1/admin-log"),
+  });
   const lng = intlLocale(i18n.language);
   const rows = list.data?.pages.flatMap((p) => p.items) ?? [];
+  const logRows = log.data?.items ?? [];
   return (
     <>
       <div className="row" style={{ justifyContent: "space-between" }}>
@@ -79,6 +85,27 @@ export function AuditAdmin() {
         </table>
       </div>
       {list.hasNextPage && <button className="btn ghost sm" onClick={() => list.fetchNextPage()}>{t("common.more")}</button>}
+      {logRows.length > 0 && (
+        <section className="nb-adm-log" style={{ marginTop: 28 }}>
+          <h3>{t("admin.audit.logTitle")}</h3>
+          <div style={{ overflowX: "auto" }}>
+            <table className="t">
+              <thead><tr><th>{t("admin.audit.time")}</th><th>{t("admin.audit.logAction")}</th><th>{t("admin.audit.logTarget")}</th><th>{t("admin.audit.logReason")}</th><th>{t("admin.audit.logActor")}</th></tr></thead>
+              <tbody>
+                {logRows.map((e) => (
+                  <tr key={e.id}>
+                    <td className="small" style={{ whiteSpace: "nowrap" }}>{dateTime(e.at, lng)}</td>
+                    <td className="mono small">{e.action}</td>
+                    <td className="mono small">{e.target}</td>
+                    <td>{e.after?.reason ?? "—"}</td>
+                    <td>{e.actorEmail}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
     </>
   );
 }

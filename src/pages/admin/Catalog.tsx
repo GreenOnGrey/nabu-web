@@ -6,12 +6,28 @@ import type { AdminCatalogItem } from "../../api/types";
 import { errorText } from "../../lib/errors";
 import { Icon, Modal, Switch, useToast } from "@green-on-grey/ui-kit";
 import { ToolsBlock, type ToolsValue } from "./CatalogTools";
+import { CatalogTabs, CatalogUsage } from "./CatalogUsage";
+import type { CatalogTab } from "./catalogUsage";
 import { actionResult, allowedCount, allowedOf, bytesToMb, DEFAULT_FILE_MAX_BYTES, DEFAULT_RESULT_MAX_BYTES, mbToBytes, readOnlyPreset, type ToolChoice } from "./catalogTools";
 
-/** The catalog of skills and MCP (R11–R14, design §3.11): source (URL, upload,
+/** The section «Catalog» of the administration (FTR.NAB.CMN-0001 R34): its items and,
+ * since FTR.NAB.CHAT-0005 R1, the tab «Usage» beside them (design §3.1). */
+export function CatalogAdmin() {
+  const { t } = useTranslation();
+  const [tab, setTab] = useState<CatalogTab>("items");
+  return (
+    <>
+      <h2 style={{ margin: 0 }}>{t("admin.catalog.title")}</h2>
+      <CatalogTabs value={tab} onChange={setTab} />
+      <div style={{ marginTop: 16 }}>{tab === "items" ? <ItemsAdmin /> : <CatalogUsage />}</div>
+    </>
+  );
+}
+
+/** The items of the catalog of skills and MCP (R11–R14, design §3.11): source (URL, upload,
  * git), access mode, publication, check of MCP servers; items in development are marked.
  * The tools the agent sees and the file arguments — FTR.NAB.CMN-0006 design §3. */
-export function CatalogAdmin() {
+function ItemsAdmin() {
   const { t } = useTranslation();
   const qc = useQueryClient();
   const toast = useToast();
@@ -32,8 +48,7 @@ export function CatalogAdmin() {
   });
   return (
     <>
-      <div className="row" style={{ justifyContent: "space-between" }}>
-        <h2 style={{ margin: 0 }}>{t("admin.catalog.title")}</h2>
+      <div className="row" style={{ justifyContent: "flex-end" }}>
         <div className="row" style={{ gap: 8 }}>
           <button className="btn sm" onClick={() => setEditing("skill")}><Icon name="plus" size={15} />{t("admin.catalog.addSkill")}</button>
           <button className="btn primary sm" onClick={() => setEditing("mcp")}><Icon name="plus" size={15} />{t("admin.catalog.addMcp")}</button>
