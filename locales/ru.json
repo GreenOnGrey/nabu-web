@@ -256,14 +256,12 @@
     "platform": "платформенный",
     "platformRead": "платформенный · чтение",
     "skill": "скилл",
-    "inDevelopment": "в разработке",
     "connected": "Подключено",
     "connect": "Подключить",
     "revoke": "Отозвать доступ",
     "disable": "Отключить",
     "status": {
       "available": "Доступно",
-      "in_development": "Скоро",
       "unavailable": "Недоступно"
     },
     "empty": "Каталог пуст",

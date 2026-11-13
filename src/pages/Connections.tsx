@@ -64,7 +64,6 @@ export function ConnectionsPage() {
               {it.type === "mcp" && it.mode === "personal" && <span className="mode p">{t("connections.personal")}</span>}
               {it.type === "mcp" && it.mode === "platform" && <span className="mode">{it.readOnly ? t("connections.platformRead") : t("connections.platform")}</span>}
               {it.type === "skill" && <span className="mode">{t("connections.skill")}</span>}
-              {it.inDevelopment && <span className="mode dev">{t("connections.inDevelopment")}</span>}
             </div>
             <div className="d">{it.description}</div>
             <div className="acts">
@@ -76,7 +75,7 @@ export function ConnectionsPage() {
                   {it.mode === "personal" ? t("connections.revoke") : t("connections.disable")}
                 </button>
               ) : (
-                <button className="btn sm primary" disabled={it.inDevelopment || connect.isPending}
+                <button className="btn sm primary" disabled={connect.isPending}
                   onClick={() => (it.authKind === "token" ? setTokenFor(it) : connect.mutate({ id: it.id }))}>
                   {t("connections.connect")}
                 </button>

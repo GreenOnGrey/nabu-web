@@ -256,14 +256,12 @@
     "platform": "plataforma",
     "platformRead": "plataforma · lectura",
     "skill": "skill",
-    "inDevelopment": "en desarrollo",
     "connected": "Conectado",
     "connect": "Conectar",
     "revoke": "Revocar acceso",
     "disable": "Desactivar",
     "status": {
       "available": "Disponible",
-      "in_development": "Próximamente",
       "unavailable": "No disponible"
     },
     "empty": "El catálogo está vacío",
