@@ -117,6 +117,8 @@ export const SCREENS: Screen[] = [
     await click("Использование")(page);
     await expect(page.getByRole("row", { name: /github/ })).toBeVisible();
     await page.getByLabel("Группа").selectOption({ label: "Продажи" });
+    // the filter reaches the answer: «docling» is granted to «Все пользователи» only
+    await expect(page.getByText("docling", { exact: true })).toHaveCount(0);
     const report = page.locator(".nb-cu");
     await expect(report).not.toContainText("Ада Лавлейс");
     await expect(report).not.toContainText("Алан Тьюринг");

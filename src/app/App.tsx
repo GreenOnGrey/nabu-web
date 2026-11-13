@@ -108,6 +108,7 @@ function Authenticated() {
       onEvent("catalog.changed", () => {
         qc.invalidateQueries({ queryKey: ["admin", "catalog"] });
         qc.invalidateQueries({ queryKey: ["admin", "catalog-usage"] });
+        qc.invalidateQueries({ queryKey: ["admin", "admin-log"] });
       }),
       onEvent("connections.changed", () => {
         qc.invalidateQueries({ queryKey: keys.catalog });

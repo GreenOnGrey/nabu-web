@@ -165,8 +165,9 @@ const usageRow = (over) => ({ itemId: "a1", itemName: "docling", itemType: "mcp"
   calls90: 0, availableDays: PERIOD_DAYS, hints: [], state: "active", confirmationsRejected: null,
   groups: [{ groupId: "g-sales", groupName: "Продажи", builtin: null, calls: 0 }], ...over });
 const usageRows = [
-  // R8: an explicit grant and 0 calls over 30 available days
-  usageRow({ hints: ["unused"], state: "unused" }),
+  // R8: an explicit grant and 0 calls over 30 available days; granted to «Все пользователи» only,
+  // so a filter by «Продажи» drops it and the filter is visible in the table
+  usageRow({ hints: ["unused"], state: "unused", groups: [{ groupId: "g-all", groupName: "All users", builtin: "all", calls: 0 }] }),
   usageRow({ itemId: "a2", itemName: "github", toolCount: 12, calls: 310, adminCalls: 12, serviceCalls: 40, users: 7,
     sessions: 22, ok: 302, errorsByCode: { tool_error: 4, transport_error: 2, denied: 2 }, authCalls: 0, deniedCalls: 2,
     p50Ms: 420, p95Ms: 2600, lastCallAt: T("11:00", "02"), calls90: 940 }),
@@ -301,7 +302,7 @@ function assertUsageFixture(meta = usageMeta, tiles = usageTiles) {
     if (!row) fail(`candidate ${c.itemName} is not among the rows of the report`);
     if (c.calls !== row.calls) fail(`candidate ${c.itemName}: calls ${c.calls} differ from the row (${row.calls})`);
     if (c.tools !== row.toolCount) fail(`candidate ${c.itemName}: tools ${c.tools} differ from the toolCount of the row (${row.toolCount})`);
-    // a static reason is not a hint: an item of the panel never says «unused» in the table (R20, CST-02)
+    // a static reason is not a hint: an item of the panel never says «unused» in the table (R20)
     if (row.hints.includes("unused")) fail(`candidate ${c.itemName}: an item of the panel carries the hint «unused» (R20)`);
     if (c.lastOkAt !== null && at(c.lastOkAt) > updated) fail(`candidate ${c.itemName}: lastOkAt is later than meta.updatedAt (R15)`);
     for (const reason of c.reasons) {
@@ -391,7 +392,11 @@ function api(url, theme, comm, usage) {
   const tiles = usage === "goal" ? goalTiles : usageTiles;
   if (p === "/admin/api/v1/catalog/usage") {
     const group = url.searchParams.get("group");
-    const rows = group ? usageRows.filter((r) => r.groups.some((g) => g.groupId === group)) : usageRows;
+    // R23: the filter «including withdrawn» is off by default; rows «outside the catalog» have no
+    // publication and are always in the answer, as the API of nabu-core returns them
+    const kept = url.searchParams.get("includeUnpublished") === "true"
+      ? usageRows : usageRows.filter((r) => r.published || r.itemType === "unknown");
+    const rows = group ? kept.filter((r) => r.groups.some((g) => g.groupId === group)) : kept;
     return { items: rows, nextCursor: null, meta };
   }
   if (p === "/admin/api/v1/catalog/usage/summary") return { tiles, meta };

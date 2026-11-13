@@ -16,7 +16,7 @@ import {
   drilldownWindow, exportPath, filterCount, freshness, hasManyAuth, impactCounts, impactWarnings, isUnavailable,
   itemCardSections, latencyText, modeLabel, needsConfirmName, overduePins, overlapLines, pinError, pinState, primaryAction,
   publicationInfo, readiness, reasonCounts, resolvedView, revokeImpact, rowBadges, skillImpactNote, skillTelemetry,
-  outsideRows, sortUsageRows, successComposition, successShare, thresholdItems, unpublishError, usageParams, usageSections,
+  csvNoteKey, outsideRows, sortUsageRows, successComposition, successShare, thresholdItems, unpublishError, usageParams, usageSections,
   visibleGroups, visibleRows, withdrawnLabel, withdrawnNote,
 } from "./catalogUsage";
 import type { CatalogTab, UsageFilters } from "./catalogUsage";
@@ -107,10 +107,12 @@ export function CatalogUsage() {
   }
 
   const sections = usageSections();
-  const visible = visibleRows(rows.data?.items ?? [], filters.includeUnpublished);
+  // R23: rows «outside the catalog» are not publications — the filter «including withdrawn» never hides them
+  const allRows = rows.data?.items ?? [];
+  const visible = visibleRows(allRows, filters.includeUnpublished);
   const sorted = sortUsageRows(catalogRows(visible));
-  const outside = outsideRows(visible);
-  // a period earlier than the first day of data starts at that day (R6, RDY-03)
+  const outside = outsideRows(allRows);
+  // a period earlier than the first day of data starts at that day (R6)
   const changeFilters = (f: UsageFilters) => setFilters(meta ? { ...f, ...clampPeriod(f.from, f.to, meta.dataFrom) } : f);
   const list = candidates.data?.items ?? [];
   const overdue = overduePins(pins.data?.items ?? [], now);
@@ -136,7 +138,7 @@ export function CatalogUsage() {
                 </button>
               ))}
             </div>
-            <button className="btn primary sm" disabled={download.isPending} onClick={() => download.mutate()}>
+            <button className="btn primary sm" disabled={download.isPending} onClick={() => download.mutate()} title={t(csvNoteKey())}>
               {t("admin.catalogUsage.exportCsv")}
             </button>
           </div>
@@ -187,10 +189,12 @@ export function CatalogUsage() {
                 <th className="nb-cu-num">{t("admin.catalogUsage.col.adminCalls")}</th>
                 <th className="nb-cu-num">{t("admin.catalogUsage.col.serviceCalls")}</th>
                 <th className="nb-cu-num">{t("admin.catalogUsage.col.users")}</th>
+                {allColumns && <th className="nb-cu-num">{t("admin.catalogUsage.col.sessions")}</th>}
                 <th>{t("admin.catalogUsage.col.success")}</th>
                 <th>{t("admin.catalogUsage.col.errors")}</th>
                 <th className="nb-cu-num">{t("admin.catalogUsage.col.auth")}</th>
-                <th className="nb-cu-num">{t("admin.catalogUsage.col.latency")}</th>
+                {allColumns && <th className="nb-cu-num">{t("admin.catalogUsage.col.confirmations")}</th>}
+                {allColumns && <th className="nb-cu-num">{t("admin.catalogUsage.col.latency")}</th>}
                 <th>{t("admin.catalogUsage.col.lastCall")}</th>
                 <th className="nb-cu-num">{t("admin.catalogUsage.col.calls90")}</th>
                 <th />
@@ -204,7 +208,7 @@ export function CatalogUsage() {
                   onPin={() => setPin(r)} meta={meta} />
               ))}
               {outside.length > 0 && (
-                <tr className="nb-cu-outside-sep"><td colSpan={allColumns ? 17 : 15}>{t("admin.catalogUsage.outsideRows", { count: outside.length })}</td></tr>
+                <tr className="nb-cu-outside-sep"><td colSpan={allColumns ? 17 : 14}>{t("admin.catalogUsage.outsideRows", { count: outside.length })}</td></tr>
               )}
               {outside.map((r) => (
                 <Row key={`${r.itemId}-${r.itemName}`} row={r} filters={filters} expanded={false} allColumns={allColumns} onExpand={() => undefined}
@@ -212,7 +216,7 @@ export function CatalogUsage() {
                   onPin={() => setPin(r)} meta={meta} />
               ))}
               {visible.length === 0 && (
-                <tr><td colSpan={allColumns ? 17 : 15} className="nb-cu-empty">{t("admin.catalogUsage.empty")}</td></tr>
+                <tr><td colSpan={allColumns ? 17 : 14} className="nb-cu-empty">{t("admin.catalogUsage.empty")}</td></tr>
               )}
             </tbody>
           </table>
@@ -469,7 +473,7 @@ function Row({ row, filters, expanded, onExpand, onOpen, onUnpublish, onPublish,
     return (
       <tr className="nb-cu-withdrawn">
         <td><div className="nb-cu-pos"><b>{row.itemName}</b><span className="small muted">{t("admin.catalogUsage.deletedRow", { date: dateOnly(row.deletedAt, lng) })}</span></div></td>
-        <td colSpan={allColumns ? 16 : 14} className="small muted">{t("admin.catalogUsage.deletedNoMetrics")}</td>
+        <td colSpan={allColumns ? 16 : 13} className="small muted">{t("admin.catalogUsage.deletedNoMetrics")}</td>
       </tr>
     );
   }
@@ -505,12 +509,12 @@ function Row({ row, filters, expanded, onExpand, onOpen, onUnpublish, onPublish,
         <td className="nb-cu-num">{n(row.serviceCalls)}</td>
         <td className="nb-cu-num">{n(row.users)}</td>
         {allColumns && <td className="nb-cu-num">{n(row.sessions)}</td>}
-        {allColumns && <td className="nb-cu-num">{confirmationsText(row).known ? n(row.confirmationsRejected ?? 0) : t("admin.catalogUsage.noData")}</td>}
         <td>{share === null ? <span className="muted">—</span>
           : <span className={share < (meta?.thresholds.errorsShare ?? 0.7) ? "nb-cu-bad" : undefined}>{new Intl.NumberFormat(lng, { style: "percent", maximumFractionDigits: 0 }).format(share)}</span>}</td>
         <td className="small mono">{Object.entries(row.errorsByCode).map(([c, v]) => `${c} ${v}`).join(" · ") || "—"}</td>
         <td className="nb-cu-num">{n(row.authCalls)}</td>
-        <td className="nb-cu-num">{latencyText(row.p50Ms, row.p95Ms) ?? "—"}</td>
+        {allColumns && <td className="nb-cu-num">{confirmationsText(row).known ? n(row.confirmationsRejected ?? 0) : t("admin.catalogUsage.noData")}</td>}
+        {allColumns && <td className="nb-cu-num">{latencyText(row.p50Ms, row.p95Ms) ?? "—"}</td>}
         <td>{row.lastCallAt ? dateTime(row.lastCallAt, lng) : <span className="muted">—</span>}</td>
         <td className="nb-cu-num">{row.itemType === "unknown" ? "—" : n(row.calls90)}</td>
         <td className="nb-cu-rowactions">
@@ -522,7 +526,7 @@ function Row({ row, filters, expanded, onExpand, onOpen, onUnpublish, onPublish,
       </tr>
       {expanded && meta && (
         <tr className="nb-cu-drill">
-          <td colSpan={allColumns ? 17 : 15}>
+          <td colSpan={allColumns ? 17 : 14}>
             <Drilldown row={row} filters={filters} meta={meta} />
           </td>
         </tr>
@@ -642,7 +646,9 @@ function ItemCardDialog({ row, meta, filters, showImplicit, onClose, onUnpublish
       {itemCardSections().includes("tools") && (
         <section className="nb-cu-sec">
           <h4 className="nb-cu-h4">{t("admin.catalogUsage.card.tools")}</h4>
-          <div className="small muted">{t("admin.catalogUsage.drill.clamped", { days: meta?.windows.drilldownDays ?? 31 })}</div>
+          <div className="small muted">{w.clamped
+            ? t("admin.catalogUsage.drill.clamped", { days: meta?.windows.drilldownDays ?? 31 })
+            : t("admin.catalogUsage.drill.title", { from: w.from, to: w.to })}</div>
           <table className="t nb-cu-mini">
             <thead><tr><th>{t("admin.catalogUsage.drill.tool")}</th><th className="nb-cu-num">{t("admin.catalogUsage.col.calls")}</th><th className="nb-cu-num">{t("admin.catalogUsage.col.errors")}</th><th className="nb-cu-num">{t("admin.catalogUsage.col.latency")}</th></tr></thead>
             <tbody>
@@ -716,6 +722,9 @@ function UnpublishDialog({ row, onClose, onDone }: { row: UsageRow; onClose: () 
   const error = data ? unpublishError({ name: data.item.name, reason, confirmName, connections: data.connections }) : null;
   const counts = data ? impactCounts(data) : null;
   const warnings = data ? impactWarnings(data) : [];
+  const returned = data?.publication.removedDays != null && data.publication.publishedAt
+    ? t("admin.catalogUsage.card.withdrawnNote", { count: data.publication.removedDays, date: dateOnly(data.publication.publishedAt, lng) })
+    : null;
   return (
     <Modal wide title={t("admin.catalogUsage.unpublishTitle", { name: row.itemName })} onClose={onClose} footer={<>
       <button className="btn ghost" onClick={onClose}>{t("common.cancel")}</button>
@@ -741,6 +750,7 @@ function UnpublishDialog({ row, onClose, onDone }: { row: UsageRow; onClose: () 
       {warnings.includes("calls90") && data && (
         <div className="small nb-cu-chip-amber">{t("admin.catalogUsage.impact.calls90", { count: data.calls90, date: data.lastCallAt ? dateTime(data.lastCallAt, lng) : "—" })}</div>
       )}
+      {returned && <div className="small nb-cu-chip-amber">{returned}</div>}
       {warnings.includes("incompleteWindow") && <div className="small nb-cu-chip-amber">{t("admin.catalogUsage.impact.incomplete")}</div>}
       {data && skillImpactNote(data.item.type) && <div className="small nb-cu-chip-amber">{t("admin.catalogUsage.skillImpact")}</div>}
       <label className="nb-cu-field nb-cu-col">
@@ -837,7 +847,7 @@ function PinDialog({ row, pinDays, onClose, onDone }: { row: UsageRow; pinDays: 
   const act = useMutation({
     mutationFn: () => api.post(USAGE_PATHS.pinsOf(row.itemId), {
       reason,
-      // the server fills the date when it is absent (R12, PIN-04)
+      // the server fills the date when it is absent (R12)
       ...(reviewAt ? { reviewAt: new Date(`${reviewAt}T00:00:00Z`).toISOString() } : {}),
     }),
     onSuccess: onDone,

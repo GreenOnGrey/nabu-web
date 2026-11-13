@@ -66,13 +66,13 @@ export function itemCardSections(): string[] {
   return ["publication", "calls", "groups", "tools", "overlap", "pins"];
 }
 
-/** The columns of the flat table (R17, TBL-05); most of them can be hidden,
- * the item and its state never are. `auth` is a column, not a state (R10, AUT-03). */
+/** The columns of the flat table (R17); most of them can be hidden,
+ * the item and its state never are. `auth` is a column, not a state (R10). */
 export function usageColumns(): { key: string; hiddenByDefault?: boolean }[] {
   return [
     { key: "item" }, { key: "hints" }, { key: "state" }, { key: "tools" }, { key: "calls" },
-    { key: "adminCalls" }, { key: "serviceCalls" }, { key: "users" }, { key: "success" }, { key: "errors" },
-    { key: "auth" }, { key: "sessions", hiddenByDefault: true }, { key: "confirmations", hiddenByDefault: true },
+    { key: "adminCalls" }, { key: "serviceCalls" }, { key: "users" }, { key: "sessions", hiddenByDefault: true },
+    { key: "success" }, { key: "errors" }, { key: "auth" }, { key: "confirmations", hiddenByDefault: true },
     { key: "latency", hiddenByDefault: true }, { key: "lastCall" }, { key: "calls90" },
   ];
 }
@@ -98,7 +98,7 @@ export function defaultPeriod(now: Date): { from: string; to: string } {
 }
 
 /** A period never starts before the first day of data (R6): `from` earlier than
- * `dataFrom` is not an error, the report simply starts at `dataFrom` (RDY-03). */
+ * `dataFrom` is not an error, the report simply starts at `dataFrom` (R6). */
 export function clampPeriod(from: string, to: string, dataFrom: string): { from: string; to: string } {
   return { from: from < dataFrom ? dataFrom : from, to };
 }
@@ -108,7 +108,7 @@ export function defaultFilters(now: Date): UsageFilters {
   return { ...defaultPeriod(now), step: "day", group: "", callerKind: "", channel: "", mode: "", includeUnpublished: false, hint: "" };
 }
 
-/** The query of the report; the CSV repeats exactly these filters (R25, CSV-01). */
+/** The query of the report; the CSV repeats exactly these filters (R25). */
 export function usageParams(f: UsageFilters): Record<string, string | boolean> {
   const out: Record<string, string | boolean> = { from: f.from, to: f.to, step: f.step };
   if (f.group) out.group = f.group;
@@ -142,7 +142,7 @@ export function exportPath(f: UsageFilters): string {
   return `${USAGE_PATHS.exportCsv}?${q.toString()}`;
 }
 
-/** The columns of the CSV: the columns of the screen and no personalities (R25, R26, CSV-02). */
+/** The columns of the CSV: the columns of the screen and no personalities (R25, R26). */
 export const CSV_COLUMNS = [
   "item", "type", "mode", "published", "published_at", "unpublished_at", "tools", "calls", "admin_calls",
   "service_calls", "users", "sessions", "ok", "errors_by_code", "auth_calls", "denied_calls", "p50_ms", "p95_ms",
@@ -190,7 +190,7 @@ export interface Readiness {
   banner: boolean;
   hintsReady: boolean;
   goalReady: boolean;
-  /** the window the hint waits for; it is the configured one (R7, CFG-02) */
+  /** the window the hint waits for; it is the configured one (R7) */
   hintDays: number;
   goalDays: number;
   observedDays: number;
@@ -267,12 +267,12 @@ export function successShare(row: Pick<UsageRow, "calls" | "ok" | "authCalls" | 
   return actual <= 0 ? null : row.ok / actual;
 }
 
-/** The rows the table shows: withdrawn items only under «including withdrawn» (R23, CUT-01). */
+/** The rows the table shows: withdrawn items only under «including withdrawn» (R23). */
 export function visibleRows(rows: UsageRow[], includeUnpublished: boolean): UsageRow[] {
   return includeUnpublished ? rows : rows.filter((r) => r.published);
 }
 
-/** Calls that matched no item of the catalog (R23, CUT-03): the zero UUID and no groups. */
+/** Calls that matched no item of the catalog (R23): the zero UUID and no groups. */
 export const ZERO_UUID = "00000000-0000-0000-0000-000000000000";
 export function outsideRows(rows: UsageRow[]): UsageRow[] {
   return rows.filter((r) => r.itemId === ZERO_UUID || r.itemType === "unknown");
@@ -280,12 +280,12 @@ export function outsideRows(rows: UsageRow[]): UsageRow[] {
 export function catalogRows(rows: UsageRow[]): UsageRow[] {
   return rows.filter((r) => r.itemId !== ZERO_UUID && r.itemType !== "unknown");
 }
-/** A row of an item deleted from the catalog: it has a tombstone date and no metrics (R23, CUT-02). */
+/** A row of an item deleted from the catalog: it has a tombstone date and no metrics (R23). */
 export function deletedRows(rows: UsageRow[]): UsageRow[] {
   return rows.filter((r) => r.deletedAt !== null);
 }
 
-/** Badges of hints and the «затихла» mark (R8–R11, HNT-01, REF-01); a skill never gets «unused» (R24, HNT-03). */
+/** Badges of hints and the «затихла» mark (R8–R11, REF-01); a skill never gets «unused» (R24). */
 export function rowBadges(row: Pick<UsageRow, "itemType" | "hints" | "state">): string[] {
   if (row.itemType === "skill") return row.state === "pinned" ? ["pinned"] : [];
   const out: string[] = [...row.hints];
@@ -325,7 +325,7 @@ export function sortUsageRows(rows: UsageRow[]): UsageRow[] {
   });
 }
 
-/** The column «отклонено подтверждений» (R17): a number, or «нет данных» — not zero (TBL-02, TBL-03). */
+/** The column «отклонено подтверждений» (R17): a number, or «нет данных» — not zero (R17). */
 export function confirmationsText(row: Pick<UsageRow, "confirmationsRejected">): { known: boolean; value: number | null } {
   return { known: row.confirmationsRejected !== null, value: row.confirmationsRejected };
 }
@@ -353,18 +353,18 @@ export function controlGroup(groups: UsageGroupSlice[]): UsageGroupSlice | null 
 export interface PublicationInfo {
   publishedAt: string | null;
   unpublishedAt: string | null;
-  /** «дата публикации оценочная»: published before the rollout (R13, PUB-04) */
+  /** «дата публикации оценочная»: published before the rollout (R13) */
   estimated: boolean;
   /** days the item spent withdrawn before it came back; null — it never came back (R13) */
   removedDays: number | null;
   returnedAt: string | null;
   /** days it has been published in the current interval */
   availableDays: number;
-  /** «молодая»: published less than the hint window ago (R13, PUB-03) */
+  /** «молодая»: published less than the hint window ago (R13) */
   young: boolean;
 }
 
-/** The intervals are oldest first; the last open one is the current state (R13, PUB-02). */
+/** The intervals are oldest first; the last open one is the current state (R13). */
 export function publicationInfo(intervals: UsageInterval[], hintDays: number, now: Date): PublicationInfo {
   const last = intervals.at(-1) ?? null;
   const prev = intervals.length > 1 ? intervals.at(-2) : null;
@@ -383,23 +383,23 @@ export function publicationInfo(intervals: UsageInterval[], hintDays: number, no
   };
 }
 
-/** «снята N дней, возвращена <дата>» — the one sentence of the card and of the confirmation (R13, ACT-08, ACT-13). */
+/** «снята N дней, возвращена <дата>» — the one sentence of the card and of the confirmation (R13, ACT-08). */
 export function withdrawnNote(info: PublicationInfo): { removedDays: number; returnedAt: string } | null {
   return info.removedDays === null || info.returnedAt === null ? null : { removedDays: info.removedDays, returnedAt: info.returnedAt };
 }
 
-/** The «young» state of a table row (R13, PUB-03). */
+/** The «young» state of a table row (R13). */
 export function isYoung(publishedAt: string | null, unpublishedAt: string | null, hintDays: number, now: Date): boolean {
   if (publishedAt === null || unpublishedAt !== null) return false;
   return daysBetween(publishedAt, now.toISOString()) < hintDays;
 }
 
-/** The mark of a withdrawn row (R23, CUT-01): the date it was withdrawn. */
+/** The mark of a withdrawn row (R23): the date it was withdrawn. */
 export function withdrawnLabel(row: Pick<UsageRow, "published" | "unpublishedAt">): { withdrawn: boolean; at: string | null } {
   return { withdrawn: !row.published, at: row.unpublishedAt };
 }
 
-/** A deleted item is a tombstone line without metrics (R23, CUT-02). */
+/** A deleted item is a tombstone line without metrics (R23). */
 export function deletedLabel(row: Pick<UsageRow, "deletedAt">): { deleted: boolean; at: string | null } {
   return { deleted: row.deletedAt !== null, at: row.deletedAt };
 }
@@ -409,11 +409,11 @@ export function deletedLabel(row: Pick<UsageRow, "deletedAt">): { deleted: boole
 export interface DrilldownWindow {
   from: string;
   to: string;
-  /** the asked period was longer than the drill-down window and was cut (DRL-02) */
+  /** the asked period was longer than the drill-down window and was cut (R21) */
   clamped: boolean;
 }
 
-/** The window of the drill-down is never longer than the configured one (R21, DRL-02). */
+/** The window of the drill-down is never longer than the configured one (R21). */
 export function drilldownWindow(from: string, to: string, drilldownDays: number): DrilldownWindow {
   const span = daysBetween(from, to) + 1;
   if (span <= drilldownDays) return { from, to, clamped: false };
@@ -429,7 +429,7 @@ export function latencyText(p50: number | null, p95: number | null): string | nu
 
 // ─── candidates (R20, R10, R15) ─────────────────────────────────────
 
-/** «много инструментов» — at least the configured number of allowed tools (R20, CST-04). */
+/** «много инструментов» — at least the configured number of allowed tools (R20). */
 export function isToolsMany(tools: number | null, threshold: number): boolean {
   return tools !== null && tools >= threshold;
 }
@@ -439,20 +439,20 @@ export function reasonCounts(candidates: UsageCandidate[]): { reason: CandidateR
   return CANDIDATE_REASONS.map((reason) => ({ reason, count: candidates.filter((c) => c.reasons.includes(reason)).length }));
 }
 
-/** «много ошибок авторизации» needs both the share and the calls (R10, CST-03): 60 % at 10 calls is not enough. */
+/** «много ошибок авторизации» needs both the share and the calls (R10): 60 % at 10 calls is not enough. */
 export function hasManyAuth(authShare: number | null, calls: number, meta: UsageMeta): boolean {
   return authShare !== null && authShare >= meta.thresholds.authShare && calls >= meta.thresholds.authMinCalls;
 }
 
 /** A candidate whose reason is «unavailable» carries the date of the last successful check,
- * or nothing when the item was never checked (R15, UNV-03). */
+ * or nothing when the item was never checked (R15). */
 export function candidateCheck(c: Pick<UsageCandidate, "reasons" | "lastOkAt">): { unavailable: boolean; lastOkAt: string | null } {
   return { unavailable: c.reasons.includes("unavailable"), lastOkAt: c.reasons.includes("unavailable") ? c.lastOkAt : null };
 }
 
 // ─── «unavailable» is not «unused» (R15) ────────────────────────────
 
-/** «недоступна» is a failed check only; `unconfigured` is the start catalog, not an error (R15, UNV-05). */
+/** «недоступна» is a failed check only; `unconfigured` is the start catalog, not an error (R15). */
 export function isUnavailable(status: string | null): boolean {
   return status === "error";
 }
@@ -462,7 +462,7 @@ export function checkTimes(card: Pick<UsageItemCard, "lastCheckAt" | "lastOkAt">
   return { lastCheckAt: card.lastCheckAt, lastOkAt: card.lastOkAt };
 }
 
-/** A hint is not put on an unavailable item, nor on a skill (R15, R24, HNT-03, HNT-04). */
+/** A hint is not put on an unavailable item, nor on a skill (R15, R24). */
 export function hintSuppressed(card: Pick<UsageItemCard, "itemType" | "status" | "states">): boolean {
   return card.itemType === "skill" || isUnavailable(card.status) || card.states.some((s) => s === "unavailable" || s === "not_granted" || s === "pinned");
 }
@@ -470,7 +470,7 @@ export function hintSuppressed(card: Pick<UsageItemCard, "itemType" | "status" |
 // ─── skills (R24) ──────────────────────────────────────────────────
 
 export interface SkillTelemetry {
-  /** false — «нет данных о применении», not zero activations (R24, SKL-01) */
+  /** false — «нет данных о применении», not zero activations (R24) */
   hasData: boolean;
   activations: number | null;
   sessions: number | null;
@@ -478,14 +478,14 @@ export interface SkillTelemetry {
   incomplete: true;
 }
 
-/** Skills count explicit activations and collected sessions only (R24, AGG-09, SKL-01–SKL-03). */
+/** Skills count explicit activations and collected sessions only (R24). */
 export function skillTelemetry(card: Pick<UsageItemCard, "skillActivations" | "skillSessions">): SkillTelemetry {
   const activations = card.skillActivations;
   const sessions = card.skillSessions;
   return { hasData: activations !== null || sessions !== null, activations, sessions, incomplete: true };
 }
 
-/** A skill never gets «unused», and never enters the goal metric (R24, HNT-03, SKL-04). */
+/** A skill never gets «unused», and never enters the goal metric (R24). */
 export function skillInGoal(itemType: UsageRow["itemType"]): boolean {
   return itemType === "mcp";
 }
@@ -504,7 +504,7 @@ export interface DeadShareView {
   droppedOut: { total: number; withCalls: number } | null;
 }
 
-/** The «dead share» tile: a value after 90 days, a progress of the observation before (R6, R14, RDY-02, RDY-05). */
+/** The «dead share» tile: a value after 90 days, a progress of the observation before (R6, R14, RDY-02). */
 export function deadShareView(tiles: UsageTiles, meta: UsageMeta): DeadShareView {
   const d = tiles.deadShare;
   const r = readiness(meta);
@@ -541,14 +541,14 @@ export interface UnpublishInput {
 }
 
 /** The dialogs validate before the request: a reason always, the name when there are
- * connections to delete (R27, ACT-02, ACT-03). The server repeats the same codes. */
+ * connections to delete (R27). The server repeats the same codes. */
 export function unpublishError(input: UnpublishInput): "reason_required" | "name_mismatch" | null {
   if (input.reason.trim() === "") return "reason_required";
   if (input.connections > 0 && input.confirmName.trim() !== input.name) return "name_mismatch";
   return null;
 }
 
-/** What a withdrawal touches (R27, ACT-01): users, connections, groups, agents and their tasks. */
+/** What a withdrawal touches (R27): users, connections, groups, agents and their tasks. */
 export function impactCounts(impact: UsageImpact): {
   users: number; connections: number; groups: number; agents: number; clients: number; tasks: number;
 } {
@@ -572,12 +572,12 @@ export function impactWarnings(impact: Pick<UsageImpact, "calls90" | "lastCallAt
   return out;
 }
 
-/** The preview of revoking one grant shows that group only (R28, ACT-10). */
+/** The preview of revoking one grant shows that group only (R28). */
 export function revokeImpact(impact: UsageImpact, groupId: string): UsageImpact {
   return { ...impact, grants: impact.grants.filter((g) => g.groupId === groupId) };
 }
 
-/** The confirmations field is not asked when nothing is deleted (R27, ACT-03). */
+/** The confirmations field is not asked when nothing is deleted (R27). */
 export function needsConfirmName(impact: Pick<UsageImpact, "connections">): boolean {
   return impact.connections > 0;
 }
@@ -592,7 +592,7 @@ export interface PinInput {
   reviewAt: string;
 }
 
-/** Pins need a reason and a date in the future (R12, PIN-03). */
+/** Pins need a reason and a date in the future (R12). */
 export function pinError(input: PinInput, now: Date): "reason_required" | "review_at_past" | null {
   if (input.reason.trim() === "") return "reason_required";
   const at = new Date(input.reviewAt).getTime();
@@ -600,12 +600,12 @@ export function pinError(input: PinInput, now: Date): "reason_required" | "revie
   return null;
 }
 
-/** The default review date: now plus the configured period (R7, R12, PIN-04). */
+/** The default review date: now plus the configured period (R7, R12). */
 export function defaultReviewAt(now: Date, pinDays: number): string {
   return new Date(now.getTime() + pinDays * 86_400_000).toISOString();
 }
 
-/** An effective pin hides the hint; an overdue one does not and is listed apart (R12, PIN-02). */
+/** An effective pin hides the hint; an overdue one does not and is listed apart (R12). */
 export function pinState(pin: Pick<UsagePin, "releasedAt" | "reviewAt">, now: Date): "released" | "overdue" | "effective" {
   if (pin.releasedAt !== null) return "released";
   return new Date(pin.reviewAt).getTime() <= now.getTime() ? "overdue" : "effective";
@@ -615,14 +615,14 @@ export function overduePins(pins: UsagePin[], now: Date): UsagePin[] {
   return pins.filter((p) => pinState(p, now) === "overdue");
 }
 
-/** Publication does not resume paused tasks; the confirmation says how many wait (R29, ACT-12). */
+/** Publication does not resume paused tasks; the confirmation says how many wait (R29). */
 export function pendingTasks(card: Pick<UsageItemCard, "unresolvedTasks">): number {
   return card.unresolvedTasks.length;
 }
 
 // ─── the overlap (R22) ─────────────────────────────────────────────
 
-/** Shared tool names of two items — a reference only, never a recommendation (R22, OVL-01). */
+/** Shared tool names of two items — a reference only, never a recommendation (R22). */
 export function overlapLines(overlap: { itemId: string; itemName: string; tools: string[] }[]): { itemName: string; tools: string[] }[] {
   return overlap.map((o) => ({ itemName: o.itemName, tools: o.tools }));
 }
@@ -632,9 +632,9 @@ export const OVERLAP_NOTE_KEY = "admin.catalogUsage.overlapNote";
 
 // ─── privacy and money (R25, R26, R16) ────────────────────────────
 
-/** Keys the report must never have: money, tokens and personalities (R16, R25, R26, TIL-04).
+/** Keys the report must never have: money, tokens and personalities (R16, R25, R26).
  * The report counts people, it never names them. */
-const FORBIDDEN_KEYS = /(cost|price|usd|token|money|email|user_?id|user_?name|person|@)/i;
+const FORBIDDEN_KEYS = /(cost|price|usd|token|money|email|user_?id|user_?name|people|persons|personal_?data|@)/i;
 
 /** True when an answer carries a monetary or personal field; a test keeps it false for every answer. */
 export function hasMoneyOrPersonalities(value: unknown): boolean {
