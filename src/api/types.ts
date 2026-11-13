@@ -417,10 +417,9 @@ export interface CatalogItem {
   mode: "personal" | "platform" | null;
   authKind?: string;
   readOnly: boolean;
-  status: "available" | "in_development" | "unavailable";
+  status: "available" | "unavailable";
   connected: boolean;
   connectedAt: string | null;
-  inDevelopment: boolean;
 }
 
 
@@ -670,7 +669,6 @@ export interface AdminCatalogItem {
   readOnly: boolean;
   exposure: string;
   published: boolean;
-  inDevelopment: boolean;
   status: string | null;
   statusReason: string | null;
   tools: CatalogTool[];

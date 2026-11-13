@@ -256,14 +256,12 @@
     "platform": "platform",
     "platformRead": "platform · read",
     "skill": "skill",
-    "inDevelopment": "in development",
     "connected": "Connected",
     "connect": "Connect",
     "revoke": "Revoke access",
     "disable": "Disable",
     "status": {
       "available": "Available",
-      "in_development": "Coming soon",
       "unavailable": "Unavailable"
     },
     "empty": "The catalog is empty",

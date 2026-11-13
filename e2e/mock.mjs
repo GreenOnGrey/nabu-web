@@ -110,8 +110,8 @@ const memories = [{ id: "y1", text: "Предпочитает краткие о�
 const space = { state: "running", usedBytes: 1200000, quotaBytes: 100000000, files: 2, lastActivityAt: T("13:00"), enabled: true };
 const files = [{ path: "notes/план.md", size: 2048, sha256: "ab12", modifiedAt: T("13:00"), modifiedBy: "agent" }, { path: "счёт.pdf", size: 120000, sha256: "cd34", modifiedAt: T("08:40"), modifiedBy: "user" },
   { path: "backup/archive.zip", size: 1204000, sha256: "ef56", modifiedAt: T("08:00"), modifiedBy: "agent" }];
-const catalog = [{ id: "i1", type: "mcp", name: "github", title: "GitHub", description: "Задачи и запросы на изменение.", mode: "personal", authKind: "oauth", readOnly: false, status: "available", connected: true, connectedAt: T("09:00", "02"), inDevelopment: false },
-  { id: "i2", type: "skill", name: "summary", title: "Сводка", description: "Краткое изложение длинных текстов.", mode: "platform", readOnly: true, status: "available", connected: false, connectedAt: null, inDevelopment: false }];
+const catalog = [{ id: "i1", type: "mcp", name: "github", title: "GitHub", description: "Задачи и запросы на изменение.", mode: "personal", authKind: "oauth", readOnly: false, status: "available", connected: true, connectedAt: T("09:00", "02") },
+  { id: "i2", type: "skill", name: "summary", title: "Сводка", description: "Краткое изложение длинных текстов.", mode: "platform", readOnly: true, status: "available", connected: false, connectedAt: null }];
 const users = [{ id: "u1", email: "ada@example.com", name: "Ада Лавлейс", isAdmin: true, status: "active", lastSeenAt: T("14:00"), createdAt: T("09:00", "01"), channels: ["telegram"] },
   { id: "u2", email: "alan@example.com", name: "Алан Тьюринг", isAdmin: false, status: "invited", lastSeenAt: null, createdAt: T("09:00", "05"), channels: [] },
   { id: "u3", email: "grace@example.com", name: "Грейс Хоппер", isAdmin: false, status: "blocked", lastSeenAt: T("10:00", "04"), createdAt: T("09:00", "02"), channels: [] }];
@@ -130,7 +130,7 @@ const tool = (name, readOnly, stringArgs, description) => ({ name, readOnly, des
 const adminCatalog = [
   { id: "a1", type: "mcp", name: "docling", title: "Документы", description: "Разбор PDF, DOCX и сканов.",
     source: { kind: "url", url: "http://docling-mcp.mcp.svc:8080/mcp" }, mode: "platform", personalAuth: null,
-    platformAuth: { Authorization: "…3f9a" }, readOnly: false, exposure: "deferred", published: true, inDevelopment: false,
+    platformAuth: { Authorization: "…3f9a" }, readOnly: false, exposure: "deferred", published: true,
     status: "ok", statusReason: null, skills: [], syncedAt: null, checkedAt: T("11:42", "14"),
     tools: [tool("convert_document_into_docling_document", false, ["source"], "Convert a document from a URL or local path into a Docling document."),
       tool("export_docling_document_to_markdown", true, ["document_key"], "Export a cached Docling document to Markdown."),
@@ -146,7 +146,7 @@ const adminCatalog = [
     source: { kind: "url", url: "https://ai.workspace.vk.ru/mcp" }, mode: "personal",
     personalAuth: { kind: "mcp_oauth", issuer: "https://ai.workspace.vk.ru", authorizeUrl: "https://ai.workspace.vk.ru/oauth/authorize",
       tokenUrl: "https://ai.workspace.vk.ru/oauth/token", resource: "https://ai.workspace.vk.ru/mcp", clientId: "nabu-7f3c2a", registeredAt: T("10:15", "13") },
-    platformAuth: {}, readOnly: true, exposure: "deferred", published: true, inDevelopment: false,
+    platformAuth: {}, readOnly: true, exposure: "deferred", published: true,
     status: null, statusReason: null, skills: [], syncedAt: null, checkedAt: null, tools: [], allowedTools: null, fileArgs: [], fileMaxBytes: 20971520, newTools: [],
     callbackUrl: "https://nabu.example/api/v1/oauth/callback/a2" },
 ];

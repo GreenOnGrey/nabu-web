@@ -89,6 +89,8 @@ export const SCREENS: Screen[] = [
   { name: "admin-catalog-mcp-oauth", path: "/admin/catalog", act: async (page) => {
     await page.getByRole("button", { name: "Изменить" }).nth(1).click();
     await page.getByRole("dialog").getByText("nabu-7f3c2a", { exact: false }).waitFor();
+    // FTR.NAB.ADM-0001 CAT-NODEV-03: no switch «in development»
+    if (await page.getByRole("dialog").getByText("в разработке").count()) throw new Error("CAT-NODEV-03: the switch is shown");
   } },
   // FTR.NAB.CMN-0007 design §3.2: the card of an ordinary group
   { name: "admin-groups-card", path: "/admin/groups", act: async (page) => { await page.getByText("Продажи", { exact: true }).click(); } },

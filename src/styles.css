@@ -9,7 +9,6 @@
 .ccard .acts{display:flex;align-items:center;gap:8px;justify-content:space-between;margin-top:6px}
 .mode{font-size:11px;padding:2px 8px;border-radius:999px;background:var(--surface-2);color:var(--text-2);white-space:nowrap}
 .mode.p{background:var(--violet-soft);color:var(--violet-text)}
-.mode.dev{background:var(--amber-soft);color:var(--amber)}
 .memrow{display:grid;grid-template-columns:1fr 170px auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px}
 .channels{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:24px}
 .runs{border-top:1px solid var(--border);margin-top:10px;padding-top:10px}

@@ -47,7 +47,6 @@ export function CatalogAdmin() {
             {list.data?.items.map((it) => (
               <tr key={it.id}>
                 <td><b>{it.title || it.name}</b> <span className="mono small muted">{it.name}</span>
-                  {it.inDevelopment && <> <span className="mode dev">{t("connections.inDevelopment")}</span></>}
                   <div className="small muted">{it.type === "skill" ? t("admin.catalog.skills", { count: it.skills.length }) : toolsLabel(t, it)}</div></td>
                 <td className="small">{it.source.kind === "url" ? <span className="mono">{it.source.url}</span>
                   : it.source.kind === "git" ? <span className="mono">{it.source.repo}/{it.source.path}@{it.source.ref || "main"}</span>
@@ -122,11 +121,10 @@ function EditItem({ item: initial, type, onClose }: { item: AdminCatalogItem | n
   const [audience, setAudience] = useState(item?.personalAuth?.audience ?? "");
   const [headers, setHeaders] = useState<{ k: string; v: string }[]>(Object.keys(item?.platformAuth ?? {}).map((k) => ({ k, v: "" })));
   const [exposure, setExposure] = useState(item?.exposure ?? "deferred");
-  const [inDev, setInDev] = useState(item?.inDevelopment ?? false);
   const fileMaxBytes = mbToBytes(tools.fileMax);
   const resultMaxBytes = mbToBytes(tools.resultMax, DEFAULT_RESULT_MAX_BYTES);
   const toSave = async () => {
-      const body: Record<string, unknown> = { type, name, title, description, inDevelopment: inDev,
+      const body: Record<string, unknown> = { type, name, title, description,
         source: srcKind === "url" ? { kind: "url", url } : srcKind === "git" ? { kind: "git", repo, path, ref } : { kind: "upload" } };
       if (type === "mcp") {
         Object.assign(body, { mode, exposure });
@@ -266,7 +264,6 @@ function EditItem({ item: initial, type, onClose }: { item: AdminCatalogItem | n
           </div>
         </>
       )}
-      <Switch on={inDev} onChange={setInDev} label={t("connections.inDevelopment")} />
       {save.error && <div className="err-text">{errorText(t, save.error)}</div>}
     </Modal>
   );

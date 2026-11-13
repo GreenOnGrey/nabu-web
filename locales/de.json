@@ -256,14 +256,12 @@
     "platform": "Plattform",
     "platformRead": "Plattform · lesen",
     "skill": "Skill",
-    "inDevelopment": "in Entwicklung",
     "connected": "Verbunden",
     "connect": "Verbinden",
     "revoke": "Zugriff entziehen",
     "disable": "Deaktivieren",
     "status": {
       "available": "Verfügbar",
-      "in_development": "Demnächst",
       "unavailable": "Nicht verfügbar"
     },
     "empty": "Der Katalog ist leer",

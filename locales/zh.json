@@ -256,14 +256,12 @@
     "platform": "平台",
     "platformRead": "平台 · 只读",
     "skill": "技能",
-    "inDevelopment": "开发中",
     "connected": "已连接",
     "connect": "连接",
     "revoke": "撤销访问",
     "disable": "停用",
     "status": {
       "available": "可用",
-      "in_development": "即将推出",
       "unavailable": "不可用"
     },
     "empty": "目录为空",
