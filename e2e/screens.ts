@@ -85,6 +85,11 @@ export const SCREENS: Screen[] = [
     await page.getByRole("button", { name: /^Аргументы/ }).first().click();
   } },
   { name: "admin-catalog-new", path: "/admin/catalog", act: click("Добавить MCP") },
+  // FTR.NAB.ADM-0001 design §3.1: OAuth MCP of an item, registered
+  { name: "admin-catalog-mcp-oauth", path: "/admin/catalog", act: async (page) => {
+    await page.getByRole("button", { name: "Изменить" }).nth(1).click();
+    await page.getByRole("dialog").getByText("nabu-7f3c2a", { exact: false }).waitFor();
+  } },
   // FTR.NAB.CMN-0007 design §3.2: the card of an ordinary group
   { name: "admin-groups-card", path: "/admin/groups", act: async (page) => { await page.getByText("Продажи", { exact: true }).click(); } },
 ];

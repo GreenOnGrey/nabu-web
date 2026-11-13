@@ -192,7 +192,10 @@
       "collected": "消息：{messages}，新笔记：{notes}",
       "items": "{count, plural, other {# 项}}",
       "nothing": "没有需要提醒的",
-      "nothingNew": "没有新内容"
+      "nothingNew": "没有新内容",
+      "truncated": "因数量过多未读取：{chats}",
+      "truncatedChat": "{chat}：已读取最近 {count} 条",
+      "rateLimited": "来源限制了请求频率：下次运行将重试"
     }
   },
   "memory": {
@@ -493,7 +496,8 @@
       "auth": {
         "oauth": "OAuth",
         "token": "个人令牌",
-        "delegation": "委托"
+        "delegation": "委托",
+        "mcp_oauth": "OAuth MCP（自动）"
       },
       "audience": "受众",
       "delegationHint": "Nabu 为该受众签发令牌并传递用户邮箱；产品使用 Nabu 的公钥验证签名。",
@@ -538,7 +542,19 @@
       "checkedNew": "{count, plural, other {# 个新工具}}",
       "checkFailed": "{name}：{reason}",
       "synced": "{name} 已同步 · {count, plural, other {# 个技能}}",
-      "syncing": "正在同步…"
+      "syncing": "正在同步…",
+      "mcpOAuth": {
+        "hint": "Nabu 会自动找到授权服务器并注册客户端。",
+        "pending": "保存时注册客户端",
+        "saving": "正在注册客户端…",
+        "issuer": "授权服务器",
+        "client": "客户端",
+        "registered": "注册于 {date}",
+        "reregister": "重新注册客户端",
+        "confirm": "用户的连接将被重置：他们需要重新连接，在此之前其通信收集会暂停。",
+        "done": "客户端已重新注册",
+        "manual": "手动填写"
+      }
     },
     "service-agents": {
       "title": "服务智能体",
@@ -1288,7 +1304,13 @@
     "no_files": "该运行没有工作副本",
     "bad_archive": "工作副本的归档已损坏或包含目录之外的路径",
     "workspace_too_large": "工作副本超出限制：{files, number} 个文件，{bytes, number} 字节；最多 {maxFiles, number} 个文件和 {maxBytes, number} 字节",
-    "expired": "该运行的文件已被删除"
+    "expired": "该运行的文件已被删除",
+    "mcp_oauth_discovery_failed": "服务器未提供授权元数据。",
+    "mcp_oauth_registration_unsupported": "服务器不支持自动注册客户端。",
+    "mcp_oauth_registration_failed": "授权服务器拒绝注册客户端。",
+    "mcp_oauth_only": "只有使用 OAuth MCP 的条目才能注册客户端。",
+    "source_access": "无法访问来源。请在“连接”中重新连接。",
+    "source_unavailable": "来源未响应。"
   },
   "comm": {
     "lead": "助手了解的关于您和您工作往来的信息",
@@ -1507,7 +1529,15 @@
       "collectedText": "笔记：{notes}，未完成约定：{commitments} · 保留 {days} 天",
       "deleteAll": "删除已收集的内容",
       "deleteAllTitle": "删除全部已收集的内容？",
-      "deleteAllText": "将删除笔记（{notes}）、约定（{commitments}）、人员和主题，并关闭记忆任务。记忆中的事实会保留。"
+      "deleteAllText": "将删除笔记（{notes}）、约定（{commitments}）、人员和主题，并关闭记忆任务。记忆中的事实会保留。",
+      "muted": {
+        "title": "已静音的群组不收集",
+        "add": "恢复群组",
+        "search": "已静音群组的名称",
+        "included": "虽已静音仍收集",
+        "none": "未找到已静音的群组",
+        "error": "无法读取群组列表：请重新连接 VK WorkSpace"
+      }
     }
   },
   "models": {

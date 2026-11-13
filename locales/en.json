@@ -192,7 +192,10 @@
       "collected": "Messages: {messages}, new notes: {notes}",
       "items": "{count, plural, one {# item} other {# items}}",
       "nothing": "Nothing to remind of",
-      "nothingNew": "Nothing new"
+      "nothingNew": "Nothing new",
+      "truncated": "Not read for the volume: {chats}",
+      "truncatedChat": "{chat} — the latest {count} read",
+      "rateLimited": "The source limits the rate of requests: the next run repeats"
     }
   },
   "memory": {
@@ -493,7 +496,8 @@
       "auth": {
         "oauth": "OAuth",
         "token": "Personal token",
-        "delegation": "Delegation"
+        "delegation": "Delegation",
+        "mcp_oauth": "OAuth MCP (automatic)"
       },
       "audience": "Audience",
       "delegationHint": "Nabu signs a token for this audience and passes the user's email; the product checks the signature by Nabu's keys.",
@@ -538,7 +542,19 @@
       "checkedNew": "{count, plural, one {# new} other {# new}}",
       "checkFailed": "{name}: {reason}",
       "synced": "{name} synchronized · {count, plural, one {# skill} other {# skills}}",
-      "syncing": "Synchronizing…"
+      "syncing": "Synchronizing…",
+      "mcpOAuth": {
+        "hint": "Nabu finds the authorization server and registers its client itself.",
+        "pending": "The client is registered on save",
+        "saving": "Registering the client…",
+        "issuer": "Authorization server",
+        "client": "Client",
+        "registered": "registered {date}",
+        "reregister": "Re-register the client",
+        "confirm": "The connections of users will be reset: they connect again, and their collection of communications pauses until then.",
+        "done": "The client is registered again",
+        "manual": "Fill in manually"
+      }
     },
     "service-agents": {
       "title": "Service agents",
@@ -1288,7 +1304,13 @@
     "no_files": "The run has no working copy",
     "bad_archive": "The archive of the working copy is broken or has paths outside its directory",
     "workspace_too_large": "The working copy is over the limit: {files, number} files, {bytes, number} bytes; at most {maxFiles, number} files and {maxBytes, number} bytes",
-    "expired": "The files of the run are already deleted"
+    "expired": "The files of the run are already deleted",
+    "mcp_oauth_discovery_failed": "The server gives no metadata of its authorization.",
+    "mcp_oauth_registration_unsupported": "The server does not support the automatic registration of a client.",
+    "mcp_oauth_registration_failed": "The authorization server refused to register the client.",
+    "mcp_oauth_only": "Only an item with OAuth MCP registers its client.",
+    "source_access": "No access to the source. Connect it again in Connections.",
+    "source_unavailable": "The source did not answer."
   },
   "comm": {
     "lead": "What the agent knows about you and your work correspondence",
@@ -1507,7 +1529,15 @@
       "collectedText": "Notes: {notes}, open commitments: {commitments} · kept for {days} days",
       "deleteAll": "Delete everything collected",
       "deleteAllTitle": "Delete everything collected?",
-      "deleteAllText": "Notes ({notes}), commitments ({commitments}), people and topics are deleted and the memory tasks are switched off. The facts of the memory stay."
+      "deleteAllText": "Notes ({notes}), commitments ({commitments}), people and topics are deleted and the memory tasks are switched off. The facts of the memory stay.",
+      "muted": {
+        "title": "Muted groups are not collected",
+        "add": "Return a group",
+        "search": "Name of a muted group",
+        "included": "Collected though muted",
+        "none": "No muted groups found",
+        "error": "The list of groups could not be read: connect VK WorkSpace again"
+      }
     }
   },
   "models": {

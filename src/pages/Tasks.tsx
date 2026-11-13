@@ -99,7 +99,7 @@ function TaskRow({ task, lng, open, onToggle, onCancel, onResume, onPause }: {
               <span className={task.lastRun.status === "succeeded" ? "ok-t" : task.lastRun.status === "failed" ? "err-t" : "muted"}>
                 {t(`tasks.run.${task.lastRun.status}`)}
               </span>
-              <div className="small muted">{task.lastRun.error ?? memorySummary(t, task.lastRun.summary) ?? ""}</div>
+              <div className="small muted" style={{ whiteSpace: "pre-line" }}>{task.lastRun.error ?? (memory ? memorySummary(t, task.lastRun.summary) : task.lastRun.summary) ?? ""}</div>
             </>
           ) : <span className="muted">—</span>}
           {task.status === "paused" && memory && task.pauseKind && task.pauseKind !== "user" && <div className="small warn-t">{t(`comm.tasks.paused.${task.pauseKind}`, { defaultValue: task.pauseReason ?? "" })}</div>}
@@ -121,6 +121,19 @@ function TaskRow({ task, lng, open, onToggle, onCancel, onResume, onPause }: {
 /** The outcome of a run of a memory task: the server stores counters, the text is ours. */
 function memorySummary(t: (k: string, o?: Record<string, unknown>) => string, s: string | null): string | null {
   if (!s) return s;
+  // FTR.NAB.ADM-0001 R10: a second line names the chats read up to the limit
+  const nl = s.indexOf("\ntruncated:");
+  if (nl >= 0) {
+    let chats: Record<string, number> = {};
+    try {
+      const parsed: unknown = JSON.parse(s.slice(nl + "\ntruncated:".length));
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) chats = parsed as Record<string, number>;
+    } catch { /* the first line alone */ }
+    const list = Object.entries(chats).map(([chat, count]) => t("tasks.memory.truncatedChat", { chat, count })).join("; ");
+    const head = memorySummary(t, s.slice(0, nl)) ?? "";
+    return list ? head + "\n" + t("tasks.memory.truncated", { chats: list }) : head;
+  }
+  if (s === "rate_limited") return t("tasks.memory.rateLimited");
   const collect = /^messages:(\d+) notes:(\d+)$/.exec(s);
   if (collect) return t("tasks.memory.collected", { messages: Number(collect[1]), notes: Number(collect[2]) });
   const items = /^items:(\d+)$/.exec(s);
@@ -161,7 +174,7 @@ function Runs({ task, lng }: { task: Task; lng: string }) {
         <div className="r" key={r.id}>
           <span>{dateTime(r.startedAt, lng)}</span>
           <span className={r.status === "succeeded" ? "ok-t" : r.status === "failed" ? "err-t" : "muted"}>{t(`tasks.run.${r.status}`)}</span>
-          <span className="t2">{r.errorText ?? r.summary ?? ""}
+          <span className="t2" style={{ whiteSpace: "pre-line" }}>{r.errorText ?? (task.kind !== "agent" ? memorySummary(t, r.summary) : r.summary) ?? ""}
             {r.deliveryNote === "channel_unavailable" && <span className="small warn-t"> · {t("tasks.channelUnavailable")}</span>}</span>
           {r.messageId ? <Link to="/" className="small">{t("tasks.openInChat")}</Link> : <span />}
         </div>

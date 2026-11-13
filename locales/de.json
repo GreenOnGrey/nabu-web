@@ -192,7 +192,10 @@
       "collected": "Nachrichten: {messages}, neue Notizen: {notes}",
       "items": "{count, plural, one {# Punkt} other {# Punkte}}",
       "nothing": "Nichts zu erinnern",
-      "nothingNew": "Nichts Neues"
+      "nothingNew": "Nichts Neues",
+      "truncated": "Wegen der Menge nicht gelesen: {chats}",
+      "truncatedChat": "{chat} — die letzten {count} gelesen",
+      "rateLimited": "Die Quelle begrenzt die Anfragerate: Der nächste Lauf wiederholt die Sammlung"
     }
   },
   "memory": {
@@ -493,7 +496,8 @@
       "auth": {
         "oauth": "OAuth",
         "token": "Persönliches Token",
-        "delegation": "Delegierung"
+        "delegation": "Delegierung",
+        "mcp_oauth": "OAuth MCP (automatisch)"
       },
       "audience": "Audience",
       "delegationHint": "Nabu signiert ein Token für diese Audience und übergibt die E-Mail des Benutzers; das Produkt prüft die Signatur mit den Schlüsseln von Nabu.",
@@ -538,7 +542,19 @@
       "checkedNew": "{count, plural, one {# neues} other {# neue}}",
       "checkFailed": "{name}: {reason}",
       "synced": "{name} synchronisiert · {count, plural, one {# Skill} other {# Skills}}",
-      "syncing": "Wird synchronisiert…"
+      "syncing": "Wird synchronisiert…",
+      "mcpOAuth": {
+        "hint": "Nabu findet den Autorisierungsserver und registriert seinen Client selbst.",
+        "pending": "Der Client wird beim Speichern registriert",
+        "saving": "Client wird registriert…",
+        "issuer": "Autorisierungsserver",
+        "client": "Client",
+        "registered": "registriert am {date}",
+        "reregister": "Client neu registrieren",
+        "confirm": "Die Verbindungen der Nutzer werden zurückgesetzt: Sie verbinden sich erneut, bis dahin pausiert ihre Sammlung der Kommunikation.",
+        "done": "Der Client ist neu registriert",
+        "manual": "Manuell ausfüllen"
+      }
     },
     "service-agents": {
       "title": "Dienstagenten",
@@ -1288,7 +1304,13 @@
     "no_files": "Der Lauf hat keine Arbeitskopie",
     "bad_archive": "Das Archiv der Arbeitskopie ist beschädigt oder enthält Pfade außerhalb des Verzeichnisses",
     "workspace_too_large": "Die Arbeitskopie überschreitet das Limit: {files, number} Dateien, {bytes, number} Bytes; höchstens {maxFiles, number} Dateien und {maxBytes, number} Bytes",
-    "expired": "Die Dateien des Laufs sind bereits gelöscht"
+    "expired": "Die Dateien des Laufs sind bereits gelöscht",
+    "mcp_oauth_discovery_failed": "Der Server liefert keine Metadaten seiner Autorisierung.",
+    "mcp_oauth_registration_unsupported": "Der Server unterstützt die automatische Registrierung eines Clients nicht.",
+    "mcp_oauth_registration_failed": "Der Autorisierungsserver hat die Registrierung des Clients abgelehnt.",
+    "mcp_oauth_only": "Nur ein Eintrag mit OAuth MCP registriert seinen Client.",
+    "source_access": "Kein Zugriff auf die Quelle. Verbinden Sie sie in Verbindungen erneut.",
+    "source_unavailable": "Die Quelle hat nicht geantwortet."
   },
   "comm": {
     "lead": "Was der Agent über Sie und Ihre Arbeitskorrespondenz weiß",
@@ -1507,7 +1529,15 @@
       "collectedText": "Notizen: {notes}, offene Zusagen: {commitments} · Aufbewahrung {days} Tage",
       "deleteAll": "Erfasstes löschen",
       "deleteAllTitle": "Alles Erfasste löschen?",
-      "deleteAllText": "Notizen ({notes}), Zusagen ({commitments}), Personen und Themen werden gelöscht und die Gedächtnisaufgaben ausgeschaltet. Die Fakten bleiben."
+      "deleteAllText": "Notizen ({notes}), Zusagen ({commitments}), Personen und Themen werden gelöscht und die Gedächtnisaufgaben ausgeschaltet. Die Fakten bleiben.",
+      "muted": {
+        "title": "Stummgeschaltete Gruppen werden nicht gesammelt",
+        "add": "Gruppe zurückholen",
+        "search": "Name einer stummgeschalteten Gruppe",
+        "included": "Gesammelt, obwohl stummgeschaltet",
+        "none": "Keine stummgeschalteten Gruppen gefunden",
+        "error": "Die Liste der Gruppen konnte nicht gelesen werden: Verbinden Sie VK WorkSpace erneut"
+      }
     }
   },
   "models": {
