@@ -846,7 +846,12 @@
       "result": "Итог",
       "via": "через {client}",
       "empty": "Записей нет",
-      "system": "Система"
+      "system": "Система",
+      "logTitle": "Журнал администрирования",
+      "logAction": "Действие",
+      "logTarget": "Объект",
+      "logReason": "Причина",
+      "logActor": "Автор"
     },
     "channels": {
       "title": "Каналы",

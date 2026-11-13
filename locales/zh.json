@@ -846,7 +846,12 @@
       "result": "结果",
       "via": "通过 {client}",
       "empty": "没有记录",
-      "system": "系统"
+      "system": "系统",
+      "logTitle": "管理日志",
+      "logAction": "操作",
+      "logTarget": "对象",
+      "logReason": "原因",
+      "logActor": "作者"
     },
     "channels": {
       "title": "渠道",

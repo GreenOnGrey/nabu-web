@@ -846,7 +846,12 @@
       "result": "Result",
       "via": "via {client}",
       "empty": "No records",
-      "system": "System"
+      "system": "System",
+      "logTitle": "Administration log",
+      "logAction": "Action",
+      "logTarget": "Target",
+      "logReason": "Reason",
+      "logActor": "Author"
     },
     "channels": {
       "title": "Channels",

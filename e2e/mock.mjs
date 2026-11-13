@@ -185,6 +185,10 @@ const usageRows = [
   usageRow({ itemId: "a6", itemName: "kubernetes", toolCount: 8, calls: 3, users: 1, sessions: 1, ok: 1,
     errorsByCode: { tool_error: 2 }, p50Ms: 900, p95Ms: 3000, lastCallAt: T("10:00", "09"), calls90: 3,
     state: "unavailable", groups: [{ groupId: "g-sales", groupName: "Продажи", builtin: null, calls: 3 }] }),
+  // R23, ACT-06: withdrawn on 5 October — hidden by default, and under «включая снятые»
+  // it comes back with the date of the withdrawal and without hints
+  usageRow({ itemId: "a7", itemName: "yandex-mail", toolCount: 4, published: false, publishedAt: null,
+    unpublishedAt: T("09:00", "05"), availableDays: 0, state: "unpublished", hints: [], groups: [] }),
   // R23: calls of a server that is not in the catalog — no groups, no publication, outside the tops
   usageRow({ itemId: "00000000-0000-0000-0000-000000000000", itemName: "postgres-legacy", itemType: "unknown", mode: null,
     published: false, publishedAt: null, toolCount: null, calls: 20, users: 3, sessions: 4, ok: 2,
@@ -214,16 +218,34 @@ const usageCandidates = [
 ];
 const usagePins = { items: [], nextCursor: null };
 
+// R16, TIL-01: ninety days of aggregates — the goal tile shows its value, not the progress of
+// the observation, and the trends start on the first day of data.
+const goalMeta = { ...usageMeta, dataFrom: "2026-07-13",
+  ready: { quick: true, hints: true, goal: true, observationDays: 90, observationLeft: 0 },
+  goalMetric: { value: 15.0, baseline: 22.5, delta: -7.5, verifiedManuallyAt: "2026-10-01" } };
+const goalTiles = { ...usageTiles, deadShare: { value: 15.0, dead: 6, total: 40, baseline: 22.5, delta: -7.5,
+  verifiedManuallyAt: "2026-10-01", droppedOut: { total: 3, withCalls: 1 } } };
+
+// R31, ACT-16: the administration log after a withdrawal, a publication and a grant revocation.
+// Newest first, as GET /admin-log answers; the reason and the author are what the feed shows.
+const adminLog = [
+  { id: 3, at: T("14:10"), actorEmail: "evgeny@example.com", action: "catalog.grant.revoke", target: "catalog_item:a1",
+    before: null, after: { reason: "Бухгалтерия перешла на Jira", groupName: "Бухгалтерия", removedConnections: 3, pausedCollectionTasks: 1 } },
+  { id: 2, at: T("14:05"), actorEmail: "evgeny@example.com", action: "catalog.publish", target: "catalog_item:a1",
+    before: { published: false }, after: { reason: "миграция завершена", published: true } },
+  { id: 1, at: T("14:00"), actorEmail: "ada@example.com", action: "catalog.unpublish", target: "catalog_item:a1",
+    before: { published: true }, after: { reason: "переходим на Jira", removedConnections: 12, pausedCollectionTasks: 4 } },
+];
+
 // ─── the rules the fixture may not break (R8, R10, R11, R13, R15, R16, R20) ───
 /** The seven reasons of «candidates for review» (R20, design §3.2). */
 const CANDIDATE_REASONS = ["not_granted", "tools_overlap", "tools_many", "new_position", "service_only", "many_auth", "unavailable"];
 /** The states that are also a hint of the table (R8–R11). */
 const HINT_STATES = ["unused", "dormant", "single_user", "errors_only"];
 
-function assertUsageFixture() {
+function assertUsageFixture(meta = usageMeta, tiles = usageTiles) {
   const fail = (what) => { throw new Error(`e2e/mock.mjs: ${what}`); };
   const at = (iso) => Date.parse(iso);
-  const meta = usageMeta;
   const t = meta.thresholds;
   const updated = at(meta.updatedAt);
   const sum = (list, f) => list.reduce((n, x) => n + f(x), 0);
@@ -235,8 +257,8 @@ function assertUsageFixture() {
   const auth = sum(usageRows, (r) => r.authCalls);
   const denied = sum(usageRows, (r) => r.deniedCalls);
   const share = Math.round((sum(usageRows, (r) => r.ok) / (calls - auth - denied)) * 1000) / 1000;
-  if (usageTiles.platformSuccess.value !== share) fail(`platformSuccess.value ${usageTiles.platformSuccess.value} is not ${share} (R16)`);
-  if (usageTiles.platformSuccess.auth !== auth || usageTiles.platformSuccess.denied !== denied) fail("platformSuccess.auth/denied differ from the rows (R16)");
+  if (tiles.platformSuccess.value !== share) fail(`platformSuccess.value ${tiles.platformSuccess.value} is not ${share} (R16)`);
+  if (tiles.platformSuccess.auth !== auth || tiles.platformSuccess.denied !== denied) fail("platformSuccess.auth/denied differ from the rows (R16)");
 
   for (const r of usageRows) {
     const errors = sum(Object.values(r.errorsByCode), (n) => n);
@@ -291,24 +313,24 @@ function assertUsageFixture() {
     }
     if (c.authShare !== null && row.calls > 0 && c.authShare !== row.authCalls / row.calls) fail(`candidate ${c.itemName}: authShare ${c.authShare} differs from the row (${row.authCalls / row.calls})`);
   }
-  if (usageTiles.resolvedCandidates.candidates !== usageCandidates.length) fail("resolvedCandidates.candidates differ from the panel (R16)");
-  if (usageTiles.resolvedCandidates.value !== Math.round((usageTiles.resolvedCandidates.resolved / usageCandidates.length) * 100) / 100) fail("resolvedCandidates.value is not resolved/candidates (R16)");
+  if (tiles.resolvedCandidates.candidates !== usageCandidates.length) fail("resolvedCandidates.candidates differ from the panel (R16)");
+  if (tiles.resolvedCandidates.value !== Math.round((tiles.resolvedCandidates.resolved / usageCandidates.length) * 100) / 100) fail("resolvedCandidates.value is not resolved/candidates (R16)");
 
   // R16: the other tiles count the same rows; out-of-catalog rows stay outside the tops (R23)
-  if (usageTiles.unusedCount !== usageRows.filter((r) => r.hints.includes("unused")).length) fail("unusedCount differs from the rows with the hint");
-  if (usageTiles.pinnedUnused !== usagePins.items.filter((p) => p.effective).length) fail("pinnedUnused differs from the effective pins");
-  if (usageTiles.publishedToolCount.value !== sum(items.filter((r) => r.published && r.itemType === "mcp"), (r) => r.toolCount ?? 0)) fail("publishedToolCount differs from the tools of the published items");
-  const topCalls = [...items].filter((r) => r.calls > 0).sort((a, b) => b.calls - a.calls).slice(0, usageTiles.topCalls.length);
+  if (tiles.unusedCount !== usageRows.filter((r) => r.hints.includes("unused")).length) fail("unusedCount differs from the rows with the hint");
+  if (tiles.pinnedUnused !== usagePins.items.filter((p) => p.effective).length) fail("pinnedUnused differs from the effective pins");
+  if (tiles.publishedToolCount.value !== sum(items.filter((r) => r.published && r.itemType === "mcp"), (r) => r.toolCount ?? 0)) fail("publishedToolCount differs from the tools of the published items");
+  const topCalls = [...items].filter((r) => r.calls > 0).sort((a, b) => b.calls - a.calls).slice(0, tiles.topCalls.length);
   const key = (x) => `${x.itemId}:${x.calls}`;
-  if (usageTiles.topCalls.map(key).join() !== topCalls.map(key).join()) fail(`topCalls ${usageTiles.topCalls.map(key)} differ from the rows ${topCalls.map(key)}`);
+  if (tiles.topCalls.map(key).join() !== topCalls.map(key).join()) fail(`topCalls ${tiles.topCalls.map(key)} differ from the rows ${topCalls.map(key)}`);
   const codes = items
     .flatMap((r) => Object.entries(r.errorsByCode)
       .filter(([code, n]) => code !== "auth" && code !== "denied" && n > 0)
       .map(([code, n]) => ({ itemId: r.itemId, code, calls: n })))
-    .sort((a, b) => b.calls - a.calls).slice(0, usageTiles.topErrors.length);
+    .sort((a, b) => b.calls - a.calls).slice(0, tiles.topErrors.length);
   const codeKey = (x) => `${x.itemId}:${x.code}:${x.calls}`;
-  if (usageTiles.topErrors.map(codeKey).join() !== codes.map(codeKey).join()) fail(`topErrors ${usageTiles.topErrors.map(codeKey)} differ from the rows ${codes.map(codeKey)}`);
-  if (!meta.ready.goal && (usageTiles.deadShare.value !== null || usageTiles.deadShare.dead !== null)) fail("deadShare before the goal window is filled (R6, R14)");
+  if (tiles.topErrors.map(codeKey).join() !== codes.map(codeKey).join()) fail(`topErrors ${tiles.topErrors.map(codeKey)} differ from the rows ${codes.map(codeKey)}`);
+  if (!meta.ready.goal && (tiles.deadShare.value !== null || tiles.deadShare.dead !== null)) fail("deadShare before the goal window is filled (R6, R14)");
 
   // R6, R7: the readiness of the meta follows the observation and the windows
   const observed = Math.floor((updated - at(`${meta.dataFrom}T00:00:00Z`)) / 86_400_000);
@@ -318,6 +340,7 @@ function assertUsageFixture() {
   if (meta.ready.goal !== (observed >= meta.windows.goalDays)) fail("ready.goal contradicts the goal window (R6)");
 }
 assertUsageFixture();
+assertUsageFixture(goalMeta, goalTiles);
 
 // FTR.NAB.CMN-0007 design §3.1–3.2: the built-in groups and an ordinary one with its members.
 const grants = { models: [{ connectionId: "c1", model: "sonnet" }], defaultModel: { connectionId: "c1", model: "sonnet" }, channels: ["telegram"], catalogItems: ["a1"] };
@@ -340,7 +363,7 @@ const commGraph = {
 };
 const commTags = (kind) => ({ items: commGraph.nodes.filter((n) => n.kind === kind).map(({ id, kind: k, label, notes }) => ({ id, kind: k, label, notes })) });
 
-function api(url, theme, comm) {
+function api(url, theme, comm, usage) {
   const p = url.pathname;
   if (p === "/api/v1/me") return me(theme);
   if (p === "/api/v1/config") return config;
@@ -362,11 +385,19 @@ function api(url, theme, comm) {
   if (comm && p === "/api/v1/comm/graph") return commGraph;
   if (p === "/admin/api/v1/clients") return { items: clients };
   if (p === "/admin/api/v1/catalog") return { items: adminCatalog };
-  // FTR.NAB.CHAT-0005: the report of the tab «Usage»
-  if (p === "/admin/api/v1/catalog/usage") return { items: usageRows, nextCursor: null, meta: usageMeta };
-  if (p === "/admin/api/v1/catalog/usage/summary") return { tiles: usageTiles, meta: usageMeta };
-  if (p === "/admin/api/v1/catalog/usage/candidates") return { items: usageCandidates, nextCursor: null, meta: usageMeta };
+  // FTR.NAB.CHAT-0005: the report of the tab «Usage». A screen may ask for the goal window of
+  // TIL-01 (mock-usage=goal) or for the administration log of ACT-16 (mock-usage=events).
+  const meta = usage === "goal" ? goalMeta : usageMeta;
+  const tiles = usage === "goal" ? goalTiles : usageTiles;
+  if (p === "/admin/api/v1/catalog/usage") {
+    const group = url.searchParams.get("group");
+    const rows = group ? usageRows.filter((r) => r.groups.some((g) => g.groupId === group)) : usageRows;
+    return { items: rows, nextCursor: null, meta };
+  }
+  if (p === "/admin/api/v1/catalog/usage/summary") return { tiles, meta };
+  if (p === "/admin/api/v1/catalog/usage/candidates") return { items: usageCandidates, nextCursor: null, meta };
   if (p === "/admin/api/v1/catalog/usage/pins") return usagePins;
+  if (p === "/admin/api/v1/admin-log") return { items: usage === "events" ? adminLog : [], nextCursor: null };
   if (p === "/admin/api/v1/groups") return { items: userGroups };
   if (/^\/admin\/api\/v1\/groups\/[^/]+\/members$/.test(p)) return { items: members, nextCursor: null };
   if (p === "/admin/api/v1/harnesses") return { items: [{ name: "pi", version: "1.3.0", status: "ok" }] };
@@ -417,7 +448,7 @@ http.createServer((req, res) => {
     }
     if (url.pathname === "/api/v1/me" && cookie("mock-auth") === "0") { res.writeHead(401, { "content-type": "application/json" }); return res.end('{"error":{"code":"unauthenticated","message":"sign in"}}'); }
     res.writeHead(200, { "content-type": "application/json" });
-    return res.end(JSON.stringify(api(url, cookie("mock-theme"), cookie("mock-comm") === "1")));
+    return res.end(JSON.stringify(api(url, cookie("mock-theme"), cookie("mock-comm") === "1", cookie("mock-usage"))));
   }
   let file = path.join(DIST, decodeURIComponent(url.pathname));
   if (!file.startsWith(DIST) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) file = path.join(DIST, "index.html");

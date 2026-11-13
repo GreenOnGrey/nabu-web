@@ -774,6 +774,18 @@ export interface AuditEntry {
   error: string | null;
 }
 
+/** An action of an administrator (FTR.NAB.CMN-0007 tech §2; the items of this feature — FTR.NAB.CHAT-0005 R31). */
+export interface AdminLogEntry {
+  id: number;
+  at: string;
+  actorEmail: string;
+  action: string;
+  target: string;
+  before: Record<string, unknown> | null;
+  /** The reason of the action and the numbers of its cascade live here. */
+  after: (Record<string, unknown> & { reason?: string }) | null;
+}
+
 // ─── FTR.NAB.CMN-0007: groups of users and access ───────────────────
 
 export interface GroupGrants {

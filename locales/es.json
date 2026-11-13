@@ -846,7 +846,12 @@
       "result": "Resultado",
       "via": "a través de {client}",
       "empty": "Sin registros",
-      "system": "Sistema"
+      "system": "Sistema",
+      "logTitle": "Registro de administración",
+      "logAction": "Acción",
+      "logTarget": "Objeto",
+      "logReason": "Motivo",
+      "logActor": "Autor"
     },
     "channels": {
       "title": "Canales",
