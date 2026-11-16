@@ -71,7 +71,12 @@ export function AuditAdmin() {
                 <td>{actor.name}{actor.note && <div className="small muted">{actor.note}</div>}</td>
                 <td className="small">{e.channel}</td>
                 <td><span className="mono small">{e.server ? `${e.server}: ` : ""}{e.tool}</span>{e.argsSummary && <div className="small muted mono" style={{ maxWidth: 380, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={e.argsSummary}>{e.argsSummary}</div>}</td>
-                <td>{e.result === "ok" ? <span className="ok-t">{t("admin.audit.results.ok")}</span> : <span className="err-t" title={e.error ?? ""}>{t("admin.audit.results.error")}</span>}</td>
+                <td>{e.result === "ok" ? <span className="ok-t">{t("admin.audit.results.ok")}</span> : (
+                  <span className="err-t">
+                    {t("admin.audit.results.error")}
+                    {/* The message of the provider or of the tool: a failed turn of the model is here too (R28). */}
+                    {e.error && <div className="small muted mono" style={{ maxWidth: 380, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={e.error}>{e.error}</div>}
+                  </span>)}</td>
               </tr>
             ); })}
             {rows.length === 0 && !list.isLoading && <tr><td colSpan={6} className="muted">{t("admin.audit.empty")}</td></tr>}
