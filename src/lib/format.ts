@@ -49,6 +49,12 @@ export function bytes(n: number, lng: string): string {
   return new Intl.NumberFormat(lng, { style: "unit", unit: units[i], unitDisplay: "short", maximumFractionDigits: 1 }).format(v);
 }
 
+/** A price per 1M tokens in the interface language: a provider gives floats with
+ * a long tail (159.67999999999998), the interface rounds them. */
+export function price(n: number, lng: string): string {
+  return new Intl.NumberFormat(lng, { maximumFractionDigits: 4 }).format(n);
+}
+
 export function initials(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return "?";

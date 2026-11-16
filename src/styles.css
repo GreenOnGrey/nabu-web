@@ -223,13 +223,25 @@ table.comm-t td:nth-child(1),table.comm-t td:nth-child(2){display:inline-block;w
 }
 .caps-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 18px;padding:4px 0 8px}
 .caps-grid .src{font-size:11px;color:var(--muted);margin-top:2px}
-/* design §3.4: the table of models in the narrow dialog — the model, its price, the unfolding */
+/* FTR.NAB.CHAT-0001 design §3.4: the table of models in the dialog — the model, its price, the unfolding;
+   the dialog is wide, and on a phone the price goes under the model so the table never grows past it */
 .models-edit .mt-tick{width:28px}
 .models-edit .mt-model{min-width:0}
 .models-edit .mt-model .caps{margin-top:4px}
 .models-edit .mt-id{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:320px}
 .models-edit .mt-price{white-space:nowrap;text-align:right}
 .models-edit .mt-fold{width:28px}
+@media (max-width:700px){
+  .models-edit,.models-edit tbody{display:block}
+  .models-edit tbody tr{display:flex;flex-wrap:wrap;align-items:flex-start;gap:4px 8px;padding:8px 0;border-bottom:1px solid var(--border)}
+  .models-edit tbody tr td{display:block;padding:0;border:0}
+  .models-edit tbody tr .mt-tick{order:1;width:auto;padding-top:3px}
+  .models-edit tbody tr .mt-model{order:2;flex:1 1 0}
+  .models-edit tbody tr .mt-fold{order:3;width:auto;padding-top:3px}
+  .models-edit tbody tr .mt-price{order:4;flex:1 1 100%;text-align:right}
+  .models-edit tbody tr .mt-id{white-space:normal;overflow-wrap:anywhere}
+  .models-edit tbody tr.xp{display:block}
+}
 .cap-sw{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
 .cap-lab{min-height:2.6em;display:flex;align-items:flex-end;margin-bottom:6px}
 .caps-cost{display:flex;gap:4px;min-width:0}
