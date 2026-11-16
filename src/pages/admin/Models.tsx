@@ -8,7 +8,7 @@ import { api, ApiError } from "../../api/client";
 import { adminKeys, useModelConnections } from "../../api/queries";
 import type { CapsPatch, CheckResult, Choice, ConnectionType, ModelConnection, ModelConnectionList, ModelDef, ModelRef, PersonalModels } from "../../api/types";
 import { errorText } from "../../lib/errors";
-import { dateTime } from "../../lib/format";
+import { dateTime, price } from "../../lib/format";
 import { intlLocale } from "../../lib/i18n";
 import { llmErrorText } from "../../lib/llm";
 import { choiceKey, modelIds, usableModel } from "../../lib/models";
@@ -107,11 +107,19 @@ export function ModelsAdmin() {
   );
 }
 
-const price = (m: ModelDef) => (m.cost && (m.cost.input || m.cost.output) ? `${m.cost.input} / ${m.cost.output}` : "—");
+/** The price of a model: the input and the output for 1M tokens (FTR.NAB.CHAT-0001
+ * design §3.4). A provider gives floats with a long tail (159.67999999999998):
+ * Intl rounds them and keeps the table within the dialog. */
+const priceOf = (m: ModelDef, lng: string) =>
+  m.cost && (m.cost.input || m.cost.output) ? `${price(m.cost.input, lng)} / ${price(m.cost.output, lng)}` : "—";
+
+/** The same price in a number field: four decimals, not the tail of the provider. */
+const round4 = (v: number) => Math.round(v * 1e4) / 1e4;
 
 /** The models of a connection with the results of the last check. */
 function ModelRows({ conn, check, onSwitchOff }: { conn: ModelConnection; check?: CheckResult; onSwitchOff: (model: string, cap: string) => void }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lng = intlLocale(i18n.language);
   const result = (id: string) => check?.results.find((r) => r.model === id);
   return (
     <table className="t models-t">
@@ -122,7 +130,7 @@ function ModelRows({ conn, check, onSwitchOff }: { conn: ModelConnection; check?
             <tr key={m.id}>
               <td className="mt-model"><b>{m.name || m.id}</b><div className="mono small muted mt-id">{m.id}{m.aliases?.length ? ` · ${m.aliases.join(", ")}` : ""}</div></td>
               <td><ModelCaps m={m} /></td>
-              <td className="small muted">{price(m)}</td>
+              <td className="small muted">{priceOf(m, lng)}</td>
               <td className="small">
                 {r && (r.ok ? <span className="ok-t"><Icon name="check" size={13} /> {r.embeddings ? t("admin.models.embeddingsModel") : t("admin.models.latency", { ms: r.latencyMs ?? 0 })}</span>
                   : <span className="err-t"><Icon name="alert" size={13} /> {llmErrorText(t, r.errorClass ?? "bad_request")}</span>)}
@@ -150,7 +158,8 @@ function ModelTable({ models, picked, edits, onToggle, onEdit }: {
   onToggle: (id: string) => void;
   onEdit: (id: string, p: CapsPatch) => void;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lng = intlLocale(i18n.language);
   const [open, setOpen] = useState<string | null>(null);
   const [q, setQ] = useState("");
   const shown = models.filter((m) => !q || (m.name ?? m.id).toLowerCase().includes(q.toLowerCase()) || m.id.toLowerCase().includes(q.toLowerCase()));
@@ -183,9 +192,9 @@ function ModelTable({ models, picked, edits, onToggle, onEdit }: {
               <Fragment key={m.id}>
                 <tr>
                   <td className="mt-tick"><input type="checkbox" checked={picked.has(m.id)} disabled={disabled} onChange={() => onToggle(m.id)} aria-label={m.id} /></td>
-                  {/* the name, the id and the capabilities in one cell: the dialog is narrow */}
+                  {/* the name, the id and the capabilities in one cell: the price and the unfolding stand beside */}
                   <td className="mt-model"><b>{m.name || m.id}</b><div className="mono small muted mt-id" title={m.id}>{m.id}</div><ModelCaps m={m} /></td>
-                  <td className="small muted mt-price">{price(m)}</td>
+                  <td className="small muted mt-price">{priceOf(m, lng)}</td>
                   <td className="mt-fold"><button className="textbtn" aria-expanded={open === m.id} aria-label={t(open === m.id ? "admin.models.fold" : "admin.models.unfold", { model: m.name || m.id })}
                     onClick={() => setOpen(open === m.id ? null : m.id)}>{open === m.id ? "▴" : "▾"}</button></td>
                 </tr>
@@ -219,7 +228,7 @@ function ModelTable({ models, picked, edits, onToggle, onEdit }: {
                           <div className="caps-cost">
                             {(["input", "output"] as const).map((k) => (
                               <input key={k} className="inp cap-num" type="number" min={0} step="0.001" aria-label={t(`admin.models.cap.cost_${k}`)}
-                                value={(e.cost ?? m.cost)?.[k] ?? 0}
+                                value={round4((e.cost ?? m.cost)?.[k] ?? 0)}
                                 onChange={(ev) => onEdit(m.id, { ...e, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, ...(e.cost ?? m.cost), [k]: Number(ev.target.value) } })} />
                             ))}
                           </div>
@@ -283,7 +292,7 @@ function AddConnection({ types, onClose }: { types: ModelConnectionList["types"]
   const keyRefused = (discover.error ?? draft.error) instanceof ApiError && ((discover.error ?? draft.error) as ApiError).code === "invalid_key";
   const choose = (x: ConnectionType) => { setType(x); setPicked(new Set()); setEdits({}); discover.reset(); };
   return (
-    <Modal title={t("admin.models.add")} onClose={onClose} footer={<>
+    <Modal wide title={t("admin.models.add")} onClose={onClose} footer={<>
       <button className="btn ghost" onClick={onClose}>{t("common.cancel")}</button>
       <button className="btn" disabled={!apiKey || ids.length === 0 || draft.isPending} onClick={() => draft.mutate()}>{t("admin.models.check")}</button>
       <button className="btn primary" disabled={!apiKey || ids.length === 0 || create.isPending} onClick={() => create.mutate()}>{t("common.save")}</button>
@@ -316,7 +325,7 @@ function AddConnection({ types, onClose }: { types: ModelConnectionList["types"]
             </select></div>
         )}
         {type === "openai_compatible" && (
-          <div className="field"><label htmlFor="c-url">{t("admin.models.baseUrl")}</label>
+          <div className="field" style={{ gridColumn: "1 / -1" }}><label htmlFor="c-url">{t("admin.models.baseUrl")}</label>
             <input id="c-url" className="inp" value={baseUrl} onChange={(e) => setBaseUrl(e.target.value)} placeholder="http://litellm:4000/v1" /></div>
         )}
       </div>

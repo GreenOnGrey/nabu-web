@@ -67,6 +67,15 @@ export const SCREENS: Screen[] = [
   { name: "connections", path: "/connections" },
   { name: "admin", path: "/admin" },
   ...ADMIN.map((s) => ({ name: `admin-${s}`, path: `/admin/${s}` })),
+  // FTR.NAB.CHAT-0001 design §3.4: a new connection — the models the provider lists and their prices
+  { name: "admin-models-add", path: "/admin/models", act: async (page) => {
+    await page.getByRole("button", { name: "Добавить подключение" }).click();
+    await page.getByRole("button", { name: "OpenAI-совместимый" }).click();
+    await page.getByLabel("Ключ", { exact: true }).fill("sk-live-0123456789");
+    await page.getByLabel("Базовый URL").fill("https://litellm.apps.citydrive.ru/v1");
+    await page.getByRole("button", { name: "Загрузить модели" }).click();
+    await page.getByRole("dialog").getByRole("checkbox", { name: "GLM-5.3" }).waitFor();
+  } },
   // FTR.NAB.CMN-0008 design §3: the card of a package, the profiles
   { name: "admin-sandbox-package", path: "/admin/sandbox-images", only: "desktop", act: async (page) => { await page.getByText("opencv-python").first().click(); } },
   { name: "admin-sandbox-profiles", path: "/admin/sandbox-images", act: async (page) => { await page.getByRole("tab", { name: "Профили" }).click(); } },

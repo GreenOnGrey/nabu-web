@@ -123,6 +123,29 @@ const clients = [
     canArchive: false, canRestore: false, enabled: true, prevSecretExpiresAt: null, createdAt: "2026-01-12T09:00:00Z" },
 ];
 
+// FTR.NAB.CHAT-0001 design §3.4: a connection of models and the list its provider
+// gives — prices with a long tail that the table rounds.
+const mdef = (id, name, extra = {}) => ({ id, name, contextWindow: 128000, maxTokens: 64000, reasoning: false, input: ["text"], tools: true, ...extra });
+const providerModels = [
+  mdef("deepseek-v4.1-flash", "DeepSeek V4.1 Flash", { input: ["text", "image"], reasoning: true, contextWindow: 1000000,
+    cost: { input: 53.23, output: 159.67999999999998, cacheRead: 5.32, cacheWrite: 0 } }),
+  mdef("GLM-5.3", "GLM-5.3", { reasoning: true, contextWindow: 200000, maxTokens: 200000,
+    cost: { input: 141.92999999999998, output: 496.7599999999993, cacheRead: 0, cacheWrite: 0 } }),
+  mdef("qwen3.8-27b", "qwen3.8-27b", { reasoning: true, contextWindow: 262144 }),
+  mdef("nemotron-embed-1b", "nemotron-embed-1b", { embeddings: true, tools: false }),
+];
+const modelConnections = [
+  { id: "mc1", name: "LiteLLM", type: "openai_compatible", baseUrl: "https://litellm.apps.citydrive.ru/v1", options: {}, keyLast4: "9f3a",
+    enabled: true, status: "ok", statusReason: null, checkedAt: T("10:00"), refreshedAt: T("10:00"), createdAt: T("09:00", "01"), newCount: 1,
+    models: providerModels.slice(0, 3), discovered: [{ id: "glm-5.3-air", name: "GLM-5.3 Air", firstSeenAt: T("10:00") }] },
+];
+const connectionTypes = [
+  { type: "deepseek", baseUrl: "https://api.deepseek.com/v1" },
+  { type: "gigachat", scopes: ["GIGACHAT_API_PERS", "GIGACHAT_API_B2B", "GIGACHAT_API_CORP"], defaultScope: "GIGACHAT_API_CORP" },
+  { type: "zai", endpoints: { general: "https://api.z.ai/api/paas/v4", coding: "https://api.z.ai/api/coding/paas/v4" } },
+  { type: "openai_compatible", baseUrl: "" },
+];
+
 // The catalog of the administration (FTR.NAB.CMN-0006 design §3): a checked item
 // with allowed tools, a file argument and a new tool of the server; the form of
 // a new item shows the plate "Save and check".
@@ -193,6 +216,9 @@ function api(url, theme, comm) {
   if (comm && p === "/api/v1/comm/topics") return commTags("topic");
   if (comm && p === "/api/v1/comm/graph") return commGraph;
   if (p === "/admin/api/v1/clients") return { items: clients };
+  if (p === "/admin/api/v1/model-connections") return { items: modelConnections, types: connectionTypes };
+  if (p === "/admin/api/v1/personal-models") return { default: { connectionId: "mc1", model: "deepseek-v4.1-flash", thinking: "off" },
+    available: [{ connectionId: "mc1", model: "deepseek-v4.1-flash" }, { connectionId: "mc1", model: "GLM-5.3" }] };
   if (p === "/admin/api/v1/catalog") return { items: adminCatalog };
   if (p === "/admin/api/v1/groups") return { items: userGroups };
   if (/^\/admin\/api\/v1\/groups\/[^/]+\/members$/.test(p)) return { items: members, nextCursor: null };
@@ -230,6 +256,11 @@ http.createServer((req, res) => {
     return res.end("retry: 600000\n\n");
   }
   if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/admin/api/")) {
+    // the discovery of the models of a connection: the dialog loads its table by this POST
+    if (url.pathname === "/admin/api/v1/model-connections/discover" && req.method === "POST") {
+      res.writeHead(200, { "content-type": "application/json" });
+      return res.end(JSON.stringify({ listed: true, models: providerModels }));
+    }
     if (req.method !== "GET") { res.writeHead(204); return res.end(); }
     const att = /^\/api\/v1\/attachments\/([^/]+)$/.exec(url.pathname);
     if (att) {
