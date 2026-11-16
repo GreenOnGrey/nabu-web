@@ -103,4 +103,14 @@ export const SCREENS: Screen[] = [
   } },
   // FTR.NAB.CMN-0007 design §3.2: the card of an ordinary group
   { name: "admin-groups-card", path: "/admin/groups", act: async (page) => { await page.getByText("Продажи", { exact: true }).click(); } },
+  // FTR.NAB.CMN-0005 qa CMP-01: the dialog keeps the focus in the field being typed in — the form beside it renders
+  // on every letter and makes a new onClose with it (ui-kit 1.19.0)
+  { name: "admin-groups-create", path: "/admin/groups", act: async (page) => {
+    await page.getByRole("button", { name: "Создать группу" }).click();
+    const note = page.getByRole("dialog").getByLabel("Описание");
+    await note.click();
+    await page.keyboard.type("Отдел продаж");
+    if (!(await note.evaluate((el) => el === document.activeElement))) throw new Error("CMP-01: the focus left the field being typed in");
+    if ((await note.inputValue()) !== "Отдел продаж") throw new Error("CMP-01: the text did not reach the field");
+  } },
 ];
