@@ -447,11 +447,12 @@ export function useConversation(conv: Conversation, modelWindow = 0): Pick<ChatP
         setBusy(false);
       }
     },
-    async onUpload(file) {
+    // design §6.5 of the kit (FTR.NAB.CMN-0005): the share of the body goes to the chip of the file in the composer
+    async onUpload(file, onProgress) {
       const form = new FormData();
       form.append("file", file);
       try {
-        const a = await api.upload<{ attachmentId: string }>("/api/v1/attachments", form);
+        const a = await api.upload<{ attachmentId: string }>("/api/v1/attachments", form, onProgress);
         if (file.type.startsWith("image/")) setImageIds((s) => new Set(s).add(a.attachmentId));
         return { id: a.attachmentId, fileName: file.name };
       } catch (e) {
