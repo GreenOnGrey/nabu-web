@@ -2,9 +2,10 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import { api, qs } from "../../api/client";
-import { adminKeys, useAdminGroups } from "../../api/queries";
-import type { AdminUser, ArchiveResult, EffectiveAccess, RestoreRequest, UserCard } from "../../api/types";
+import { adminKeys, useAdminChannels, useAdminGroups } from "../../api/queries";
+import type { AdminChannel, AdminUser, ArchiveResult, EffectiveAccess, RestoreRequest, UserCard, UserChannel } from "../../api/types";
 import { useSession } from "../../app/session";
 import { errorText } from "../../lib/errors";
 import { intlLocale } from "../../lib/i18n";
@@ -23,9 +24,9 @@ const DAY = 24 * 3600 * 1000;
 /** Whole days until the purge, counted in a handler or a query — never during render. */
 const daysLeft = (iso: string | undefined, now: number) => (iso ? Math.max(0, Math.ceil((new Date(iso).getTime() - now) / DAY)) : null);
 
-/** Users (R34; FTR.NAB.CMN-0002 R24, design §3.3–3.4): search, invitation,
- * the admin role, blocking, the channels of a user, the archive with restore
- * requests. */
+/** Users (R34; FTR.NAB.CMN-0002 R24, design §3.3–3.4, qa UI-06): search, invitation,
+ * the groups of a user, the admin role of the card (FTR.NAB.CMN-0007 qa ACC-09),
+ * blocking with a confirmation, the channels of a user, the archive with restore requests. */
 export function UsersAdmin() {
   const { t, i18n } = useTranslation();
   const { me } = useSession();
@@ -36,6 +37,7 @@ export function UsersAdmin() {
   const [inviting, setInviting] = useState(false);
   const [archiving, setArchiving] = useState<string[] | null>(null);
   const [card, setCard] = useState<string | null>(null);
+  const [blocking, setBlocking] = useState<AdminUser | null>(null);
   const locale = intlLocale(i18n.language);
   const params = filter === "active" ? { q } : filter === "archived" ? { q, status: "archived" } : { q, status: "archived", purgeWithinDays: 7 };
   const users = useQuery({
@@ -107,26 +109,38 @@ export function UsersAdmin() {
       ))}
       <div style={{ overflowX: "auto" }}>
         {filter === "active" ? (
-          <table className="t">
-            <thead><tr><th>{t("admin.users.user")}</th><th>{t("admin.users.channels")}</th><th>{t("admin.users.role")}</th><th>{t("admin.users.lastSeen")}</th><th>{t("admin.users.status")}</th><th /></tr></thead>
+          <table className="t users-t">
+            <thead><tr>
+              <th>{t("admin.users.user")}</th>
+              <th>{t("admin.users.groupColumn")}</th>
+              <th>{t("admin.users.status")}</th>
+              <th>{t("admin.users.lastSeen")}</th>
+              <th><span className="sr-only">{t("admin.users.actions")}</span></th>
+            </tr></thead>
             <tbody>
               {list.map((u) => (
                 <tr key={u.id}>
                   <td><button className="linklike" onClick={() => setCard(u.id)}>
                     <div className="row" style={{ gap: 8, flexWrap: "nowrap" }}><Avatar small name={u.name || u.email} /><div style={{ textAlign: "left" }}><b>{u.name || u.email}</b><div className="small muted">{u.email}</div></div></div>
                   </button></td>
-                  <td>{u.channels.map((c) => t(`channels.${c}`)).join(", ") || <span className="muted">—</span>}</td>
-                  <td><Switch on={u.isAdmin} disabled={u.id === me.id} label={t("admin.users.admin")} onChange={(v) => patch.mutate({ id: u.id, isAdmin: v })} /></td>
-                  <td>{u.lastSeenAt ? relativeTime(u.lastSeenAt, locale) : <span className="muted">—</span>}</td>
+                  <td><GroupChips user={u} /></td>
                   <td><span className={`st ${u.status === "active" ? "ok" : u.status === "invited" ? "review" : "draft"}`}>{t(`admin.users.statuses.${u.status}`)}</span></td>
-                  <td style={{ whiteSpace: "nowrap" }}>
-                    {u.id !== me.id && (
-                      <button className={`btn sm${u.status === "blocked" ? "" : " danger"}`} onClick={() => patch.mutate({ id: u.id, blocked: u.status !== "blocked" })}>
-                        {u.status === "blocked" ? t("admin.users.unblock") : t("admin.users.block")}
-                      </button>
-                    )}{" "}
-                    <button className="btn ghost sm" onClick={() => setCard(u.id)}>{t("admin.users.card")}</button>{" "}
-                    <Link className="btn ghost sm" to={`${adminPath("audit")}?user=${u.id}`}>{t("admin.users.audit")}</Link>
+                  <td className="users-seen">{u.lastSeenAt ? relativeTime(u.lastSeenAt, locale) : <span className="muted">—</span>}</td>
+                  {/* FTR.NAB.CMN-0001 design §3.7: the block stands at the right edge in a place of its own, so the
+                      rows without it keep the other buttons in one column */}
+                  <td className="users-actions">
+                    <span className="users-links">
+                      <button className="btn ghost sm" onClick={() => setCard(u.id)}>{t("admin.users.card")}</button>
+                      <Link className="btn ghost sm" to={`${adminPath("audit")}?user=${u.id}`}>{t("admin.users.audit")}</Link>
+                    </span>
+                    <span className="users-block">
+                      {u.id !== me.id && (
+                        <button className={`btn sm${u.status === "blocked" ? "" : " danger"}`}
+                          onClick={() => (u.status === "blocked" ? patch.mutate({ id: u.id, blocked: false }) : setBlocking(u))}>
+                          {u.status === "blocked" ? t("admin.users.unblock") : t("admin.users.block")}
+                        </button>
+                      )}
+                    </span>
                   </td>
                 </tr>
               ))}
@@ -155,10 +169,41 @@ export function UsersAdmin() {
           </table>
         )}
       </div>
+      {blocking && (
+        <Modal title={t("admin.users.blockTitle")} onClose={() => setBlocking(null)} footer={<>
+          <button className="btn ghost" onClick={() => setBlocking(null)}>{t("common.cancel")}</button>
+          <button className="btn danger" disabled={patch.isPending}
+            onClick={() => patch.mutate({ id: blocking.id, blocked: true }, { onSuccess: () => setBlocking(null) })}>
+            {t("admin.users.block")}
+          </button>
+        </>}>
+          <p style={{ marginTop: 0 }}>{t("admin.users.blockText", { name: blocking.name || blocking.email, email: blocking.email })}</p>
+        </Modal>
+      )}
       {inviting && <Invite onClose={() => setInviting(false)} />}
       {archiving && <ArchiveDialog emails={archiving} onClose={() => { setArchiving(null); inv(); }} />}
       {card && <UserCardModal id={card} self={card === me.id} onClose={() => setCard(null)} onArchive={(email) => { setCard(null); setArchiving([email]); }} />}
     </>
+  );
+}
+
+/** The groups of a user in the list (FTR.NAB.CMN-0007 R7): the role reads as the built-in «Administrators», the rest
+ * are the memberships. Three chips and a count; the hint keeps the whole list. */
+function GroupChips({ user }: { user: AdminUser }) {
+  const { t } = useTranslation();
+  const groups = user.groups.filter((g) => !g.builtin);
+  // one line: a chip and a count keep the rows of one height, the hint and the card hold the whole list; the role
+  // takes the place of the first chip of an administrator
+  const shown = user.isAdmin ? [] : groups.slice(0, 1);
+  const rest = groups.length - shown.length;
+  const role = t("admin.groups.admins");
+  if (!user.isAdmin && groups.length === 0) return <span className="muted">—</span>;
+  return (
+    <span className="chips users-groups" title={[...(user.isAdmin ? [role] : []), ...groups.map((g) => g.name)].join(", ")}>
+      {user.isAdmin && <span className="chip"><Icon name="lock" size={12} />{role}</span>}
+      {shown.map((g) => <span key={g.id} className="chip">{g.name}</span>)}
+      {rest > 0 && <span className="chip">+{rest}</span>}
+    </span>
   );
 }
 
@@ -208,6 +253,12 @@ function UserCardModal({ id, self, onClose, onArchive }: { id: string; self: boo
   const done = () => { qc.invalidateQueries({ queryKey: key }); qc.invalidateQueries({ queryKey: ["admin", "users"] }); qc.invalidateQueries({ queryKey: ["admin", "channels"] }); };
   const fail = (e: unknown) => toast({ kind: "error", title: errorText(t, e) });
   const unbind = useMutation({ mutationFn: () => api.del(`/admin/api/v1/users/${id}/channels/telegram/binding`), onSuccess: done, onError: fail });
+  // FTR.NAB.CMN-0007 R3: the role of administrator changes here — a list of users is for the people, not for a switch
+  const patchUser = useMutation({
+    mutationFn: (p: { isAdmin?: boolean; blocked?: boolean }) => api.patch(`/admin/api/v1/users/${id}`, p),
+    onSuccess: done, onError: fail,
+  });
+  const adminChannels = useAdminChannels();
   const u = card.data?.user;
   return (
     <Modal wide title={u ? u.name || u.email : "…"} onClose={onClose} footer={<>
@@ -215,20 +266,31 @@ function UserCardModal({ id, self, onClose, onArchive }: { id: string; self: boo
       <span className="spacer" />
       <button className="btn primary" onClick={onClose}>{t("common.close")}</button>
     </>}>
-      {u && <div className="small muted" style={{ marginBottom: 12 }}>{u.email} · {t(`admin.users.statuses.${u.status}`)}</div>}
+      {u && (
+        <div className="row" style={{ gap: 12, justifyContent: "space-between", marginBottom: 12 }}>
+          <div className="small muted">{u.email} · {t(`admin.users.statuses.${u.status}`)}</div>
+          {u.status !== "archived" && (
+            <Switch on={u.isAdmin} disabled={self || patchUser.isPending} label={t("admin.users.admin")}
+              onChange={(v) => patchUser.mutate({ isAdmin: v })} />
+          )}
+        </div>
+      )}
       <h3 className="sec" style={{ marginTop: 0 }}>{t("admin.users.channels")}</h3>
-      {/* FTR.NAB.CMN-0007 R5: channels come from groups; the card only shows them */}
-      <table className="t"><tbody>
-        {(card.data?.channels ?? []).map((c) => (
-          <tr key={c.kind}>
-            <td><b>{channelLabel(t, c.kind)}</b>
-              {c.binding && <div className="small muted">{t("connections.linkedAs", { account: c.binding.account, when: dateTime(c.binding.boundAt, locale) })}{" "}
-                <button className="linklike small" onClick={() => unbind.mutate()}>{t("connections.unlink")}</button></div>}</td>
-            <td className="small">{c.available ? <span className="ok-t">{t("admin.users.available")}</span> : <span className="muted">{t("admin.users.notAvailable")}</span>}</td>
-            <td className="small muted">{t(`admin.users.reasons.${c.reason}`, { defaultValue: c.reason })}</td>
-          </tr>
-        ))}
-      </tbody></table>
+      {/* FTR.NAB.CMN-0007 R5: channels come from groups; the card only shows them, and the reason explains the answer */}
+      <table className="t users-channels">
+        <thead><tr><th>{t("admin.users.channelCol")}</th><th>{t("admin.users.accessCol")}</th><th>{t("admin.users.reasonCol")}</th></tr></thead>
+        <tbody>
+          {(card.data?.channels ?? []).map((c) => (
+            <tr key={c.kind}>
+              <td><b>{channelLabel(t, c.kind)}</b>
+                {c.binding && <div className="small muted">{t("connections.linkedAs", { account: c.binding.account, when: dateTime(c.binding.boundAt, locale) })}{" "}
+                  <button className="linklike small" onClick={() => unbind.mutate()}>{t("connections.unlink")}</button></div>}</td>
+              <td className="small">{c.available ? <span className="ok-t">{t("admin.users.available")}</span> : <span className="muted">{t("admin.users.notAvailable")}</span>}</td>
+              <td className="small muted">{channelReason(t, c, u, adminChannels.data?.items ?? [])}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
       {u && u.status !== "archived" && <UserAccess id={id} />}
       {(card.data?.groupAgents.length ?? 0) > 0 && (
         <>
@@ -243,6 +305,17 @@ function UserCardModal({ id, self, onClose, onArchive }: { id: string; self: boo
       )}
     </Modal>
   );
+}
+
+/** Why a channel is not available (FTR.NAB.CMN-0002 design §3.3): the interface can tell a switched-off channel from
+ * the one the groups of the user do not grant, and from a blocked account. An available channel says what grants it. */
+function channelReason(t: TFunction, c: UserChannel, u: AdminUser | undefined, channels: AdminChannel[]): string {
+  if (c.available) return t(`admin.users.reasons.${c.reason}`, { defaultValue: c.reason });
+  if (u?.status === "blocked") return t("admin.users.whyBlocked");
+  if (u?.status === "invited") return t("admin.users.whyInvited");
+  if (u && u.status !== "active") return t("admin.users.whyInactive");
+  if (channels.some((x) => x.kind === c.kind && !x.enabled)) return t("admin.users.whyOff");
+  return t("admin.users.whyNotGranted");
 }
 
 function Invite({ onClose }: { onClose: () => void }) {
@@ -301,7 +374,7 @@ function UserAccess({ id }: { id: string }) {
   const defaultFrom = def ? t(`admin.access.defaultFrom.${def.source}`, { group: def.groupId ? nameOf(def.groupId) : "" }) : "";
   return (
     <>
-      <h3 className="sec">{t("admin.access.title")}</h3>
+      <h3 className="sec" style={{ marginTop: 18 }}>{t("admin.access.title")}</h3>
       <div className="chips" style={{ alignItems: "center", marginBottom: 10 }}>
         {a.groups.map((g) => g.builtin ? (
           <span key={g.id} className="chip"><Icon name="lock" size={12} />{groupName(t, g)}</span>

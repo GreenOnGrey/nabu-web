@@ -263,6 +263,25 @@ table.comm-t td:nth-child(1),table.comm-t td:nth-child(2){display:inline-block;w
 .grp-row.off{color:var(--muted)}
 .grp-order{white-space:nowrap}
 .grp-search{margin-bottom:8px}
+/* FTR.NAB.CMN-0007 design §3.2: the search of a member and its suggestions; the rows are ours, so the label rule of
+   the kit's .field does not reach them */
+.grp-find{margin-bottom:12px}
+.grp-hint{margin-top:6px}
+.grp-suggest{margin-top:6px;max-height:240px;overflow-y:auto}
+.grp-suggest .grp-row:last-child{border-bottom:0}
+/* FTR.NAB.CMN-0001 design §3.7: the list of users — the actions at the right edge, the block in a place of its own,
+   the names of the groups and the time of the last visit on one line */
+.users-t th,.users-t .users-seen{white-space:nowrap}
+.users-groups{flex-wrap:nowrap;gap:4px}
+.users-actions{width:1%;white-space:nowrap;text-align:right;padding-right:0}
+.users-links{display:inline-flex;gap:6px}
+.users-block{display:inline-block;min-width:120px;margin-left:10px;text-align:right}
+.users-channels th:first-child{width:44%}
+.users-channels th:nth-child(2){width:18%}
+.users-channels th:last-child{width:38%}
+/* FTR.NAB.CMN-0003 design §3.1: the field of the kit in a row of the settings takes the width of the row; a disabled
+   fieldset stops its button while the settings are on their way */
+.digest-select{border:0;margin:0;padding:0;min-width:0}
 .grp-sec.off{opacity:.7}
 .sm-ic{width:22px;height:22px;font-size:10px}
 .access-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}

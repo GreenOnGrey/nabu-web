@@ -112,9 +112,21 @@ const files = [{ path: "notes/план.md", size: 2048, sha256: "ab12", modified
   { path: "backup/archive.zip", size: 1204000, sha256: "ef56", modifiedAt: T("08:00"), modifiedBy: "agent" }];
 const catalog = [{ id: "i1", type: "mcp", name: "github", title: "GitHub", description: "Задачи и запросы на изменение.", mode: "personal", authKind: "oauth", readOnly: false, status: "available", connected: true, connectedAt: T("09:00", "02") },
   { id: "i2", type: "skill", name: "summary", title: "Сводка", description: "Краткое изложение длинных текстов.", mode: "platform", readOnly: true, status: "available", connected: false, connectedAt: null }];
-const users = [{ id: "u1", email: "ada@example.com", name: "Ада Лавлейс", isAdmin: true, status: "active", lastSeenAt: T("14:00"), createdAt: T("09:00", "01"), channels: ["telegram"] },
-  { id: "u2", email: "alan@example.com", name: "Алан Тьюринг", isAdmin: false, status: "invited", lastSeenAt: null, createdAt: T("09:00", "05"), channels: [] },
-  { id: "u3", email: "grace@example.com", name: "Грейс Хоппер", isAdmin: false, status: "blocked", lastSeenAt: T("10:00", "04"), createdAt: T("09:00", "02"), channels: [] }];
+// FTR.NAB.CMN-0007 R7: the groups come with the row of the list; the role is the built-in «Administrators».
+const users = [{ id: "u1", email: "ada@example.com", name: "Ада Лавлейс", isAdmin: true, status: "active", lastSeenAt: T("14:00"), createdAt: T("09:00", "01"), channels: ["telegram"],
+    groups: [{ id: "g-sales", name: "Продажи", builtin: null }] },
+  { id: "u2", email: "alan@example.com", name: "Алан Тьюринг", isAdmin: false, status: "invited", lastSeenAt: null, createdAt: T("09:00", "05"), channels: [],
+    groups: [{ id: "g-sales", name: "Продажи", builtin: null }, { id: "g-legal", name: "Юристы", builtin: null }, { id: "g-ops", name: "Операции", builtin: null }, { id: "g-hr", name: "Найм", builtin: null }] },
+  { id: "u3", email: "grace@example.com", name: "Грейс Хоппер", isAdmin: false, status: "blocked", lastSeenAt: T("10:00", "04"), createdAt: T("09:00", "02"), channels: [], groups: [] }];
+// FTR.NAB.CMN-0002 design §3.3: the card of a user — the channels with their reasons and the access of the groups.
+const userCardFor = (id) => ({ user: users.find((u) => u.id === id) ?? users[1], channels: [{ kind: "web", available: true, reason: "always" },
+  { kind: "telegram", available: true, reason: "group" },
+  { kind: "vkteams", available: false, reason: "disabled" }], groupAgents: [] });
+const userAccess = { admin: false, groups: [{ id: "g-sales", name: "Продажи", builtin: null }],
+  models: [{ connectionId: "c1", model: "sonnet", name: "Sonnet", connection: "Anthropic", via: ["g-sales"] }],
+  defaultModel: { connectionId: "c1", model: "sonnet", source: "group", groupId: "g-sales" },
+  channels: [{ kind: "telegram", via: ["g-sales"] }],
+  catalogItems: [{ id: "a1", type: "mcp", title: "GitHub", mode: "personal", via: ["g-sales"] }] };
 const commState = { allowed: false, available: false, consentAt: null, retentionDays: 90, semantic: false, sources: [], collect: { status: "off", pauseKind: null, nextRunAt: null, backfill: null, budgetUsedPct: 0 }, counts: { notes: 0, openCommitments: 0 } };
 
 // A service client with an address: the edit and the delete dialogs open from its card (FTR.NAB.CMN-0001 SVC-10, SVC-11).
@@ -234,6 +246,17 @@ function api(url, theme, comm) {
   if (p === "/admin/api/v1/proxies/templates") return proxyTemplates;
   if (p === "/admin/api/v1/voice") return { configured: true, ok: true, url: "http://whisper.nabu.svc:9000" };
   if (p === "/admin/api/v1/users") return { items: url.searchParams.get("status") === "archived" ? [] : users };
+  if (/^\/admin\/api\/v1\/users\/[^/]+$/.test(p)) return userCardFor(p.split("/").at(-1));
+  if (/^\/admin\/api\/v1\/users\/[^/]+\/access$/.test(p)) return userAccess;
+  // FTR.NAB.CMN-0003 R14: the prepared tasks; the day digest names a channel the user no longer has
+  if (p === "/api/v1/memory-tasks") return { items: [
+    { kind: "collect", enabled: false, taskId: null, status: "off", pauseKind: null, nextRunAt: null, lastRun: null,
+      settings: { sources: [], interval: "1h", roundTheClock: false, exclusions: { senders: [], folders: [], chats: [] }, time: "09:00", channel: "web" } },
+    { kind: "digest_day", enabled: true, taskId: "t-day", status: "active", pauseKind: null, nextRunAt: T("09:00", "18"), lastRun: null,
+      settings: { sources: [], interval: "1h", roundTheClock: false, exclusions: { senders: [], folders: [], chats: [] }, time: "09:00", days: [1, 2, 3, 4, 5], channel: "telegram" } },
+    { kind: "digest_week", enabled: true, taskId: "t-week", status: "active", pauseKind: null, nextRunAt: T("09:00", "23"), lastRun: null,
+      settings: { sources: [], interval: "1h", roundTheClock: false, exclusions: { senders: [], folders: [], chats: [] }, time: "09:00", weekday: 1, channel: "vkteams" } },
+  ] };
   return { items: [], nextCursor: null };
 }
 
