@@ -275,8 +275,8 @@ function GroupPanel({ group, onClose, onDirty }: { group: UserGroup; onClose: ()
   );
 }
 
-/** The members of a group by pages (tech §2): «All users» is everyone, «Administrators»
- * follow the role; the members of an ordinary group are added several at once. */
+/** The members of a group by pages (tech §2, qa GRP-09): «All users» is everyone, «Administrators»
+ * follow the role; the members of an ordinary group are added several at once, and the search folds the case. */
 function Members({ group }: { group: UserGroup }) {
   const { t } = useTranslation();
   const qc = useQueryClient();
@@ -305,15 +305,25 @@ function Members({ group }: { group: UserGroup }) {
   return (
     <>
       {!group.builtin && (
-        <div className="field">
-          <input className="inp" placeholder={t("admin.groups.addMember")} aria-label={t("admin.groups.addMember")} value={find} onChange={(e) => setFind(e.target.value)} />
-          {found.map((u) => (
-            <label key={u.id} className="grp-row">
-              <input type="checkbox" checked={chosen.includes(u.id)} onChange={() => setChosen((c) => toggle(c, u.id, same))} />
-              <Avatar name={u.name || u.email} small />
-              <span className="grp-name">{u.name || u.email} <span className="small muted">{u.email}</span></span>
-            </label>
-          ))}
+        // FTR.NAB.CMN-0007 design §3.2: the search of a member with its suggestions, apart from the field of the kit —
+        // inside .field the rule of its label makes every row a block (the rows of the panel are ours)
+        <div className="grp-find">
+          <div className="search">
+            <Icon name="search" />
+            <input placeholder={t("admin.groups.addMember")} aria-label={t("admin.groups.addMember")} value={find} onChange={(e) => setFind(e.target.value)} />
+          </div>
+          {find.trim().length < 2 && <div className="grp-hint small muted">{t("admin.groups.minChars")}</div>}
+          {found.length > 0 && (
+            <div className="grp-suggest">
+              {found.map((u) => (
+                <label key={u.id} className="grp-row">
+                  <input type="checkbox" checked={chosen.includes(u.id)} onChange={() => setChosen((c) => toggle(c, u.id, same))} />
+                  <Avatar name={u.name || u.email} small />
+                  <span className="grp-name">{u.name || u.email} <span className="small muted">{u.email}</span></span>
+                </label>
+              ))}
+            </div>
+          )}
           {chosen.length > 0 && (
             <button className="btn sm primary" disabled={add.isPending} onClick={() => add.mutate(chosen)}>
               <Icon name="plus" size={14} />{t("admin.groups.addChosen", { count: chosen.length })}
@@ -321,7 +331,10 @@ function Members({ group }: { group: UserGroup }) {
           )}
         </div>
       )}
-      <input className="inp grp-search" placeholder={t("common.search")} aria-label={t("common.search")} value={q} onChange={(e) => setQ(e.target.value)} />
+      <div className="search grp-search">
+        <Icon name="search" />
+        <input placeholder={t("admin.groups.searchMember")} aria-label={t("admin.groups.searchMember")} value={q} onChange={(e) => setQ(e.target.value)} />
+      </div>
       {list.map((m) => (
         <div key={m.id} className="grp-row">
           <Avatar name={m.name || m.email} small />

@@ -25,7 +25,7 @@ export interface PublicConfig {
 export interface MyChannel {
   kind: "telegram" | "vkteams" | "email";
   available: boolean;
-  reason: "always" | "all_users" | "user" | "disabled";
+  reason: "always" | "all_users" | "user" | "group" | "disabled";
   binding?: { account: string; boundAt: string };
   keyIssuedAt?: string;
   address?: string;
@@ -425,6 +425,14 @@ export interface CatalogItem {
 
 // ─── administration ─────────────────────────────────────────────────
 
+/** A group of a user in the list of Administration → Users (FTR.NAB.CMN-0007 R7): the built-in groups come without a
+ *  membership of their own — «all» belongs to everyone, «admins» follows the role. */
+export interface UserGroupRef {
+  id: string;
+  name: string;
+  builtin: "all" | "admins" | null;
+}
+
 export interface AdminUser {
   id: string;
   email: string;
@@ -434,6 +442,8 @@ export interface AdminUser {
   lastSeenAt: string | null;
   createdAt: string;
   channels: string[];
+  /** The memberships of the user (FTR.NAB.CMN-0007 R7). */
+  groups: UserGroupRef[];
   archivedAt?: string;
   archivedBy?: string;
   purgeAfter?: string;

@@ -4,15 +4,15 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { api } from "../../api/client";
 import { keys } from "../../api/queries";
-import type { CollectSettings, CommState, DigestSettings, MemoryTask } from "../../api/types";
+import type { CollectSettings, CommState, DigestSettings, MemoryTask, MyChannel } from "../../api/types";
 import { errorText } from "../../lib/errors";
 import { intlLocale } from "../../lib/i18n";
 import { dateTime } from "../../lib/format";
-import { Icon, Modal, Switch, useToast } from "@green-on-grey/ui-kit";
+import { Icon, Modal, Select, Switch, useToast } from "@green-on-grey/ui-kit";
 import { sourceTitle } from "./tags";
+import { digestChannels } from "./digest";
 
 const INTERVALS = ["15m", "1h", "4h", "1d"] as const;
-const CHANNELS = ["web", "telegram", "vkteams", "email"] as const;
 const DAYS = [1, 2, 3, 4, 5, 6, 7] as const;
 
 type Patch = { enabled?: boolean; settings?: Partial<CollectSettings & DigestSettings> };
@@ -24,6 +24,8 @@ export function MemoryTasksTab({ state }: { state: CommState }) {
   const qc = useQueryClient();
   const toast = useToast();
   const tasks = useQuery({ queryKey: keys.memoryTasks, queryFn: () => api.get<{ items: MemoryTask[] }>("/api/v1/memory-tasks") });
+  // FTR.NAB.CMN-0003 design §3.1: a digest goes to the site or to a channel the user may use — the groups decide it
+  const myChannels = useQuery({ queryKey: keys.channels, queryFn: () => api.get<{ items: MyChannel[] }>("/api/v1/channels") });
   const [wizard, setWizard] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const inv = () => {
@@ -78,16 +80,19 @@ export function MemoryTasksTab({ state }: { state: CommState }) {
                     onClick={() => set("digest_day")({ settings: { days: on ? day.settings.days!.filter((x) => x !== d) : [...(day.settings.days ?? []), d] } })}>{t(`comm.tasks.dayShort.${d}`)}</button>;
                 })}
               </span></div>
-            <DigestFields value={day.settings} disabled={patch.isPending} onChange={(settings) => set("digest_day")({ settings })} />
+            <DigestFields value={day.settings} myChannels={myChannels.data?.items} disabled={patch.isPending} onChange={(settings) => set("digest_day")({ settings })} />
           </TaskCard>
         )}
         {week && (
           <TaskCard task={week} icon="clock" title={t("comm.tasks.week.title")} text={t("comm.tasks.week.text")} busy={patch.isPending} onToggle={(on) => set("digest_week")({ enabled: on })}>
             <div className="kvrow"><span className="muted">{t("comm.tasks.weekday")}</span>
-              <select className="sel" value={week.settings.weekday ?? 1} disabled={patch.isPending} onChange={(e) => set("digest_week")({ settings: { weekday: Number(e.target.value) } })} aria-label={t("comm.tasks.weekday")}>
-                {DAYS.map((d) => <option key={d} value={d}>{t(`days.${d % 7}`)}</option>)}
-              </select></div>
-            <DigestFields value={week.settings} disabled={patch.isPending} onChange={(settings) => set("digest_week")({ settings })} />
+              {/* a disabled fieldset stops the button of the list too, without a prop the kit does not have */}
+              <fieldset disabled={patch.isPending} className="digest-select">
+                <Select value={String(week.settings.weekday ?? 1)} label={t("comm.tasks.weekday")}
+                  options={DAYS.map((d) => ({ value: String(d), label: t(`days.${d % 7}`) }))}
+                  onChange={(v) => set("digest_week")({ settings: { weekday: Number(v) } })} />
+              </fieldset></div>
+            <DigestFields value={week.settings} myChannels={myChannels.data?.items} disabled={patch.isPending} onChange={(settings) => set("digest_week")({ settings })} />
           </TaskCard>
         )}
       </div>
@@ -131,17 +136,22 @@ function TaskCard({ task, icon, title, text, busy, onToggle, children }: {
   );
 }
 
-function DigestFields({ value, disabled, onChange }: { value: DigestSettings; disabled: boolean; onChange: (s: Partial<DigestSettings>) => void }) {
+function DigestFields({ value, myChannels, disabled, onChange }: {
+  value: DigestSettings; myChannels: MyChannel[] | undefined; disabled: boolean; onChange: (s: Partial<DigestSettings>) => void;
+}) {
   const { t } = useTranslation();
+  const channels = digestChannels(myChannels, value.channel);
   return (
     <>
       <div className="kvrow"><span className="muted">{t("comm.tasks.time")}</span>
         <input type="time" className="inp time-inp" defaultValue={value.time} disabled={disabled} aria-label={t("comm.tasks.time")}
           onBlur={(e) => { if (e.target.value && e.target.value !== value.time) onChange({ time: e.target.value }); }} /></div>
       <div className="kvrow"><span className="muted">{t("tasks.cols.channel")}</span>
-        <select className="sel" value={value.channel} disabled={disabled} onChange={(e) => onChange({ channel: e.target.value })} aria-label={t("tasks.cols.channel")}>
-          {CHANNELS.map((c) => <option key={c} value={c}>{t(`channels.${c}`)}</option>)}
-        </select></div>
+        <fieldset disabled={disabled} className="digest-select">
+          <Select value={value.channel} label={t("tasks.cols.channel")}
+            options={channels.map((c) => ({ value: c.value, label: c.unavailable ? `${t(`channels.${c.value}`)} · ${t("comm.tasks.channelUnavailable")}` : t(`channels.${c.value}`) }))}
+            onChange={(v) => onChange({ channel: v })} />
+        </fieldset></div>
     </>
   );
 }

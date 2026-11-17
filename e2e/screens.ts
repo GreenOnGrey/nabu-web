@@ -46,6 +46,8 @@ export const SCREENS: Screen[] = [
   { name: "admin-sections", path: "/admin/audit", only: "phone", act: click("Администрирование") },
   { name: "memory", path: "/memory" },
   { name: "memory-add", path: "/memory", act: async (page) => { await page.locator(".btn.primary.sm").first().click(); } },
+  // FTR.NAB.CMN-0003 design §3.1: the digest of a week names a channel the user has lost
+  { name: "memory-tasks", path: "/memory?tab=tasks", comm: true }, // FTR.NAB.CMN-0003 qa TASK-21
   // FTR.NAB.CMN-0003 R19: the graph of people and topics, at rest and with a pinned person
   { name: "memory-graph", path: "/memory?tab=comm&view=graph", comm: true },
   { name: "memory-graph-pinned", path: "/memory?tab=comm&view=graph", comm: true, act: async (page) => {
@@ -103,6 +105,10 @@ export const SCREENS: Screen[] = [
   } },
   // FTR.NAB.CMN-0007 design §3.2: the card of an ordinary group
   { name: "admin-groups-card", path: "/admin/groups", act: async (page) => { await page.getByText("Продажи", { exact: true }).click(); } },
+  // FTR.NAB.CMN-0002 design §3.3, FTR.NAB.CMN-0001 design §3.7: the card of a user and the block that asks first
+  // FTR.NAB.CMN-0002 qa UI-06: the card and the confirmation of a block
+  { name: "admin-users-card", path: "/admin/users", act: async (page) => { await page.getByRole("button", { name: "Алан Тьюринг" }).click(); } },
+  { name: "admin-users-block", path: "/admin/users", act: click("Заблокировать") },
   // FTR.NAB.CMN-0005 qa CMP-01: the dialog keeps the focus in the field being typed in — the form beside it renders
   // on every letter and makes a new onClose with it (ui-kit 1.19.0)
   { name: "admin-groups-create", path: "/admin/groups", act: async (page) => {
