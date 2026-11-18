@@ -132,6 +132,7 @@
       "unavailable": "The model is temporarily unavailable. Retry later.",
       "bad_request": "The model rejected the request.",
       "context_overflow": "The conversation became too long for the model. Start a new topic.",
+      "timeout": "The work did not finish in the time allowed. It will be retried later.",
       "agent_crashed": "The agent stopped unexpectedly. Retry.",
       "agent_busy": "The agent is busy. Retry in a minute.",
       "agent_not_configured": "The agent is not configured: an administrator has to add a model connection.",
