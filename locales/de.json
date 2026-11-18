@@ -132,6 +132,7 @@
       "unavailable": "Das Modell ist vorübergehend nicht verfügbar. Versuchen Sie es später erneut.",
       "bad_request": "Das Modell hat die Anfrage abgelehnt.",
       "context_overflow": "Das Gespräch ist für das Modell zu lang geworden. Beginnen Sie ein neues Thema.",
+      "timeout": "Die Arbeit wurde nicht rechtzeitig fertig. Sie wird später erneut versucht.",
       "agent_crashed": "Der Agent wurde unerwartet beendet. Versuchen Sie es erneut.",
       "agent_busy": "Der Agent ist ausgelastet. Versuchen Sie es in einer Minute erneut.",
       "agent_not_configured": "Der Agent ist nicht eingerichtet: Ein Administrator muss eine Modellverbindung hinzufügen.",

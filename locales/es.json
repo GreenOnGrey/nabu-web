@@ -132,6 +132,7 @@
       "unavailable": "El modelo no está disponible temporalmente. Reintente más tarde.",
       "bad_request": "El modelo rechazó la solicitud.",
       "context_overflow": "La conversación es demasiado larga para el modelo. Empiece un tema nuevo.",
+      "timeout": "El trabajo no terminó en el tiempo previsto. Se reintentará más tarde.",
       "agent_crashed": "El agente se detuvo inesperadamente. Reintente.",
       "agent_busy": "El agente está ocupado. Reintente en un minuto.",
       "agent_not_configured": "El agente no está configurado: un administrador debe añadir una conexión de modelos.",
