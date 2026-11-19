@@ -196,7 +196,8 @@
       "nothingNew": "Nothing new",
       "truncated": "Not read for the volume: {chats}",
       "truncatedChat": "{chat} — the latest {count} read",
-      "rateLimited": "The source limits the rate of requests: the next run repeats"
+      "rateLimited": "The source limits the rate of requests: the next run repeats",
+      "busy": "The previous collection is still going: the run was skipped"
     }
   },
   "memory": {
@@ -1050,6 +1051,14 @@
       "modelMissing": "Without a model the collection does not run.",
       "limit": "Monthly limit per user",
       "limitHint": "When it is spent the collection pauses until next month; digests keep working. 0 — no limit.",
+      "collectTitle": "Collection",
+      "runTimeout": "Time for one batch",
+      "minutes": "minutes",
+      "runTimeoutHint": "How long the collector works on one batch of messages before the batch counts as failed. Applies to batches started after saving.",
+      "batchThreads": "Threads in a batch",
+      "batchThreadsHint": "Fewer threads make a batch shorter so it fits its time; more threads mean fewer runs of the model. Applies from the next collection run.",
+      "byDefault": "Default: {value} (setting of the installation)",
+      "reset": "Reset to default",
       "sources": "Sources of communications",
       "sourcesHint": "A personal MCP server becomes a source when an adapter exists for it.",
       "server": "MCP server",
@@ -1195,6 +1204,7 @@
     "invalid_owner": "The new owner must be a member of the group with access to the channel.",
     "invalid_transfer": "Group agents are transferred to an active administrator.",
     "invalid_retention": "The retention is from 1 to 3650 days.",
+    "invalid_collect_limit": "The time for a batch is 1 to 120 minutes, the threads in a batch 1 to 100.",
     "identity_conflict": "Another identity of the sign-in provider is linked to this account.",
     "emails_required": "Enter at least one email.",
     "too_many_emails": "At most 500 emails per call.",

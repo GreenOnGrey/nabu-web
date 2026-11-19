@@ -30,6 +30,8 @@ export function CommAdmin() {
   });
   const [days, setDays] = useState<string | null>(null);
   const [limit, setLimit] = useState<string | null>(null);
+  const [timeout, setTimeoutMin] = useState<string | null>(null);
+  const [threads, setThreads] = useState<string | null>(null);
   const s = cur.data;
   if (!s) return null;
   const money = new Intl.NumberFormat(i18n.language, { style: "currency", currency: "USD" });
@@ -82,6 +84,13 @@ export function CommAdmin() {
           </div>
           <div className="hint">{t("admin.comm.limitHint")}</div>
         </div>
+        <h4 style={{ margin: "18px 0 6px" }}>{t("admin.comm.collectTitle")}</h4>
+        <CollectLimit id="comm-timeout" label={t("admin.comm.runTimeout")} unit={t("admin.comm.minutes")} hint={t("admin.comm.runTimeoutHint")}
+          value={s.runTimeoutMinutes} fallback={s.defaults.runTimeoutMinutes} max={120} draft={timeout} setDraft={setTimeoutMin}
+          busy={save.isPending} onSave={(v) => save.mutate({ runTimeoutMinutes: v })} />
+        <CollectLimit id="comm-threads" label={t("admin.comm.batchThreads")} hint={t("admin.comm.batchThreadsHint")}
+          value={s.batchThreads} fallback={s.defaults.batchThreads} max={100} draft={threads} setDraft={setThreads}
+          busy={save.isPending} onSave={(v) => save.mutate({ batchThreads: v })} />
       </div>
 
       <h4 style={{ margin: "22px 0 6px" }}>{t("admin.comm.sources")}</h4>
@@ -132,5 +141,29 @@ export function CommAdmin() {
         </>
       )}
     </>
+  );
+}
+
+/** A limit of the collection the administrator sets over the value of the installation (FTR.NAB.CMN-0003
+ * decision 52): an integer from 1 to max; "reset" returns the value of the installation (null). */
+function CollectLimit({ id, label, unit, hint, value, fallback, max, draft, setDraft, busy, onSave }: {
+  id: string; label: string; unit?: string; hint: string; value: number | null; fallback: number; max: number;
+  draft: string | null; setDraft: (v: string | null) => void; busy: boolean; onSave: (v: number | null) => void;
+}) {
+  const { t } = useTranslation();
+  const shown = draft ?? String(value ?? fallback);
+  const n = Number(shown);
+  const valid = Number.isInteger(n) && n >= 1 && n <= max;
+  return (
+    <div className="field">
+      <label htmlFor={id}>{label}</label>
+      <div className="row" style={{ gap: 8 }}>
+        <input id={id} className="inp" style={{ width: 120 }} inputMode="numeric" value={shown} onChange={(e) => setDraft(e.target.value)} />
+        {unit && <span className="muted">{unit}</span>}
+        <button className="btn" disabled={!valid || n === (value ?? fallback) || busy} onClick={() => { onSave(n); setDraft(null); }}>{t("common.save")}</button>
+        {value !== null && <button className="btn ghost" disabled={busy} onClick={() => { onSave(null); setDraft(null); }}>{t("admin.comm.reset")}</button>}
+      </div>
+      <div className="hint">{hint} {t("admin.comm.byDefault", { value: fallback })}</div>
+    </div>
   );
 }

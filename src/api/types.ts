@@ -373,6 +373,11 @@ export interface CommAdminSettings {
   model: { connectionId: string; model: string } | null;
   embeddings: { connectionId: string; model: string } | null;
   monthlyLimitUsd: number;
+  /** the time of a run of the collector and the threads of a batch set by the administrator; null — the
+   * value of the installation in `defaults` (FTR.NAB.CMN-0003 tech, decision 52) */
+  runTimeoutMinutes: number | null;
+  batchThreads: number | null;
+  defaults: { runTimeoutMinutes: number; batchThreads: number };
   /** the database has the vector extension; the chosen model of embeddings resolves */
   vectorsAvailable: boolean;
   semantic: boolean;

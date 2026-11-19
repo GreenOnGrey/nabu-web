@@ -196,7 +196,8 @@
       "nothingNew": "没有新内容",
       "truncated": "因数量过多未读取：{chats}",
       "truncatedChat": "{chat}：已读取最近 {count} 条",
-      "rateLimited": "来源限制了请求频率：下次运行将重试"
+      "rateLimited": "来源限制了请求频率：下次运行将重试",
+      "busy": "上一次收集仍在进行：已跳过本次运行"
     }
   },
   "memory": {
@@ -1050,6 +1051,14 @@
       "modelMissing": "未选择模型时不会进行收集。",
       "limit": "每位用户的月度额度",
       "limitHint": "用完后收集暂停至下月；摘要继续工作。0 表示不限。",
+      "collectTitle": "收集",
+      "runTimeout": "每批处理时间",
+      "minutes": "分钟",
+      "runTimeoutHint": "收集器处理一批消息的最长时间，超时则该批视为失败。适用于保存后开始的批次。",
+      "batchThreads": "每批会话数",
+      "batchThreadsHint": "会话越少，批次越短、越容易在时限内完成；越多则模型运行次数越少。从下一次收集开始生效。",
+      "byDefault": "默认：{value}（安装设置）",
+      "reset": "恢复默认",
       "sources": "沟通来源",
       "sourcesHint": "个人 MCP 服务器在有对应适配器时可作为来源。",
       "server": "MCP 服务器",
@@ -1195,6 +1204,7 @@
     "invalid_owner": "新所有者必须是拥有该渠道访问权限的群组成员。",
     "invalid_transfer": "群组代理只能移交给活跃的管理员。",
     "invalid_retention": "保留期为 1 到 3650 天。",
+    "invalid_collect_limit": "每批处理时间为 1 到 120 分钟，每批会话数为 1 到 100。",
     "identity_conflict": "该账户已关联登录提供商的另一个身份。",
     "emails_required": "请至少输入一个邮箱。",
     "too_many_emails": "每次最多 500 个邮箱。",
