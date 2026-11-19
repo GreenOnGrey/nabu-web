@@ -196,7 +196,8 @@
       "nothingNew": "Nada nuevo",
       "truncated": "No leído por el volumen: {chats}",
       "truncatedChat": "{chat}: leídos los últimos {count}",
-      "rateLimited": "La fuente limita la frecuencia de solicitudes: la próxima ejecución repetirá la recopilación"
+      "rateLimited": "La fuente limita la frecuencia de solicitudes: la próxima ejecución repetirá la recopilación",
+      "busy": "La recopilación anterior sigue en curso: se omitió la ejecución"
     }
   },
   "memory": {
@@ -1050,6 +1051,14 @@
       "modelMissing": "Sin modelo la recopilación no se ejecuta.",
       "limit": "Límite mensual por usuario",
       "limitHint": "Al agotarse, la recopilación se pausa hasta el próximo mes; los resúmenes siguen funcionando. 0 — sin límite.",
+      "collectTitle": "Recopilación",
+      "runTimeout": "Tiempo para un lote",
+      "minutes": "minutos",
+      "runTimeoutHint": "Cuánto trabaja el recopilador en un lote de mensajes antes de que el lote cuente como fallido. Se aplica a los lotes iniciados después de guardar.",
+      "batchThreads": "Hilos por lote",
+      "batchThreadsHint": "Menos hilos acortan el lote para que quepa en su tiempo; más hilos significan menos ejecuciones del modelo. Se aplica desde la próxima recopilación.",
+      "byDefault": "Por defecto: {value} (ajuste de la instalación)",
+      "reset": "Restablecer valor por defecto",
       "sources": "Fuentes de comunicaciones",
       "sourcesHint": "Un servidor MCP personal pasa a ser fuente cuando existe un adaptador para él.",
       "server": "Servidor MCP",
@@ -1195,6 +1204,7 @@
     "invalid_owner": "El nuevo propietario debe ser miembro del grupo con acceso al canal.",
     "invalid_transfer": "Los agentes de grupo se transfieren a un administrador activo.",
     "invalid_retention": "La retención es de 1 a 3650 días.",
+    "invalid_collect_limit": "El tiempo para un lote es de 1 a 120 minutos y los hilos por lote, de 1 a 100.",
     "identity_conflict": "Otra identidad del proveedor de acceso está vinculada a esta cuenta.",
     "emails_required": "Indique al menos un correo.",
     "too_many_emails": "Como máximo 500 correos por llamada.",

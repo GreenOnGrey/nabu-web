@@ -196,7 +196,8 @@
       "nothingNew": "Nichts Neues",
       "truncated": "Wegen der Menge nicht gelesen: {chats}",
       "truncatedChat": "{chat} — die letzten {count} gelesen",
-      "rateLimited": "Die Quelle begrenzt die Anfragerate: Der nächste Lauf wiederholt die Sammlung"
+      "rateLimited": "Die Quelle begrenzt die Anfragerate: Der nächste Lauf wiederholt die Sammlung",
+      "busy": "Die vorherige Sammlung läuft noch: der Lauf wurde übersprungen"
     }
   },
   "memory": {
@@ -1050,6 +1051,14 @@
       "modelMissing": "Ohne Modell läuft die Erfassung nicht.",
       "limit": "Monatslimit pro Nutzer",
       "limitHint": "Ist es aufgebraucht, pausiert die Erfassung bis zum nächsten Monat; Übersichten laufen weiter. 0 — kein Limit.",
+      "collectTitle": "Sammlung",
+      "runTimeout": "Zeit für ein Paket",
+      "minutes": "Minuten",
+      "runTimeoutHint": "Wie lange der Sammler an einem Nachrichtenpaket arbeitet, bevor das Paket als fehlgeschlagen gilt. Gilt für Pakete, die nach dem Speichern beginnen.",
+      "batchThreads": "Verläufe pro Paket",
+      "batchThreadsHint": "Weniger Verläufe machen ein Paket kürzer, damit es in die Zeit passt; mehr Verläufe bedeuten weniger Modellläufe. Gilt ab dem nächsten Sammellauf.",
+      "byDefault": "Standard: {value} (Einstellung der Installation)",
+      "reset": "Auf Standard zurücksetzen",
       "sources": "Kommunikationsquellen",
       "sourcesHint": "Ein persönlicher MCP-Server wird zur Quelle, wenn es einen Adapter für ihn gibt.",
       "server": "MCP-Server",
@@ -1195,6 +1204,7 @@
     "invalid_owner": "Der neue Besitzer muss Gruppenmitglied mit Kanalzugriff sein.",
     "invalid_transfer": "Gruppenagenten werden an einen aktiven Administrator übergeben.",
     "invalid_retention": "Die Aufbewahrung beträgt 1 bis 3650 Tage.",
+    "invalid_collect_limit": "Die Zeit für ein Paket beträgt 1 bis 120 Minuten, die Verläufe pro Paket 1 bis 100.",
     "identity_conflict": "Mit dem Konto ist eine andere Identität des Anmeldeanbieters verknüpft.",
     "emails_required": "Geben Sie mindestens eine E-Mail an.",
     "too_many_emails": "Höchstens 500 E-Mails pro Aufruf.",

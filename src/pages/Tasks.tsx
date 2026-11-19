@@ -134,6 +134,8 @@ function memorySummary(t: (k: string, o?: Record<string, unknown>) => string, s:
     return list ? head + "\n" + t("tasks.memory.truncated", { chats: list }) : head;
   }
   if (s === "rate_limited") return t("tasks.memory.rateLimited");
+  // FTR.NAB.CMN-0003 decision 53: the batches of an earlier run were still going
+  if (s === "busy") return t("tasks.memory.busy");
   const collect = /^messages:(\d+) notes:(\d+)$/.exec(s);
   if (collect) return t("tasks.memory.collected", { messages: Number(collect[1]), notes: Number(collect[2]) });
   const items = /^items:(\d+)$/.exec(s);
