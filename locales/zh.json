@@ -1076,7 +1076,13 @@
       "embeddings": "语义搜索模型",
       "embeddingsHint": "某个连接的嵌入模型。更换后向量会在后台重新计算。",
       "wordsOnly": "目前仅按词搜索：请选择嵌入模型。",
-      "noVectors": "数据库没有 vector 扩展：仅按词搜索。"
+      "noVectors": "数据库没有 vector 扩展：仅按词搜索。",
+      "thinkingOff": "明确关闭思考",
+      "thinkingWay": "方式",
+      "thinkingChatTemplate": "chat_template_kwargs — 通过 vLLM 或 LiteLLM 的 Qwen",
+      "thinkingReasoningEffort": "reasoning_effort = none — 兼容 OpenAI",
+      "thinkingHint": "收集器发给模型的每个请求都会带上关闭思考的参数：收集更快、更便宜。在聊天中模型照常工作。",
+      "thinkingAlways": "收集时此模型的思考始终关闭。"
     },
     "groups": {
       "title": "群组",
@@ -1332,7 +1338,8 @@
     "mcp_oauth_registration_failed": "授权服务器拒绝注册客户端。",
     "mcp_oauth_only": "只有使用 OAuth MCP 的条目才能注册客户端。",
     "source_access": "无法访问来源。请在“连接”中重新连接。",
-    "source_unavailable": "来源未响应。"
+    "source_unavailable": "来源未响应。",
+    "invalid_thinking_off": "未知的关闭思考方式"
   },
   "comm": {
     "lead": "助手了解的关于您和您工作往来的信息",
@@ -1446,7 +1453,9 @@
         "later": "之后",
         "undated": "无期限",
         "closed": "已关闭"
-      }
+      },
+      "fromChat": "来自聊天",
+      "openChat": "打开对话"
     },
     "digest": {
       "day": "今天别忘了",

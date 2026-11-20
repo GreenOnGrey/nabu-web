@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { api } from "../../api/client";
 import { keys } from "../../api/queries";
-import type { CommTag, Commitment } from "../../api/types";
+import type { CommTag, Commitment, Conversation } from "../../api/types";
 import { errorText } from "../../lib/errors";
 import { intlLocale } from "../../lib/i18n";
 import { Empty, Icon, useToast } from "@green-on-grey/ui-kit";
@@ -74,7 +74,11 @@ export function useCommitmentActions() {
 
 /** One commitment (R11, R12): the checkbox closes and returns it; a closed
  * one says who closed it. */
-export function CommitmentRow({ c, onTag, layout = "full" }: { c: Commitment; onTag?: (tag: CommTag) => void; layout?: "full" | "compact" | "narrow" }) {
+export function CommitmentRow({ c, onTag, layout = "full", chatPath = (id) => `/chat/${id}` }: {
+  c: Commitment; onTag?: (tag: CommTag) => void; layout?: "full" | "compact" | "narrow";
+  /** the address of a conversation: the main one lives at "/" */
+  chatPath?: (id: string) => string;
+}) {
   // full: links and tags beside the text; compact: the text only; narrow: the tags under the text
   const compact = layout !== "full", tagsBelow = layout === "narrow";
   const { t, i18n } = useTranslation();
@@ -98,6 +102,11 @@ export function CommitmentRow({ c, onTag, layout = "full" }: { c: Commitment; on
           </span>
         )}
         {c.state === "done" && c.closedBy === "agent" && <span className="auto">{t("comm.cm.byAgent")}</span>}
+        {c.origin === "chat" && (
+          <span className="auto">{t("comm.cm.fromChat")}
+            {!compact && c.conversationId && <> · <Link to={chatPath(c.conversationId)}>{t("comm.cm.openChat")}</Link></>}
+          </span>
+        )}
         {tagsBelow && (c.person || c.topics.length > 0) && (
           <span className="tgs who">
             {c.person && <TagChip tag={c.person} onClick={onTag && (() => onTag(c.person!))} />}
@@ -106,7 +115,7 @@ export function CommitmentRow({ c, onTag, layout = "full" }: { c: Commitment; on
         )}
         {!compact && (
           <span className="links">
-            <Link to={`/memory?tab=comm&note=${c.noteId}`}>{c.noteTitle}</Link>
+            {c.noteId && <Link to={`/memory?tab=comm&note=${c.noteId}`}>{c.noteTitle}</Link>}
             {c.basisUrl && <a href={c.basisUrl} target="_blank" rel="noreferrer">{t("comm.source")} <Icon name="ext" size={11} /></a>}
             {c.state === "open" && <button type="button" className="linkish" onClick={() => act.mutate({ id: c.id, state: "cancelled" })}>{t("comm.cm.cancel")}</button>}
           </span>
@@ -145,6 +154,9 @@ export function CommitmentsTab({ people, topics, onTag }: { people: CommTag[]; t
   if (topic) query.set("topic", topic);
   const list = useCommitments(query.toString());
   const items = list.data ?? [];
+  const convs = useQuery({ queryKey: keys.conversations(false), queryFn: () => api.get<{ items: Conversation[] }>("/api/v1/conversations?archived=false") });
+  const mainId = convs.data?.items.find((x) => x.kind === "main")?.id;
+  const chatPath = (id: string) => (id === mainId ? "/" : `/chat/${id}`);
   return (
     <>
       <div className="cbar">
@@ -169,7 +181,7 @@ export function CommitmentsTab({ people, topics, onTag }: { people: CommTag[]; t
       </div>
       {list.error && <div className="err-text">{errorText(t, list.error)}</div>}
       {list.data && items.length === 0 && <Empty icon="check" title={t(state === "open" ? "comm.cm.empty" : "comm.cm.emptyClosed")} />}
-      <CommitmentGroups items={items} row={(c) => <CommitmentRow key={c.id} c={c} onTag={onTag} />} />
+      <CommitmentGroups items={items} row={(c) => <CommitmentRow key={c.id} c={c} onTag={onTag} chatPath={chatPath} />} />
     </>
   );
 }

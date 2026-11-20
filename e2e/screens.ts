@@ -10,6 +10,8 @@ export interface Screen {
   only?: "desktop" | "phone";
   /** The memory of communications is on (mock-comm). */
   comm?: boolean;
+  /** The type of the connection of the model of the collection (mock-collect-model); LiteLLM by default. */
+  collectModel?: "deepseek";
   /** What to do after the page has settled, before the shot. */
   act?: (page: Page) => Promise<void>;
 }
@@ -54,6 +56,8 @@ export const SCREENS: Screen[] = [
     await page.getByRole("button", { name: /^Анна Петрова/ }).click();
     await page.mouse.move(0, 0);
   } },
+  // FTR.NAB.CMN-0003 qa UI-12: a commitment from the chat with the link to its conversation
+  { name: "memory-commitments", path: "/memory?tab=commitments", comm: true },
   { name: "tasks", path: "/tasks" },
   { name: "space", path: "/space" },
   // FTR.NAB.CHAT-0001 R34: a file of the space opens in the preview
@@ -69,6 +73,11 @@ export const SCREENS: Screen[] = [
   { name: "connections", path: "/connections" },
   { name: "admin", path: "/admin" },
   ...ADMIN.map((s) => ({ name: `admin-${s}`, path: `/admin/${s}` })),
+  // FTR.NAB.CMN-0003 qa UI-13: the explicit thinking off of the model of the collection, under the block «Сбор»
+  { name: "admin-comm-thinking", path: "/admin/comm", act: async (page) => { await page.getByText("Отключать размышление явно").scrollIntoViewIfNeeded(); } },
+  // UI-13: a DeepSeek model of the collection gets the hint instead of the switch
+  { name: "admin-comm-thinking-deepseek", path: "/admin/comm", collectModel: "deepseek",
+    act: async (page) => { await page.getByText("Размышление этой модели при сборе отключается всегда.").scrollIntoViewIfNeeded(); } },
   // FTR.NAB.CHAT-0001 design §3.4: a new connection — the models the provider lists and their prices
   { name: "admin-models-add", path: "/admin/models", act: async (page) => {
     await page.getByRole("button", { name: "Добавить подключение" }).click();

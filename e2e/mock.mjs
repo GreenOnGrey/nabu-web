@@ -5,6 +5,7 @@
 //   mock-theme=light|dark   the theme of the profile
 //   mock-auth=0             a visitor: /api/v1/me answers 401 and the app shows sign-in
 //   mock-comm=1             the memory of communications is on, with people, topics and their graph
+//   mock-collect-model=deepseek  the model of the collection is behind a DeepSeek connection
 import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
@@ -205,9 +206,22 @@ const commGraph = {
     { a: "p2", b: "t2", notes: 1 }, { a: "p1", b: "p2", notes: 2 }],
   totalNodes: 6,
 };
+// FTR.NAB.CMN-0003 R11 (design §3.6, decision 25): collected commitments and one the agent saved in the chat.
+const cmPerson = (id) => { const n = commGraph.nodes.find((x) => x.id === id); return { id, kind: "person", label: n.label, email: "" }; };
+const cmTopic = (id) => { const n = commGraph.nodes.find((x) => x.id === id); return { id, kind: "topic", label: n.label }; };
+const commitment = (id, text, direction, due, extra = {}) => ({ id, text, direction, person: null, topics: [], due, overdue: false, state: "open",
+  closedBy: null, closedAt: null, origin: "collected", noteId: "n1", noteTitle: "Перенос выпуска 2.4", conversationId: null,
+  basisUrl: "https://mail.example/m1", createdAt: T("09:00", "08"), ...extra });
+const commitments = [
+  commitment("c1", "Проверить формулировки заметок о выпуске", "mine", "2026-10-10", { overdue: true, person: cmPerson("p1"), topics: [cmTopic("t1")] }),
+  commitment("c2", "Отправить смету на согласование", "mine", "2026-10-11", { person: cmPerson("p2"), topics: [cmTopic("t2")] }),
+  commitment("c3", "Прислать смету по релизу", "mine", "2026-10-16", { person: cmPerson("p2"), origin: "chat", noteId: null, noteTitle: "",
+    conversationId: "main", basisUrl: "" }),
+  commitment("c4", "Вернуть правки по договору", "theirs", null, { person: cmPerson("p3") }),
+];
 const commTags = (kind) => ({ items: commGraph.nodes.filter((n) => n.kind === kind).map(({ id, kind: k, label, notes }) => ({ id, kind: k, label, notes })) });
 
-function api(url, theme, comm) {
+function api(url, theme, comm, collectModel) {
   const p = url.pathname;
   if (p === "/api/v1/me") return me(theme);
   if (p === "/api/v1/config") return config;
@@ -227,8 +241,16 @@ function api(url, theme, comm) {
   if (comm && p === "/api/v1/comm/people") return commTags("person");
   if (comm && p === "/api/v1/comm/topics") return commTags("topic");
   if (comm && p === "/api/v1/comm/graph") return commGraph;
+  if (comm && p === "/api/v1/commitments") return { items: url.searchParams.get("state") === "closed" ? [] : commitments };
+  // FTR.NAB.CMN-0003 R29 (design §3.10, decision 26): the model of the collection is behind LiteLLM, its thinking is off
+  if (p === "/admin/api/v1/settings/comm") return { enabled: true, retentionDays: 180, model: { connectionId: "mc1", model: "deepseek-v4.1-flash" },
+    embeddings: null, monthlyLimitUsd: 6, runTimeoutMinutes: 30, batchThreads: null, defaults: { runTimeoutMinutes: 20, batchThreads: 8 },
+    thinkingOff: "chat-template", vectorsAvailable: true, semantic: false };
+  if (p === "/admin/api/v1/comm/sources") return { items: [], adapters: ["gmail", "mail"] };
+  if (p === "/admin/api/v1/comm/usage") return { enabledUsers: 12, notes: 4312, costUsd: 18.4, monthlyLimitUsd: 6, items: [] };
   if (p === "/admin/api/v1/clients") return { items: clients };
-  if (p === "/admin/api/v1/model-connections") return { items: modelConnections, types: connectionTypes };
+  if (p === "/admin/api/v1/model-connections") return { items: collectModel === "deepseek" ? modelConnections.map((c) => ({ ...c, type: "deepseek" })) : modelConnections,
+    types: connectionTypes };
   if (p === "/admin/api/v1/personal-models") return { default: { connectionId: "mc1", model: "deepseek-v4.1-flash", thinking: "off" },
     available: [{ connectionId: "mc1", model: "deepseek-v4.1-flash" }, { connectionId: "mc1", model: "GLM-5.3" }] };
   if (p === "/admin/api/v1/catalog") return { items: adminCatalog };
@@ -298,7 +320,7 @@ http.createServer((req, res) => {
     }
     if (url.pathname === "/api/v1/me" && cookie("mock-auth") === "0") { res.writeHead(401, { "content-type": "application/json" }); return res.end('{"error":{"code":"unauthenticated","message":"sign in"}}'); }
     res.writeHead(200, { "content-type": "application/json" });
-    return res.end(JSON.stringify(api(url, cookie("mock-theme"), cookie("mock-comm") === "1")));
+    return res.end(JSON.stringify(api(url, cookie("mock-theme"), cookie("mock-comm") === "1", cookie("mock-collect-model"))));
   }
   let file = path.join(DIST, decodeURIComponent(url.pathname));
   if (!file.startsWith(DIST) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) file = path.join(DIST, "index.html");
