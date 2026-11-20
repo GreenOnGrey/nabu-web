@@ -91,6 +91,10 @@ export function CommAdmin() {
         <CollectLimit id="comm-threads" label={t("admin.comm.batchThreads")} hint={t("admin.comm.batchThreadsHint")}
           value={s.batchThreads} fallback={s.defaults.batchThreads} max={100} draft={threads} setDraft={setThreads}
           busy={save.isPending} onSave={(v) => save.mutate({ batchThreads: v })} />
+        {(!s.model || conns.data) && (
+          <ThinkingOff value={s.thinkingOff} type={conns.data?.items.find((c) => c.id === s.model?.connectionId)?.type} busy={save.isPending}
+            onSave={(v) => save.mutate({ thinkingOff: v })} />
+        )}
       </div>
 
       <h4 style={{ margin: "22px 0 6px" }}>{t("admin.comm.sources")}</h4>
@@ -164,6 +168,33 @@ function CollectLimit({ id, label, unit, hint, value, fallback, max, draft, setD
         {value !== null && <button className="btn ghost" disabled={busy} onClick={() => { onSave(null); setDraft(null); }}>{t("admin.comm.reset")}</button>}
       </div>
       <div className="hint">{hint} {t("admin.comm.byDefault", { value: fallback })}</div>
+    </div>
+  );
+}
+
+/** The explicit thinking off of the model of the collection (FTR.NAB.CMN-0003 R29, design §3.10, decision 26): a
+ * switch and the way. DeepSeek, Z.AI and GigaChat switch it off by their own parameter, so they get a hint. */
+function ThinkingOff({ value, type, busy, onSave }: {
+  value: CommAdminSettings["thinkingOff"]; type?: string; busy: boolean; onSave: (v: CommAdminSettings["thinkingOff"]) => void;
+}) {
+  const { t } = useTranslation();
+  if (type && type !== "openai_compatible") {
+    return <div className="field"><div className="hint">{t("admin.comm.thinkingAlways")}</div></div>;
+  }
+  return (
+    <div className="field">
+      <Switch on={value !== null} disabled={busy} onChange={(on) => onSave(on ? "chat-template" : null)} label={t("admin.comm.thinkingOff")} />
+      {value !== null && (
+        <>
+          <label htmlFor="comm-thinking" style={{ marginTop: 8 }}>{t("admin.comm.thinkingWay")}</label>
+          <select id="comm-thinking" className="inp" value={value} disabled={busy}
+            onChange={(e) => onSave(e.target.value as NonNullable<CommAdminSettings["thinkingOff"]>)}>
+            <option value="chat-template">{t("admin.comm.thinkingChatTemplate")}</option>
+            <option value="reasoning-effort">{t("admin.comm.thinkingReasoningEffort")}</option>
+          </select>
+          <div className="hint">{t("admin.comm.thinkingHint")}</div>
+        </>
+      )}
     </div>
   );
 }

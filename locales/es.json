@@ -1076,7 +1076,13 @@
       "embeddings": "Modelo de la búsqueda por significado",
       "embeddingsHint": "Un modelo de embeddings de una conexión. Tras un cambio los vectores se recalculan en segundo plano.",
       "wordsOnly": "La búsqueda funciona solo por palabras: elija un modelo de embeddings.",
-      "noVectors": "La base de datos no tiene la extensión vector: la búsqueda funciona solo por palabras."
+      "noVectors": "La base de datos no tiene la extensión vector: la búsqueda funciona solo por palabras.",
+      "thinkingOff": "Desactivar el razonamiento de forma explícita",
+      "thinkingWay": "Forma",
+      "thinkingChatTemplate": "chat_template_kwargs — Qwen con vLLM o LiteLLM",
+      "thinkingReasoningEffort": "reasoning_effort = none — compatibles con OpenAI",
+      "thinkingHint": "Cada solicitud del recolector al modelo lleva un parámetro que desactiva el razonamiento: la recopilación es más rápida y barata. En el chat el modelo funciona como antes.",
+      "thinkingAlways": "El razonamiento de este modelo siempre se desactiva en la recopilación."
     },
     "groups": {
       "title": "Grupos",
@@ -1332,7 +1338,8 @@
     "mcp_oauth_registration_failed": "El servidor de autorización rechazó registrar el cliente.",
     "mcp_oauth_only": "Solo un elemento con OAuth MCP registra su cliente.",
     "source_access": "Sin acceso a la fuente. Vuelva a conectarla en Conexiones.",
-    "source_unavailable": "La fuente no respondió."
+    "source_unavailable": "La fuente no respondió.",
+    "invalid_thinking_off": "Forma desconocida de desactivar el razonamiento"
   },
   "comm": {
     "lead": "Lo que el agente sabe de usted y de su correspondencia de trabajo",
@@ -1446,7 +1453,9 @@
         "later": "Más tarde",
         "undated": "Sin plazo",
         "closed": "Cerrados"
-      }
+      },
+      "fromChat": "del chat",
+      "openChat": "Abrir la conversación"
     },
     "digest": {
       "day": "No olvidar hoy",

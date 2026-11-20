@@ -1076,7 +1076,13 @@
       "embeddings": "Model of the search by meaning",
       "embeddingsHint": "An embeddings model of a connection. After a change the vectors are recounted in the background.",
       "wordsOnly": "The search works by words only: choose an embeddings model.",
-      "noVectors": "The database has no vector extension: the search works by words only."
+      "noVectors": "The database has no vector extension: the search works by words only.",
+      "thinkingOff": "Switch thinking off explicitly",
+      "thinkingWay": "Way",
+      "thinkingChatTemplate": "chat_template_kwargs — Qwen behind vLLM or LiteLLM",
+      "thinkingReasoningEffort": "reasoning_effort = none — OpenAI-compatible",
+      "thinkingHint": "Every request of the collector to the model gets a parameter that switches thinking off: the collection is faster and cheaper. In the chat the model works as before.",
+      "thinkingAlways": "Thinking of this model is always switched off for the collection."
     },
     "groups": {
       "title": "Groups",
@@ -1332,7 +1338,8 @@
     "mcp_oauth_registration_failed": "The authorization server refused to register the client.",
     "mcp_oauth_only": "Only an item with OAuth MCP registers its client.",
     "source_access": "No access to the source. Connect it again in Connections.",
-    "source_unavailable": "The source did not answer."
+    "source_unavailable": "The source did not answer.",
+    "invalid_thinking_off": "Unknown way to switch thinking off"
   },
   "comm": {
     "lead": "What the agent knows about you and your work correspondence",
@@ -1446,7 +1453,9 @@
         "later": "Later",
         "undated": "No due day",
         "closed": "Closed"
-      }
+      },
+      "fromChat": "from the chat",
+      "openChat": "Open the conversation"
     },
     "digest": {
       "day": "Do not forget today",

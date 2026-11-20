@@ -265,8 +265,13 @@ export interface Commitment {
   state: "open" | "done" | "cancelled";
   closedBy: "user" | "agent" | "collector" | null;
   closedAt: string | null;
-  noteId: string;
+  /** chat — created by the personal agent in a conversation (FTR.NAB.CMN-0003 R11, tech decision 57) */
+  origin: "collected" | "chat";
+  /** null for a commitment from the chat that the collector has not linked to a thread yet */
+  noteId: string | null;
   noteTitle: string;
+  /** the conversation a commitment from the chat was created in; null when it is gone */
+  conversationId: string | null;
   basisUrl: string;
   closeBasisUrl?: string;
 }
@@ -378,6 +383,9 @@ export interface CommAdminSettings {
   runTimeoutMinutes: number | null;
   batchThreads: number | null;
   defaults: { runTimeoutMinutes: number; batchThreads: number };
+  /** how a run of the collector switches the thinking of an OpenAI-compatible model off; null — no parameter
+   * (FTR.NAB.CMN-0003 tech, decision 58) */
+  thinkingOff: "chat-template" | "reasoning-effort" | null;
   /** the database has the vector extension; the chosen model of embeddings resolves */
   vectorsAvailable: boolean;
   semantic: boolean;

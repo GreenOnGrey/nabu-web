@@ -1076,7 +1076,13 @@
       "embeddings": "Modell der Bedeutungssuche",
       "embeddingsHint": "Ein Embedding-Modell einer Verbindung. Nach einem Wechsel werden die Vektoren im Hintergrund neu berechnet.",
       "wordsOnly": "Die Suche arbeitet nur nach Wörtern: Wählen Sie ein Embedding-Modell.",
-      "noVectors": "Die Datenbank hat keine Vektor-Erweiterung: Die Suche arbeitet nur nach Wörtern."
+      "noVectors": "Die Datenbank hat keine Vektor-Erweiterung: Die Suche arbeitet nur nach Wörtern.",
+      "thinkingOff": "Denken ausdrücklich ausschalten",
+      "thinkingWay": "Weg",
+      "thinkingChatTemplate": "chat_template_kwargs — Qwen über vLLM oder LiteLLM",
+      "thinkingReasoningEffort": "reasoning_effort = none — OpenAI-kompatibel",
+      "thinkingHint": "Jede Anfrage des Sammlers an das Modell erhält einen Parameter, der das Denken ausschaltet: Die Sammlung ist schneller und günstiger. Im Chat arbeitet das Modell wie bisher.",
+      "thinkingAlways": "Das Denken dieses Modells ist bei der Sammlung immer ausgeschaltet."
     },
     "groups": {
       "title": "Gruppen",
@@ -1332,7 +1338,8 @@
     "mcp_oauth_registration_failed": "Der Autorisierungsserver hat die Registrierung des Clients abgelehnt.",
     "mcp_oauth_only": "Nur ein Eintrag mit OAuth MCP registriert seinen Client.",
     "source_access": "Kein Zugriff auf die Quelle. Verbinden Sie sie in Verbindungen erneut.",
-    "source_unavailable": "Die Quelle hat nicht geantwortet."
+    "source_unavailable": "Die Quelle hat nicht geantwortet.",
+    "invalid_thinking_off": "Unbekannter Weg, das Denken auszuschalten"
   },
   "comm": {
     "lead": "Was der Agent über Sie und Ihre Arbeitskorrespondenz weiß",
@@ -1446,7 +1453,9 @@
         "later": "Später",
         "undated": "Ohne Frist",
         "closed": "Geschlossen"
-      }
+      },
+      "fromChat": "aus dem Chat",
+      "openChat": "Unterhaltung öffnen"
     },
     "digest": {
       "day": "Heute nicht vergessen",
