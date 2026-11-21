@@ -243,6 +243,8 @@ export interface CommTag {
   kind: "person" | "topic";
   label: string;
   email?: string;
+  /** the days of communication with the person or on the topic (FTR.NAB.MEM-0001 R20) */
+  days?: number;
   notes?: number;
 }
 
@@ -252,6 +254,8 @@ export interface CommMessage {
   sentAt: string | null;
   title: string;
   url: string;
+  /** a key message of a compacted record (FTR.NAB.MEM-0001 R6) */
+  key?: boolean;
 }
 
 export interface Commitment {
@@ -289,6 +293,17 @@ export interface CommNote {
   topics: CommTag[];
   openCommitments: number;
   userEdited: boolean;
+  /** the level of the record and its period (FTR.NAB.MEM-0001 R1, R17) */
+  level: "day" | "week" | "month" | "thread";
+  periodFrom: string;
+  periodTo: string;
+  /** the days of communication of the record */
+  days: number;
+  /** the thread, the chat or the last message — one link of the record in its source */
+  sourceUrl: string;
+  /** how many records the compaction merged into this one, and when (null — not compacted) */
+  compactedFrom: number | null;
+  compactedAt: string | null;
   summary?: string;
   appended?: { at: string; text: string }[];
   messages?: CommMessage[];
@@ -296,9 +311,10 @@ export interface CommNote {
 }
 
 export interface CommGraph {
-  nodes: { id: string; kind: "person" | "topic"; label: string; notes: number; links: number }[];
-  edges: { a: string; b: string; notes: number }[];
+  nodes: { id: string; kind: "person" | "topic"; label: string; notes: number; links: number; days: number }[];
+  edges: { a: string; b: string; notes: number; days: number }[];
   totalNodes: number;
+  totalEdges: number;
 }
 
 export interface CommSource {
@@ -315,7 +331,12 @@ export interface CommState {
   /** the tabs are shown: allowed, or switched off with something collected to see (R24) */
   available: boolean;
   consentAt: string | null;
+  /** the retention in months of the monthly records and the mail threads (FTR.NAB.MEM-0001 R16) */
+  retentionMonths: number;
+  /** the same retention in days: the version before #42 */
   retentionDays: number;
+  /** the last night the compaction of the user worked (FTR.NAB.MEM-0001 R17) */
+  compact: { lastAt: string | null };
   semantic: boolean;
   sources: CommSource[];
   collect: {
@@ -374,8 +395,13 @@ export interface DigestCard {
 
 export interface CommAdminSettings {
   enabled: boolean;
+  /** the retention of the monthly records and the mail threads in months (FTR.NAB.MEM-0001 R16) */
+  retentionMonths: number;
+  /** the same retention in days: the version before */
   retentionDays: number;
   model: { connectionId: string; model: string } | null;
+  /** the model of the compaction; null — the model of the collection (FTR.NAB.MEM-0001 R14, R25) */
+  compactModel: { connectionId: string; model: string } | null;
   embeddings: { connectionId: string; model: string } | null;
   monthlyLimitUsd: number;
   /** the time of a run of the collector and the threads of a batch set by the administrator; null — the
@@ -389,6 +415,63 @@ export interface CommAdminSettings {
   /** the database has the vector extension; the chosen model of embeddings resolves */
   vectorsAvailable: boolean;
   semantic: boolean;
+}
+
+/** The records of a user by level (FTR.NAB.MEM-0001 R25). */
+export interface CommLevels { day: number; week: number; month: number; thread: number }
+
+/** A month of the memory of communications in the administration (FTR.NAB.MEM-0001 R25, R26, tech §4). */
+export interface CommUsage {
+  month: string;
+  monthlyLimitUsd: number;
+  enabledUsers: number;
+  activeUsers: number;
+  notes: number;
+  costUsd: number;
+  cost: { collect: number; compact: number };
+  compaction: {
+    charsIn: number;
+    charsOut: number;
+    /** characters in to characters out, one decimal; null until the first compaction */
+    ratio: number | null;
+    ok: number;
+    failed: number;
+    lastNightAt: string | null;
+    brokenUsers: number;
+  };
+  levels: CommLevels;
+  commitments: { open: number; closedInMonth: number; overdue: number };
+  collect: {
+    outcomes: { ok: number; busy: number; rate_limited: number; source_access: number; timeout: number; error: number };
+    messagesBySource: { itemId: string; source: string; title: string; messages: number }[];
+  };
+  items: CommUsageRow[];
+}
+
+export interface CommUsageRow {
+  userId: string;
+  email: string;
+  notes: number;
+  levels: CommLevels;
+  runs: number;
+  lastCollect: { at: string; outcome: string } | null;
+  costUsd: number;
+  costCollect: number;
+  costCompact: number;
+  limitUsedPct: number;
+  lastCompactAt: string | null;
+  compactBroken: boolean;
+  openCommitments: number;
+}
+
+/** A day of the charts of the usage (FTR.NAB.MEM-0001 R26). */
+export interface CommUsageDay {
+  day: string;
+  costCollect: number;
+  costCompact: number;
+  messages: number;
+  created: number;
+  levels: CommLevels;
 }
 
 export interface TaskRun {

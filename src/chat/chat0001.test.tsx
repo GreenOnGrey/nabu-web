@@ -8,7 +8,7 @@ import { agentModelOptions } from "@green-on-grey/ui-kit/chat";
 const i18n = createI18n("en");
 const t = i18n.t;
 // the block «Model» is the kit's (FTR.HMR.SPEC-0001); Nabu gives it the models of the agent
-const kitT = i18n.getFixedT("en", "uikit");
+const kitT = i18n.getFixedT("en", "uikit") as unknown as Parameters<typeof agentModelOptions>[0];
 const modelOptions = (_: unknown, a: Agent, lng: string) =>
   agentModelOptions(kitT, lng, { available: a.availableModels, model: a.model, defaultModel: a.defaultModel, chosen: a.chosen, contextTokens: a.context.tokens });
 

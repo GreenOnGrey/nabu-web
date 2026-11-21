@@ -1045,7 +1045,7 @@
       "lead": "Nutzer schalten die Erfassung ihrer Mail und Messenger selbst ein, nach ihrer Einwilligung.",
       "enabled": "Kommunikationsgedächtnis erlauben",
       "retention": "Aufbewahrung der Notizen",
-      "retentionHint": "Gerechnet ab der letzten Nachricht. Eine Notiz mit offener Zusage bleibt, bis die Zusage geschlossen ist.",
+      "retentionHint": "Die monatlichen Einträge und die Mail-Verläufe. Tages- und Wochen-Einträge bleiben bis zur Zusammenführung.",
       "model": "Modell der Erfassung",
       "notChosen": "Nicht gewählt",
       "modelMissing": "Ohne Modell läuft die Erfassung nicht.",
@@ -1082,7 +1082,68 @@
       "thinkingChatTemplate": "chat_template_kwargs — Qwen über vLLM oder LiteLLM",
       "thinkingReasoningEffort": "reasoning_effort = none — OpenAI-kompatibel",
       "thinkingHint": "Jede Anfrage des Sammlers an das Modell erhält einen Parameter, der das Denken ausschaltet: Die Sammlung ist schneller und günstiger. Im Chat arbeitet das Modell wie bisher.",
-      "thinkingAlways": "Das Denken dieses Modells ist bei der Sammlung immer ausgeschaltet."
+      "thinkingAlways": "Das Denken dieses Modells ist bei der Sammlung immer ausgeschaltet.",
+      "months": "Mon.",
+      "compactModel": "Modell der Zusammenführung",
+      "compactModelHint": "Leer — das Modell der Sammlung.",
+      "use": {
+        "month": "Monat",
+        "users": "Nutzer",
+        "activeUsers": "{count} aktiv",
+        "records": "Einträge",
+        "levelsShort": "T {day} · W {week} · M {month} · V {thread}",
+        "compaction": "Zusammenführung",
+        "ratio": "×{ratio}",
+        "ratioHint": "{in} → {out} Zeichen",
+        "costTitle": "Kosten",
+        "costSplit": "Sammlung {collect} · Zusammenführung {compact}",
+        "broken": "Zusammenführung gestört",
+        "brokenFilter": "Nur diese Nutzer zeigen",
+        "charts": {
+          "cost": "Kosten, $",
+          "volume": "Nachrichten und Einträge",
+          "levels": "Einträge nach Stufe"
+        },
+        "series": {
+          "collect": "Sammlung",
+          "compact": "Zusammenführung",
+          "messages": "Nachrichten",
+          "created": "Erstellte Einträge"
+        },
+        "collectBlock": "Sammlung",
+        "outcomes": {
+          "ok": "Erledigt",
+          "busy": "Belegt",
+          "rate_limited": "Begrenzt",
+          "source_access": "Kein Zugang",
+          "timeout": "Zeitüberschreitung",
+          "error": "Fehler"
+        },
+        "bySource": "Gelesene Nachrichten je Quelle",
+        "compactBlock": "Zusammenführung",
+        "lastNight": "Letzte Nacht: {date}",
+        "okCount": "Erfolgreich: {count}",
+        "failedCount": "Fehlgeschlagen: {count}",
+        "commitmentsBlock": "Vereinbarungen",
+        "commitmentsOpen": "Offen: {count}",
+        "commitmentsClosed": "Diesen Monat geschlossen: {count}",
+        "commitmentsOverdue": "Überfällig: {count}",
+        "cols": {
+          "user": "Nutzer",
+          "notes": "Einträge",
+          "runs": "Läufe",
+          "lastCollect": "Letzte Sammlung",
+          "costCollect": "Kosten der Sammlung",
+          "costCompact": "Kosten der Zusammenführung",
+          "limit": "Limit",
+          "lastCompact": "Letzte Zusammenführung",
+          "openCommitments": "Offen"
+        },
+        "noData": "Keine Daten für diesen Monat",
+        "chip": "Nur {email}",
+        "chipClear": "Alle zeigen",
+        "shares": "{count} · {pct} %"
+      }
     },
     "groups": {
       "title": "Gruppen",
@@ -1385,7 +1446,8 @@
       "source": "Quelle",
       "summary": "Zusammenfassung",
       "open": "Offen",
-      "openTitle": "Offene Zusagen"
+      "openTitle": "Offene Zusagen",
+      "volume": "Umfang"
     },
     "invite": {
       "title": "Hier erscheint Ihre Arbeitskorrespondenz",
@@ -1403,12 +1465,14 @@
     "graph": {
       "aria": "Graph der Personen und Themen",
       "node": "{count, plural, one {{label}, # Notiz} other {{label}, # Notizen}}",
-      "shown": "{shown} von {total} Knoten",
+      "shown": "Gezeigt: {nodes} von {totalNodes} Knoten, {edges} von {totalEdges} Verbindungen",
       "few": "Noch zu wenige Verbindungen",
       "linked": "Verbunden mit",
       "panel": "Notizen der Auswahl",
       "showAll": "{count, plural, one {# in der Tabelle zeigen} other {Alle # in der Tabelle zeigen}}",
-      "minLinks": "{count, plural, one {Ab # Verbindung zeigen} other {Ab # Verbindungen zeigen}}"
+      "minLinks": "{count, plural, one {Ab # Verbindung zeigen} other {Ab # Verbindungen zeigen}}",
+      "notShown": "Der Knoten wird nicht gezeigt: zu wenige Verbindungen",
+      "nodeDays": "{label}, {count, plural, one {# Tag} other {# Tage}} Austausch"
     },
     "note": {
       "aria": "Notiz",
@@ -1423,7 +1487,12 @@
       "open": "Öffnen",
       "more": "{count, plural, one {# weitere} other {# weitere}}",
       "deleteTitle": "Notiz löschen?",
-      "deleteText": "Die Notiz und ihre Zusagen werden gelöscht. Dieser Thread wird nicht erneut erfasst."
+      "deleteText": "Die Notiz und ihre Zusagen werden gelöscht. Dieser Thread wird nicht erneut erfasst.",
+      "compacted": "Aus {count, plural, one {# Eintrag} other {# Einträgen}} zusammengeführt · {date}",
+      "openThread": "Verlauf öffnen",
+      "openChat": "Chat öffnen",
+      "allMessages": "Alle Nachrichten ({count})",
+      "openSource": "In der Quelle öffnen"
     },
     "cm": {
       "mine": "ich schulde",
@@ -1558,7 +1627,7 @@
         "failed": "Nach Fehlern pausiert. Den Grund finden Sie unter „Aufgaben“."
       },
       "collected": "Erfasstes",
-      "collectedText": "Notizen: {notes}, offene Zusagen: {commitments} · Aufbewahrung {days} Tage",
+      "collectedText": "Einträge: {notes}, offene Vereinbarungen: {commitments} · aufbewahrt {months} Monate",
       "deleteAll": "Erfasstes löschen",
       "deleteAllTitle": "Alles Erfasste löschen?",
       "deleteAllText": "Notizen ({notes}), Zusagen ({commitments}), Personen und Themen werden gelöscht und die Gedächtnisaufgaben ausgeschaltet. Die Fakten bleiben.",
@@ -1569,8 +1638,18 @@
         "included": "Gesammelt, obwohl stummgeschaltet",
         "none": "Keine stummgeschalteten Gruppen gefunden",
         "error": "Die Liste der Gruppen konnte nicht gelesen werden: Verbinden Sie VK WorkSpace erneut"
-      }
-    }
+      },
+      "lastCompact": "Letzte Zusammenführung: {date}",
+      "noCompact": "Noch keine Zusammenführung"
+    },
+    "level": {
+      "day": "Tag",
+      "week": "Woche",
+      "month": "Monat",
+      "thread": "Verlauf"
+    },
+    "days": "{count, plural, one {# Tag} other {# Tage}}",
+    "filterPersonTopic": "Person oder Thema"
   },
   "models": {
     "cap": {

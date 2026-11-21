@@ -1045,7 +1045,7 @@
       "lead": "Пользователи включают сбор почты и мессенджеров сами, после согласия.",
       "enabled": "Разрешить память коммуникаций",
       "retention": "Срок хранения заметок",
-      "retentionHint": "Считается от последнего сообщения. Заметка с открытой договорённостью хранится, пока та не закрыта.",
+      "retentionHint": "Месячные записи и цепочки писем. Дневные и недельные хранятся до сжатия.",
       "model": "Модель сбора",
       "notChosen": "Не выбрана",
       "modelMissing": "Без модели сбор не выполняется.",
@@ -1082,7 +1082,68 @@
       "thinkingChatTemplate": "chat_template_kwargs — Qwen через vLLM или LiteLLM",
       "thinkingReasoningEffort": "reasoning_effort = none — OpenAI-совместимые",
       "thinkingHint": "В каждый запрос сборщика к модели добавляется параметр, который выключает размышление: сбор быстрее и дешевле. В чате модель работает как раньше.",
-      "thinkingAlways": "Размышление этой модели при сборе отключается всегда."
+      "thinkingAlways": "Размышление этой модели при сборе отключается всегда.",
+      "months": "мес.",
+      "compactModel": "Модель сжатия",
+      "compactModelHint": "Пусто — как у сбора.",
+      "use": {
+        "month": "Месяц",
+        "users": "Пользователи",
+        "activeUsers": "{count} активны",
+        "records": "Записи",
+        "levelsShort": "Д {day} · Н {week} · М {month} · Ц {thread}",
+        "compaction": "Сжатие",
+        "ratio": "×{ratio}",
+        "ratioHint": "{in} → {out} символов",
+        "costTitle": "Стоимость",
+        "costSplit": "Сбор {collect} · сжатие {compact}",
+        "broken": "Сжатие не работает",
+        "brokenFilter": "Показать только этих пользователей",
+        "charts": {
+          "cost": "Стоимость, $",
+          "volume": "Сообщения и записи",
+          "levels": "Записи по уровням"
+        },
+        "series": {
+          "collect": "Сбор",
+          "compact": "Сжатие",
+          "messages": "Сообщения",
+          "created": "Создано записей"
+        },
+        "collectBlock": "Сбор",
+        "outcomes": {
+          "ok": "Выполнено",
+          "busy": "Занято",
+          "rate_limited": "Лимит источника",
+          "source_access": "Нет доступа",
+          "timeout": "Тайм-аут",
+          "error": "Ошибка"
+        },
+        "bySource": "Прочитано сообщений по источникам",
+        "compactBlock": "Сжатие",
+        "lastNight": "Последняя ночь: {date}",
+        "okCount": "Успешно: {count}",
+        "failedCount": "С ошибкой: {count}",
+        "commitmentsBlock": "Договорённости",
+        "commitmentsOpen": "Открытые: {count}",
+        "commitmentsClosed": "Закрыто за месяц: {count}",
+        "commitmentsOverdue": "Просроченные: {count}",
+        "cols": {
+          "user": "Пользователь",
+          "notes": "Записи",
+          "runs": "Запуски",
+          "lastCollect": "Последний сбор",
+          "costCollect": "Стоимость сбора",
+          "costCompact": "Стоимость сжатия",
+          "limit": "Лимит",
+          "lastCompact": "Последнее сжатие",
+          "openCommitments": "Открытые"
+        },
+        "noData": "За этот месяц данных нет",
+        "chip": "Только {email}",
+        "chipClear": "Показать всех",
+        "shares": "{count} · {pct} %"
+      }
     },
     "groups": {
       "title": "Группы",
@@ -1385,7 +1446,8 @@
       "source": "Источник",
       "summary": "Выжимка",
       "open": "Откр.",
-      "openTitle": "Открытые договорённости"
+      "openTitle": "Открытые договорённости",
+      "volume": "Объём"
     },
     "invite": {
       "title": "Здесь появится ваша рабочая переписка",
@@ -1403,12 +1465,14 @@
     "graph": {
       "aria": "Граф связей людей и тем",
       "node": "{count, plural, one {{label}, # заметка} few {{label}, # заметки} many {{label}, # заметок} other {{label}, # заметки}}",
-      "shown": "{shown} узлов из {total}",
+      "shown": "Показано {nodes} из {totalNodes} узлов, {edges} из {totalEdges} связей",
       "few": "Связей пока мало",
       "linked": "Связано с",
       "panel": "Заметки выбранного",
       "showAll": "{count, plural, one {Показать # в таблице} few {Показать все # в таблице} many {Показать все # в таблице} other {Показать все # в таблице}}",
-      "minLinks": "{count, plural, one {Показывать от # связи} few {Показывать от # связей} many {Показывать от # связей} other {Показывать от # связей}}"
+      "minLinks": "{count, plural, one {Показывать от # связи} few {Показывать от # связей} many {Показывать от # связей} other {Показывать от # связей}}",
+      "notShown": "Узел не показан: мало связей",
+      "nodeDays": "{label}, {count, plural, one {# день} few {# дня} many {# дней} other {# дня}} общения"
     },
     "note": {
       "aria": "Заметка",
@@ -1423,7 +1487,12 @@
       "open": "Открыть",
       "more": "{count, plural, one {Ещё #} few {Ещё #} many {Ещё #} other {Ещё #}}",
       "deleteTitle": "Удалить заметку?",
-      "deleteText": "Заметка и её договорённости будут удалены. Эта цепочка больше не будет собираться."
+      "deleteText": "Заметка и её договорённости будут удалены. Эта цепочка больше не будет собираться.",
+      "compacted": "Сжато из {count, plural, one {# записи} few {# записей} many {# записей} other {# записи}} · {date}",
+      "openThread": "Открыть цепочку",
+      "openChat": "Открыть чат",
+      "allMessages": "Все сообщения ({count})",
+      "openSource": "Открыть в источнике"
     },
     "cm": {
       "mine": "я должен",
@@ -1558,7 +1627,7 @@
         "failed": "Приостановлено после сбоев. Причина — в разделе «Задания»."
       },
       "collected": "Собранное",
-      "collectedText": "Заметок: {notes}, открытых договорённостей: {commitments} · хранится {days} дн.",
+      "collectedText": "Записи: {notes}, открытые договорённости: {commitments} · хранится {months} мес.",
       "deleteAll": "Удалить собранное",
       "deleteAllTitle": "Удалить всё собранное?",
       "deleteAllText": "Будут удалены заметки ({notes}), договорённости ({commitments}), люди и темы, а задания памяти — выключены. Факты памяти останутся.",
@@ -1569,8 +1638,18 @@
         "included": "Собираются, хотя заглушены",
         "none": "Заглушённых групп не найдено",
         "error": "Не удалось получить список групп: подключите VK WorkSpace заново"
-      }
-    }
+      },
+      "lastCompact": "Последнее сжатие: {date}",
+      "noCompact": "Сжатие ещё не выполнялось"
+    },
+    "level": {
+      "day": "День",
+      "week": "Неделя",
+      "month": "Месяц",
+      "thread": "Цепочка"
+    },
+    "days": "{count, plural, one {# день} few {# дня} many {# дней} other {# дня}}",
+    "filterPersonTopic": "Человек или тема"
   },
   "models": {
     "cap": {

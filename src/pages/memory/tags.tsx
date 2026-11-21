@@ -1,5 +1,6 @@
 import type { TFunction } from "i18next";
-import type { CommTag } from "../../api/types";
+import { useTranslation } from "react-i18next";
+import type { CommNote, CommTag } from "../../api/types";
 import { Icon } from "@green-on-grey/ui-kit";
 
 /** A person or a topic (FTR.NAB.CMN-0003 design §1, decision 19): a neutral
@@ -37,4 +38,26 @@ export function noteWhen(iso: string, precision: "minute" | "day", lng: string):
 
 export function dueText(due: string, lng: string): string {
   return new Intl.DateTimeFormat(lng, { day: "numeric", month: "short", weekday: "short", timeZone: "UTC" }).format(new Date(due + "T00:00:00Z"));
+}
+
+/** The period of a record by its level (FTR.NAB.MEM-0001 R1, design §3.1): «14 Nov», «10–16 Nov», «November 2026»,
+ * «3–19 Nov». The dates are the dates of the user, kept as they are. */
+const at = (iso: string) => new Date(iso + "T00:00:00Z");
+
+export function notePeriod(n: Pick<CommNote, "level" | "periodFrom" | "periodTo">, lng: string): string {
+  if (!n.periodFrom) return ""; // a record the collection did not date
+  const day = (iso: string) => new Intl.DateTimeFormat(lng, { day: "numeric", month: "short", timeZone: "UTC" }).format(at(iso));
+  if (n.level === "month") {
+    // «Октябрь 2026»: the month by name and the year, without the suffix some locales add to a full date
+    const name = new Intl.DateTimeFormat(lng, { month: "long", timeZone: "UTC" }).format(at(n.periodFrom));
+    return `${name.charAt(0).toLocaleUpperCase(lng)}${name.slice(1)} ${n.periodFrom.slice(0, 4)}`;
+  }
+  return n.level === "day" ? day(n.periodFrom) : `${day(n.periodFrom)}–${day(n.periodTo)}`;
+}
+
+/** The level of a record before its date (design §1): neutral for a day and a thread, a violet outline for a week
+ * and a month, so a compacted record reads as a summary. */
+export function LevelChip({ level }: { level: CommNote["level"] }) {
+  const { t } = useTranslation();
+  return <span className={`lvl${level === "week" || level === "month" ? " compact" : ""}`}>{t(`comm.level.${level}`)}</span>;
 }
