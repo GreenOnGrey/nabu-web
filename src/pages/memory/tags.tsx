@@ -59,5 +59,5 @@ export function notePeriod(n: Pick<CommNote, "level" | "periodFrom" | "periodTo"
  * and a month, so a compacted record reads as a summary. */
 export function LevelChip({ level }: { level: CommNote["level"] }) {
   const { t } = useTranslation();
-  return <span className={`lvl${level === "week" || level === "month" ? " compact" : ""}`}>{t(`comm.level.${level}`)}</span>;
+  return <span className={`nb-lvl${level === "week" || level === "month" ? " compact" : ""}`}>{t(`comm.level.${level}`)}</span>;
 }

@@ -279,13 +279,13 @@ function PickedPanel({ picked, graph, filter, onClose, onNote, onAll }: {
       {linked.length > 0 && <><div className="lab">{t("comm.graph.linked")}</div><div className="tgs">{linked.map((n) => <TagChip key={n.id} tag={n} />)}</div></>}
       <div className="lab">{t("comm.notes")}{notes.data ? ` · ${notes.data.length}` : ""}</div>
       {notes.data?.slice(0, 8).map((n) => (
-        <div className="mrow-wrap" key={n.id}>
+        <div className="nb-mrow-wrap" key={n.id}>
           <button type="button" className="mrow grow" onClick={() => onNote(n.id)}>
             <span className="small muted"><LevelChip level={n.level} />{notePeriod(n, lng)} · {sourceName(t, n.source)}</span>
             <b>{n.title}</b>
             <span className="small t2">{n.excerpt}</span>
           </button>
-          {n.sourceUrl && <a className="iconbtn" href={n.sourceUrl} target="_blank" rel="noreferrer"
+          {n.sourceUrl && <a className="iconbtn nb-ext" href={n.sourceUrl} target="_blank" rel="noreferrer"
             aria-label={t("comm.note.openSource")} title={t("comm.note.openSource")}><Icon name="ext" size={14} /></a>}
         </div>
       ))}

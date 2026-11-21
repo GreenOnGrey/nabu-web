@@ -381,8 +381,8 @@ table.comm-t td:nth-child(1),table.comm-t td:nth-child(2){display:inline-block;w
 
 /* Level of a record before its date (FTR.NAB.MEM-0001 design §1): neutral for a day and a thread, a violet
    outline for a week and a month — a compacted record reads as a summary. */
-.lvl{display:inline-block;font-size:11px;font-weight:500;line-height:16px;padding:0 6px;border-radius:999px;background:var(--surface-2);color:var(--text-2);white-space:nowrap;margin-right:6px;vertical-align:1px}
-.lvl.compact{background:transparent;border:1px solid var(--violet);color:var(--violet)}
-.mrow-wrap{display:flex;align-items:flex-start;gap:6px}
-.mrow-wrap>.mrow{flex:1}
-.mrow-wrap>.iconbtn{margin-top:8px}
+.nb-lvl{display:inline-block;font-size:11px;font-weight:500;line-height:16px;padding:0 6px;border-radius:999px;background:var(--surface-2);color:var(--text-2);white-space:nowrap;margin-right:6px;vertical-align:1px}
+.nb-lvl.compact{background:transparent;border:1px solid var(--violet);color:var(--violet)}
+.nb-mrow-wrap{display:flex;align-items:flex-start;gap:6px}
+.nb-mrow-wrap>.mrow{flex:1}
+.nb-ext{margin-top:8px}
