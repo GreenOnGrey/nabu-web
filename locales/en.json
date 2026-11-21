@@ -1143,6 +1143,10 @@
         "chip": "Only {email}",
         "chipClear": "Show everyone",
         "shares": "{count} · {pct} %"
+      },
+      "tabs": {
+        "settings": "Settings",
+        "stats": "Statistics"
       }
     },
     "groups": {

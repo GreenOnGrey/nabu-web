@@ -76,6 +76,8 @@ export const SCREENS: Screen[] = [
   { name: "admin", path: "/admin" },
   ...ADMIN.map((s) => ({ name: `admin-${s}`, path: `/admin/${s}` })),
   // FTR.NAB.CMN-0003 qa UI-13: the explicit thinking off of the model of the collection, under the block «Сбор»
+  // FTR.NAB.MEM-0001 design §3.7: the usage of the memory of communications is a tab of its own
+  { name: "admin-comm-stats", path: "/admin/comm?tab=stats", comm: true },
   { name: "admin-comm-thinking", path: "/admin/comm", act: async (page) => { await page.getByText("Отключать размышление явно").scrollIntoViewIfNeeded(); } },
   // UI-13: a DeepSeek model of the collection gets the hint instead of the switch
   { name: "admin-comm-thinking-deepseek", path: "/admin/comm", collectModel: "deepseek",

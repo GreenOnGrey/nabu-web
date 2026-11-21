@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { api } from "../../api/client";
@@ -9,11 +10,34 @@ import { CommUsage } from "./CommUsage";
 
 interface SourceItem { id: string; name: string; title: string; mode: string; adapter: string | null; commSource: boolean; published: boolean; commSources: { key: string; title: string }[] }
 
-/** The memory of communications in the administration (FTR.NAB.CMN-0003 R29,
- * design §3.10), a section of its own: whether it is allowed, the retention, the model of the
- * collection, the monthly limit, which MCP servers are sources, and the
- * usage. Nothing here shows what is collected (R22). */
+const TABS = ["settings", "stats"] as const;
+type Tab = (typeof TABS)[number];
+
+/** The memory of communications in the administration (FTR.NAB.CMN-0003 R29, FTR.NAB.MEM-0001 R25, design §3.6–3.8),
+ * a section of its own with two tabs: «Settings» — whether it is allowed, the retention, the models, the limits and
+ * the sources; «Statistics» — the usage of the month. Nothing here shows what is collected (R22). */
 export function CommAdmin() {
+  const { t } = useTranslation();
+  const [sp, setSp] = useSearchParams();
+  const tab: Tab = sp.get("tab") === "stats" ? "stats" : "settings";
+  return (
+    <>
+      <h2 style={{ margin: 0 }}>{t("admin.comm.title")}</h2>
+      <p className="lead">{t("admin.comm.lead")}</p>
+      <div className="mtabs" role="tablist">
+        {TABS.map((x) => (
+          <button key={x} role="tab" aria-selected={tab === x} className={tab === x ? "on" : ""}
+            onClick={() => setSp(x === "settings" ? {} : { tab: x }, { replace: true })}>{t(`admin.comm.tabs.${x}`)}</button>
+        ))}
+      </div>
+      {tab === "settings" ? <CommSettings /> : <CommUsage />}
+    </>
+  );
+}
+
+/** The settings of the memory of communications: the switch, the retention in months, the models of the collection,
+ * the compaction, the embeddings, the monthly limit, the limits of a run and which MCP servers are sources. */
+function CommSettings() {
   const { t } = useTranslation();
   const qc = useQueryClient();
   const toast = useToast();
@@ -42,8 +66,6 @@ export function CommAdmin() {
   const retention = Number(months ?? s.retentionMonths), l = Number((limit ?? String(s.monthlyLimitUsd)).replace(",", "."));
   return (
     <>
-      <h2 style={{ margin: 0 }}>{t("admin.comm.title")}</h2>
-      <p className="lead">{t("admin.comm.lead")}</p>
       <div className="svc" style={{ maxWidth: 640 }}>
         <Switch on={s.enabled} disabled={save.isPending} onChange={(on) => save.mutate({ enabled: on })} label={t("admin.comm.enabled")} />
         <div className="field" style={{ marginTop: 14 }}>
@@ -125,8 +147,6 @@ export function CommAdmin() {
         </table>
       </div>
 
-      <h4 style={{ margin: "22px 0 6px" }}>{t("admin.comm.usage")}</h4>
-      <CommUsage />
     </>
   );
 }

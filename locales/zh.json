@@ -1143,6 +1143,10 @@
         "chip": "仅 {email}",
         "chipClear": "显示全部",
         "shares": "{count} · {pct}%"
+      },
+      "tabs": {
+        "settings": "设置",
+        "stats": "统计"
       }
     },
     "groups": {
