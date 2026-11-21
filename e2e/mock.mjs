@@ -17,7 +17,24 @@ const T = (hm, day = "11") => `2026-10-${day}T${hm}:00Z`;
 const me = (theme = "light") => ({ id: "u1", email: "ada@example.com", name: "Ада Лавлейс", isAdmin: true, language: "ru", theme, timezone: "Europe/Moscow",
   channels: [{ kind: "telegram", available: true, reason: "all_users", binding: { account: "@ada", boundAt: T("09:00", "01") } }, { kind: "email", available: true, reason: "always", address: "ada@nabu.example" }] });
 const config = { authProvider: "github", providerLabel: "GitHub", allowedOrg: "GreenOnGrey", languages: ["en", "ru", "de", "es", "zh"], defaultLanguage: "en",
-  uploadMaxBytes: 20000000, voice: true, spaces: true, channels: { telegram: true, email: true }, version: "1.0.0" };
+  uploadMaxBytes: 20000000, voice: true, spaces: true, turnStaleSeconds: 1860, channels: { telegram: true, email: true }, version: "1.0.0" };
+
+// FTR.NAB.CMN-0001 R28 (design §3.10): the audit, with a row whose details are long
+// enough to be cut in the table and opened by a click
+const auditRows = [
+  { id: 12, at: T("10:42"), agentKind: "personal", agent: "Ассистент", userEmail: "ada@example.com", clientName: null, initiatorEmail: null,
+    channel: "web", server: "hammurapi", tool: "read_document",
+    argsSummary: JSON.stringify({ path: "reports/q1.pdf", pages: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], ocr: false }),
+    result: "error",
+    error: "MCP error -32603: the document service is unavailable: the connection was refused by the upstream at 10.0.0.14:8443 after 30 s" },
+  { id: 11, at: T("10:31"), agentKind: "personal", agent: "Ассистент", userEmail: "ada@example.com", clientName: "Portfolio", initiatorEmail: "ada@example.com",
+    channel: "client:portfolio", server: "nabu", tool: "chat_attach",
+    argsSummary: JSON.stringify({ path: "reports/summary.md" }), result: "ok", error: null },
+  { id: 10, at: T("09:58"), agentKind: "service", agent: "memory-collector", userEmail: null, clientName: null, initiatorEmail: "ada@example.com",
+    channel: "email", server: null, tool: "model", argsSummary: JSON.stringify({ errorClass: "rate_limit" }),
+    result: "error", error: "429 Too Many Requests: the provider slowed the request down" },
+];
+
 // FTR.NAB.CMN-0008: requests of libraries and the profiles of sandbox images
 const pkg = (ecosystem, name, users, agent, auto, kinds, extra = {}) => ({ ecosystem, name, aliases: [], users, signals: agent + auto, bySource: { agent, auto },
   byProfile: { documents: agent + auto }, byKind: kinds, previousSignals: Math.round((agent + auto) * 0.7), new: false, lastAt: T("10:00"), status: "new", ...extra });
@@ -296,6 +313,7 @@ function api(url, theme, comm, collectModel) {
   if (p === "/admin/api/v1/comm/usage") return commUsage;
   if (p === "/admin/api/v1/comm/usage/daily") return { days: commUsageDays };
   if (p === "/admin/api/v1/clients") return { items: clients };
+  if (p === "/admin/api/v1/audit") return { items: auditRows, nextCursor: null };
   if (p === "/admin/api/v1/model-connections") return { items: collectModel === "deepseek" ? modelConnections.map((c) => ({ ...c, type: "deepseek" })) : modelConnections,
     types: connectionTypes };
   if (p === "/admin/api/v1/personal-models") return { default: { connectionId: "mc1", model: "deepseek-v4.1-flash", thinking: "off" },

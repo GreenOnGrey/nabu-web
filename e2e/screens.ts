@@ -75,6 +75,9 @@ export const SCREENS: Screen[] = [
   { name: "connections", path: "/connections" },
   { name: "admin", path: "/admin" },
   ...ADMIN.map((s) => ({ name: `admin-${s}`, path: `/admin/${s}` })),
+  // FTR.NAB.CMN-0001 design §3.10: a row of the audit opens its arguments and the
+  // full error with the copy button
+  { name: "admin-audit-open", path: "/admin/audit", act: async (page) => { await page.locator("tbody tr").first().click(); } },
   // FTR.NAB.CMN-0003 qa UI-13: the explicit thinking off of the model of the collection, under the block «Сбор»
   // FTR.NAB.MEM-0001 design §3.7: the usage of the memory of communications is a tab of its own
   { name: "admin-comm-stats", path: "/admin/comm?tab=stats", comm: true },

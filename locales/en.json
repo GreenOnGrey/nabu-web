@@ -873,7 +873,12 @@
       "result": "Result",
       "via": "via {client}",
       "empty": "No records",
-      "system": "System"
+      "system": "System",
+      "args": "Arguments",
+      "error": "Error",
+      "copy": "Copy",
+      "copied": "Copied",
+      "copyFailed": "Could not copy"
     },
     "channels": {
       "title": "Channels",

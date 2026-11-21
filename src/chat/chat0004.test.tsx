@@ -3,7 +3,7 @@ import type { Message } from "../api/types";
 import { errorText } from "../lib/errors";
 import { ApiError } from "../api/client";
 import { createI18n } from "../lib/i18n";
-import { toChatMessage } from "./adapter";
+import { liveAnswer, toChatMessage } from "./adapter";
 
 const t = createI18n("ru").t;
 const msg = (m: Partial<Message>): Message => ({
@@ -23,6 +23,13 @@ describe("FTR.NAB.CHAT-0004 in the web", () => {
     expect(out.status).toBe("stopped");
     expect(out.text).toBe("Половина");
     expect(out.error).toBeUndefined();
+  });
+
+  it("STP-19: an answer older than the timeout of a turn is not live", () => {
+    const after = Date.parse("2026-10-27T14:35:00Z");
+    expect(liveAnswer(msg({ role: "assistant", status: "streaming", createdAt: "2026-10-27T14:10:00Z" }), after)).toBe(false);
+    expect(liveAnswer(msg({ role: "assistant", status: "streaming", createdAt: "2026-10-27T14:40:00Z" }), after)).toBe(true);
+    expect(liveAnswer(msg({ role: "assistant", status: "done", createdAt: "2026-10-27T14:40:00Z" }), after)).toBe(false);
   });
 
   it("QUE-12: the errors of the queue are worded", () => {

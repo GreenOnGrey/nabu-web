@@ -14,6 +14,9 @@ export interface PublicConfig {
   voice: boolean;
   /** The limit of a recording (FTR.NAB.CHAT-0001 R20); 0 or missing — 300. */
   voiceMaxSeconds?: number;
+  /** An answer older than this is not being written any more (FTR.NAB.CHAT-0004 R13);
+   * 0 or missing — 1860 (the turn of 30 minutes and its end). */
+  turnStaleSeconds?: number;
   spaces: boolean;
   channels: Record<string, boolean>;
   version: string;
