@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -46,8 +46,6 @@ export function CommTab({ state, filter, setFilter, view, setView, noteId, setNo
   const [minLinks, setMinLinks] = useState(0);
   /** a request to centre a node: a new object each time, so choosing the same node again centres it (R21) */
   const [centered, setCentered] = useState<{ id: string } | undefined>(undefined);
-  /** the name of a found node the graph does not show (R21) */
-  const [missed, setMissed] = useState<string | null>(null);
   const key = JSON.stringify(filter);
   const notes = useQuery({
     queryKey: keys.commNotes(key), enabled: view === "table",
@@ -60,21 +58,19 @@ export function CommTab({ state, filter, setFilter, view, setView, noteId, setNo
   // a selection the new answer no longer holds (another filter or minLinks) is dropped
   const picked = pick && graph.data && (pick.kind === "node" ? [pick.id] : [pick.source, pick.target]).every((id) => graph.data.nodes.some((n) => n.id === id)) ? pick : null;
   const pickTag = (tag: CommTag) => setFilter(tag.kind === "person" ? { person: tag.id } : { topic: tag.id });
-  // a found node is centred and highlighted; one the graph does not show gets the hint by the slider (R21)
-  const pickNode = (tag: CommTag) => {
-    const shown = graph.data?.nodes.some((n) => n.id === tag.id);
-    setMissed(shown ? null : tag.label);
-    if (shown) {
-      setCentered({ id: tag.id });
-      setPicked({ kind: "node", id: tag.id });
-    }
-  };
   const active = [
     filter.person && people.find((p) => p.id === filter.person),
     filter.topic && topics.find((p) => p.id === filter.topic),
   ].filter(Boolean) as CommTag[];
   const filtered = Boolean(filter.q || filter.person || filter.topic || filter.source);
   const reset = () => setFilter({ q: "", person: "", topic: "", source: "" });
+  // the person or the topic of the filter is the node of the graph: it is highlighted and centred (R21, design §3.3),
+  // and one the graph does not show gets the hint by the slider
+  const chosen = active[0];
+  const shownChosen = chosen && graph.data?.nodes.some((n) => n.id === chosen.id) ? chosen : null;
+  useEffect(() => {
+    if (view === "graph" && shownChosen) setCentered({ id: shownChosen.id });
+  }, [view, shownChosen?.id]);
 
   return (
     <>
@@ -146,19 +142,16 @@ export function CommTab({ state, filter, setFilter, view, setView, noteId, setNo
       {view === "graph" && (
         <div className={picked ? "split" : undefined}>
           <div>
-            <div style={{ marginBottom: 10 }}>
-              <TagPicker onPick={(tag) => pickNode(tag)} />
-            </div>
             {graph.error && <div className="err-text">{errorText(t, graph.error)}</div>}
             {graph.isLoading && <div className="gwrap loading">{t("common.loading")}</div>}
             {graph.data && graph.data.nodes.length < 2 && (
               <Empty icon="graph" title={t("comm.graph.few")}><div style={{ marginTop: 10 }}><button className="btn sm" onClick={() => setView("table")}>{t("comm.view.table")}</button></div></Empty>
             )}
             {graph.data && graph.data.nodes.length >= 2 && (
-              <PeopleGraph graph={graph.data} picked={picked} onPick={setPicked} center={centered}
+              <PeopleGraph graph={graph.data} picked={picked} onPick={setPicked} center={centered} focus={shownChosen?.id}
                 onOpen={(id) => { setCentered({ id }); setPicked({ kind: "node", id }); }} />
             )}
-            {missed && <div className="small muted" style={{ marginBottom: 6 }}>{t("comm.graph.notShown")} — {missed}</div>}
+            {chosen && !shownChosen && <div className="small muted" style={{ marginBottom: 6 }}>{t("comm.graph.notShown")} — {chosen.label}</div>}
             <label className="gctl">
               {t("comm.graph.minLinks", { count: minLinks })}
               <input type="range" min={0} max={10} value={minLinks} onChange={(e) => setMinLinks(Number(e.target.value))} />
@@ -231,9 +224,9 @@ function TagPicker({ onPick, label }: { onPick: (tag: CommTag) => void; label?: 
 /** The graph of people and topics (R19, design §3.5) on the graph of the kit: a node per
  * tag sized by its days of communication, an edge per pair that meets in a record; a node is dragged, and the
  * button of the kit puts the moved nodes back (FTR.NAB.MEM-0001 R21). */
-function PeopleGraph({ graph, picked, onPick, center, onOpen }: {
+function PeopleGraph({ graph, picked, onPick, center, focus, onOpen }: {
   graph: CommGraph; picked: GraphSelection; onPick: (p: GraphSelection) => void;
-  center?: { id: string }; onOpen?: (id: string) => void;
+  center?: { id: string }; focus?: string; onOpen?: (id: string) => void;
 }) {
   const { t } = useTranslation();
   const days = useMemo(() => new Map(graph.nodes.map((n) => [n.id, n.days])), [graph]);
@@ -241,7 +234,7 @@ function PeopleGraph({ graph, picked, onPick, center, onOpen }: {
   const edges = useMemo<GraphEdge[]>(() => graph.edges.map((e) => ({ source: e.a, target: e.b, weight: e.days || e.notes })), [graph]);
   return <Graph nodes={nodes} edges={edges} ariaLabel={t("comm.graph.aria")} selected={picked} onSelect={onPick}
     legend={[{ group: 1, label: t("comm.people") }, { group: 2, label: t("comm.topics") }]}
-    draggable center={center} onOpen={onOpen}
+    draggable center={center} focus={focus} onOpen={onOpen}
     nodeLabel={(n) => t("comm.graph.nodeDays", { label: n.label, count: days.get(n.id) ?? n.size })} />;
 }
 
