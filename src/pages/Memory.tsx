@@ -95,15 +95,15 @@ function FactsTab() {
   const lng = intlLocale(i18n.language);
   return (
     <>
-      <div className="row" style={{ justifyContent: "flex-end", alignItems: "flex-start", marginBottom: 8 }}>
-        <div className="row" style={{ gap: 8 }}>
-          <button className="btn danger sm" onClick={() => setClearing(true)} disabled={!list.data?.items.length && !q}>{t("memory.clear")}</button>
-          <button className="btn primary sm" onClick={() => setEditing("new")}><Icon name="plus" size={15} />{t("memory.add")}</button>
+      {/* FTR.NAB.CMN-0005 R27: the search and the buttons are one row and one height */}
+      <div className="ctlrow" style={{ marginBottom: 12 }}>
+        <div className="search">
+          <Icon name="search" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("memory.search")} aria-label={t("memory.search")} />
         </div>
-      </div>
-      <div className="search" style={{ maxWidth: 420, marginBottom: 12 }}>
-        <Icon name="search" />
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("memory.search")} aria-label={t("memory.search")} />
+        <span className="grow" />
+        <button className="btn danger" onClick={() => setClearing(true)} disabled={!list.data?.items.length && !q}>{t("memory.clear")}</button>
+        <button className="btn primary" onClick={() => setEditing("new")}><Icon name="plus" size={15} />{t("memory.add")}</button>
       </div>
       {list.data?.items.length === 0 && <Empty icon="brain" title={q ? t("memory.notFound") : t("memory.empty")}>{!q && t("memory.emptyHint")}</Empty>}
       {list.data?.items.map((m) => (

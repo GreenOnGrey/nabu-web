@@ -41,7 +41,7 @@ export function CommUsage() {
 
   return (
     <>
-      <div className="row" style={{ gap: 12, alignItems: "center", marginBottom: 12, flexWrap: "wrap" }}>
+      <div className="ctlrow" style={{ marginBottom: 12 }}>
         <label className="row small" style={{ gap: 6, alignItems: "center" }}>
           {t("admin.comm.use.month")}
           <input className="inp" type="month" value={month} max={thisMonth} onChange={(e) => setMonth(e.target.value || month)} />
