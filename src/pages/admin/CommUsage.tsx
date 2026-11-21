@@ -77,19 +77,19 @@ export function CommUsage() {
 
           {days.length > 0 && (
             <>
-              <div className="lab">{t("admin.comm.use.charts.cost")}</div>
+              <div className="lab" style={{ margin: "14px 0 4px" }}>{t("admin.comm.use.charts.cost")}</div>
               <Chart ariaLabel={t("admin.comm.use.charts.cost")} x={x} height={200} format={money} stacked
                 series={[
                   { id: "collect", label: t("admin.comm.use.series.collect"), color: 1, kind: "bar", values: days.map((d) => d.costCollect) },
                   { id: "compact", label: t("admin.comm.use.series.compact"), color: 2, kind: "bar", values: days.map((d) => d.costCompact) },
                 ]} />
-              <div className="lab">{t("admin.comm.use.charts.volume")}</div>
+              <div className="lab" style={{ margin: "14px 0 4px" }}>{t("admin.comm.use.charts.volume")}</div>
               <Chart ariaLabel={t("admin.comm.use.charts.volume")} x={x} height={200} format={n}
                 series={[
                   { id: "messages", label: t("admin.comm.use.series.messages"), color: 1, kind: "line", values: days.map((d) => d.messages) },
                   { id: "created", label: t("admin.comm.use.series.created"), color: 2, kind: "line", axis: "right", dashed: true, values: days.map((d) => d.created) },
                 ]} />
-              <div className="lab">{t("admin.comm.use.charts.levels")}</div>
+              <div className="lab" style={{ margin: "14px 0 4px" }}>{t("admin.comm.use.charts.levels")}</div>
               <Chart ariaLabel={t("admin.comm.use.charts.levels")} x={x} height={200} format={n} stacked
                 series={[
                   series("day", "level-day", 1, t("comm.level.day")),
