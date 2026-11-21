@@ -63,8 +63,6 @@ table.tasks-t td.task-cell{white-space:normal;min-width:240px}
 @media (min-width:861px){
 .mtabs button.end{margin-left:auto}}
 .mtabs .n{font-size:11px;background:var(--surface-2);border-radius:999px;padding:0 6px;color:var(--text-2);font-weight:400}
-.cbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-.cbar .cm-search{flex:0 1 260px;max-width:none;padding:6px 10px}
 .view-seg{margin-left:auto;display:inline-flex}
 .view-seg button{display:inline-flex;align-items:center;gap:6px}
 .tgs{display:flex;gap:4px;flex-wrap:wrap}
@@ -139,7 +137,6 @@ table.comm-t .ex{color:var(--text-2);display:-webkit-box;-webkit-line-clamp:2;-w
 .split:has(.gwrap) .gpanel{position:static;border:1px solid var(--border);border-radius:var(--r-l) var(--r-l) 0 0;max-height:46vh;margin-top:-6px}
 .tcards{grid-template-columns:minmax(0,1fr)}
 .view-seg button span{display:none}
-.cbar .cm-search{flex:1 1 100%}
 .gctl{display:none}
 table.comm-t thead{display:none}
 table.comm-t,table.comm-t tbody,table.comm-t tr,table.comm-t td{display:block;width:100%}

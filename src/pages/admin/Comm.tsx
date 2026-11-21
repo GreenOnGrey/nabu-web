@@ -70,7 +70,7 @@ function CommSettings() {
         <Switch on={s.enabled} disabled={save.isPending} onChange={(on) => save.mutate({ enabled: on })} label={t("admin.comm.enabled")} />
         <div className="field" style={{ marginTop: 14 }}>
           <label htmlFor="comm-ret">{t("admin.comm.retention")}</label>
-          <div className="row" style={{ gap: 8 }}>
+          <div className="ctlrow lg">
             <input id="comm-ret" className="inp" style={{ width: 120 }} inputMode="numeric" value={months ?? String(s.retentionMonths)} onChange={(e) => setMonths(e.target.value)} />
             <span className="muted">{t("admin.comm.months")}</span>
             <button className="btn" disabled={!Number.isInteger(retention) || retention < 1 || retention > 60 || retention === s.retentionMonths || save.isPending} onClick={() => { save.mutate({ retentionMonths: retention }); setMonths(null); }}>{t("common.save")}</button>
@@ -104,7 +104,7 @@ function CommSettings() {
         </div>
         <div className="field">
           <label htmlFor="comm-limit">{t("admin.comm.limit")}</label>
-          <div className="row" style={{ gap: 8 }}>
+          <div className="ctlrow lg">
             <input id="comm-limit" className="inp" style={{ width: 120 }} inputMode="decimal" value={limit ?? String(s.monthlyLimitUsd)} onChange={(e) => setLimit(e.target.value)} />
             <span className="muted">USD</span>
             <button className="btn" disabled={!Number.isFinite(l) || l < 0 || l === s.monthlyLimitUsd || save.isPending} onClick={() => { save.mutate({ monthlyLimitUsd: l }); setLimit(null); }}>{t("common.save")}</button>
