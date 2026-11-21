@@ -1045,7 +1045,7 @@
       "lead": "Los usuarios activan ellos mismos la recopilación de su correo y mensajería, tras su consentimiento.",
       "enabled": "Permitir la memoria de comunicaciones",
       "retention": "Conservación de las notas",
-      "retentionHint": "Se cuenta desde el último mensaje. Una nota con un compromiso abierto se conserva hasta que se cierre.",
+      "retentionHint": "Los registros mensuales y los hilos de correo. Los diarios y semanales se guardan hasta la unión.",
       "model": "Modelo de la recopilación",
       "notChosen": "No elegido",
       "modelMissing": "Sin modelo la recopilación no se ejecuta.",
@@ -1082,7 +1082,68 @@
       "thinkingChatTemplate": "chat_template_kwargs — Qwen con vLLM o LiteLLM",
       "thinkingReasoningEffort": "reasoning_effort = none — compatibles con OpenAI",
       "thinkingHint": "Cada solicitud del recolector al modelo lleva un parámetro que desactiva el razonamiento: la recopilación es más rápida y barata. En el chat el modelo funciona como antes.",
-      "thinkingAlways": "El razonamiento de este modelo siempre se desactiva en la recopilación."
+      "thinkingAlways": "El razonamiento de este modelo siempre se desactiva en la recopilación.",
+      "months": "meses",
+      "compactModel": "Modelo de la unión",
+      "compactModelHint": "Vacío — el modelo de la recopilación.",
+      "use": {
+        "month": "Mes",
+        "users": "Usuarios",
+        "activeUsers": "{count} activos",
+        "records": "Registros",
+        "levelsShort": "D {day} · S {week} · M {month} · H {thread}",
+        "compaction": "Unión",
+        "ratio": "×{ratio}",
+        "ratioHint": "{in} → {out} caracteres",
+        "costTitle": "Coste",
+        "costSplit": "Recopilación {collect} · unión {compact}",
+        "broken": "La unión no funciona",
+        "brokenFilter": "Mostrar solo estos usuarios",
+        "charts": {
+          "cost": "Coste, $",
+          "volume": "Mensajes y registros",
+          "levels": "Registros por nivel"
+        },
+        "series": {
+          "collect": "Recopilación",
+          "compact": "Unión",
+          "messages": "Mensajes",
+          "created": "Registros creados"
+        },
+        "collectBlock": "Recopilación",
+        "outcomes": {
+          "ok": "Hecho",
+          "busy": "Ocupado",
+          "rate_limited": "Limitado",
+          "source_access": "Sin acceso",
+          "timeout": "Tiempo agotado",
+          "error": "Error"
+        },
+        "bySource": "Mensajes leídos por fuente",
+        "compactBlock": "Unión",
+        "lastNight": "Última noche: {date}",
+        "okCount": "Con éxito: {count}",
+        "failedCount": "Con error: {count}",
+        "commitmentsBlock": "Compromisos",
+        "commitmentsOpen": "Abiertos: {count}",
+        "commitmentsClosed": "Cerrados este mes: {count}",
+        "commitmentsOverdue": "Vencidos: {count}",
+        "cols": {
+          "user": "Usuario",
+          "notes": "Registros",
+          "runs": "Ejecuciones",
+          "lastCollect": "Última recopilación",
+          "costCollect": "Coste de la recopilación",
+          "costCompact": "Coste de la unión",
+          "limit": "Límite",
+          "lastCompact": "Última unión",
+          "openCommitments": "Abiertos"
+        },
+        "noData": "No hay datos de este mes",
+        "chip": "Solo {email}",
+        "chipClear": "Mostrar a todos",
+        "shares": "{count} · {pct} %"
+      }
     },
     "groups": {
       "title": "Grupos",
@@ -1385,7 +1446,8 @@
       "source": "Fuente",
       "summary": "Resumen",
       "open": "Abiertos",
-      "openTitle": "Compromisos abiertos"
+      "openTitle": "Compromisos abiertos",
+      "volume": "Volumen"
     },
     "invite": {
       "title": "Aquí aparecerá su correspondencia de trabajo",
@@ -1403,12 +1465,14 @@
     "graph": {
       "aria": "Grafo de personas y temas",
       "node": "{count, plural, one {{label}, # nota} other {{label}, # notas}}",
-      "shown": "{shown} de {total} nodos",
+      "shown": "Mostrados: {nodes} de {totalNodes} nodos, {edges} de {totalEdges} enlaces",
       "few": "Aún hay pocos vínculos",
       "linked": "Vinculado con",
       "panel": "Notas de la selección",
       "showAll": "{count, plural, one {Mostrar # en la tabla} other {Mostrar los # en la tabla}}",
-      "minLinks": "{count, plural, one {Mostrar desde # vínculo} other {Mostrar desde # vínculos}}"
+      "minLinks": "{count, plural, one {Mostrar desde # vínculo} other {Mostrar desde # vínculos}}",
+      "notShown": "El nodo no se muestra: pocos enlaces",
+      "nodeDays": "{label}, {count, plural, one {# día} other {# días}} de conversación"
     },
     "note": {
       "aria": "Nota",
@@ -1423,7 +1487,12 @@
       "open": "Abrir",
       "more": "{count, plural, one {# más} other {# más}}",
       "deleteTitle": "¿Eliminar la nota?",
-      "deleteText": "Se eliminarán la nota y sus compromisos. Este hilo no volverá a recopilarse."
+      "deleteText": "Se eliminarán la nota y sus compromisos. Este hilo no volverá a recopilarse.",
+      "compacted": "Unido de {count, plural, one {# registro} other {# registros}} · {date}",
+      "openThread": "Abrir el hilo",
+      "openChat": "Abrir el chat",
+      "allMessages": "Todos los mensajes ({count})",
+      "openSource": "Abrir en la fuente"
     },
     "cm": {
       "mine": "yo debo",
@@ -1558,7 +1627,7 @@
         "failed": "En pausa tras fallos. Vea el motivo en la sección Tareas."
       },
       "collected": "Recopilado",
-      "collectedText": "Notas: {notes}, compromisos abiertos: {commitments} · se conserva {days} días",
+      "collectedText": "Registros: {notes}, compromisos abiertos: {commitments} · se guarda {months} meses",
       "deleteAll": "Eliminar lo recopilado",
       "deleteAllTitle": "¿Eliminar todo lo recopilado?",
       "deleteAllText": "Se eliminan las notas ({notes}), los compromisos ({commitments}), las personas y los temas, y se desactivan las tareas de memoria. Los hechos se conservan.",
@@ -1569,8 +1638,18 @@
         "included": "Se recopilan aunque estén silenciados",
         "none": "No se encontraron grupos silenciados",
         "error": "No se pudo leer la lista de grupos: vuelva a conectar VK WorkSpace"
-      }
-    }
+      },
+      "lastCompact": "Última unión: {date}",
+      "noCompact": "Aún no hubo unión"
+    },
+    "level": {
+      "day": "Día",
+      "week": "Semana",
+      "month": "Mes",
+      "thread": "Hilo"
+    },
+    "days": "{count, plural, one {# día} other {# días}}",
+    "filterPersonTopic": "Persona o tema"
   },
   "models": {
     "cap": {

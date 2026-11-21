@@ -128,7 +128,7 @@ const userAccess = { admin: false, groups: [{ id: "g-sales", name: "Продаж
   defaultModel: { connectionId: "c1", model: "sonnet", source: "group", groupId: "g-sales" },
   channels: [{ kind: "telegram", via: ["g-sales"] }],
   catalogItems: [{ id: "a1", type: "mcp", title: "GitHub", mode: "personal", via: ["g-sales"] }] };
-const commState = { allowed: false, available: false, consentAt: null, retentionDays: 90, semantic: false, sources: [], collect: { status: "off", pauseKind: null, nextRunAt: null, backfill: null, budgetUsedPct: 0 }, counts: { notes: 0, openCommitments: 0 } };
+const commState = { allowed: false, available: false, consentAt: null, retentionMonths: 3, retentionDays: 90, compact: { lastAt: null }, semantic: false, sources: [], collect: { status: "off", pauseKind: null, nextRunAt: null, backfill: null, budgetUsedPct: 0 }, counts: { notes: 0, openCommitments: 0 } };
 
 // A service client with an address: the edit and the delete dialogs open from its card (FTR.NAB.CMN-0001 SVC-10, SVC-11).
 const clients = [
@@ -197,14 +197,15 @@ const userGroups = [
 const members = [{ id: "u1", email: "ada@example.com", name: "Ада Лавлейс" }, { id: "u2", email: "alan@example.com", name: "Алан Тьюринг" }];
 
 // FTR.NAB.CMN-0003 R19: the memory of communications on, and the graph of its people and topics.
-const commOn = { ...commState, allowed: true, available: true, consentAt: T("09:00", "01"), collect: { ...commState.collect, status: "active" }, counts: { notes: 42, openCommitments: 3 } };
-const tag = (id, kind, label, notes, links) => ({ id, kind, label, notes, links });
+const commOn = { ...commState, allowed: true, available: true, consentAt: T("09:00", "01"), compact: { lastAt: T("03:10", "16") }, collect: { ...commState.collect, status: "active" }, counts: { notes: 42, openCommitments: 3 } };
+const tag = (id, kind, label, notes, links) => ({ id, kind, label, notes, links, days: notes });
 const commGraph = {
   nodes: [tag("p1", "person", "Анна Петрова", 14, 4), tag("p2", "person", "Иван Соколов", 9, 3), tag("p3", "person", "Мария Ли", 3, 1),
     tag("t1", "topic", "Релиз 2.4", 12, 3), tag("t2", "topic", "Бюджет", 6, 2), tag("t3", "topic", "Найм", 2, 1)],
-  edges: [{ a: "p1", b: "t1", notes: 6 }, { a: "p2", b: "t1", notes: 3 }, { a: "p1", b: "t2", notes: 2 }, { a: "p3", b: "t3", notes: 1 },
-    { a: "p2", b: "t2", notes: 1 }, { a: "p1", b: "p2", notes: 2 }],
+  edges: [{ a: "p1", b: "t1", notes: 6, days: 4 }, { a: "p2", b: "t1", notes: 3, days: 3 }, { a: "p1", b: "t2", notes: 2, days: 2 },
+    { a: "p3", b: "t3", notes: 1, days: 1 }, { a: "p2", b: "t2", notes: 1, days: 1 }, { a: "p1", b: "p2", notes: 2, days: 2 }],
   totalNodes: 6,
+  totalEdges: 6,
 };
 // FTR.NAB.CMN-0003 R11 (design §3.6, decision 25): collected commitments and one the agent saved in the chat.
 const cmPerson = (id) => { const n = commGraph.nodes.find((x) => x.id === id); return { id, kind: "person", label: n.label, email: "" }; };
@@ -219,7 +220,50 @@ const commitments = [
     conversationId: "main", basisUrl: "" }),
   commitment("c4", "Вернуть правки по договору", "theirs", null, { person: cmPerson("p3") }),
 ];
-const commTags = (kind) => ({ items: commGraph.nodes.filter((n) => n.kind === kind).map(({ id, kind: k, label, notes }) => ({ id, kind: k, label, notes })) });
+const commTags = (kind) => ({ items: commGraph.nodes.filter((n) => n.kind === kind).map(({ id, kind: k, label, notes, days }) => ({ id, kind: k, label, notes, days })) });
+
+// FTR.NAB.MEM-0001 R1, R17, R18 (design §3.1, §3.2): the records of four levels, one of them compacted.
+const note = (id, level, title, from, to, days, messages, extra = {}) => ({ id, title, excerpt: "Обсудили сроки и договорились о следующем шаге.",
+  source: "mail", itemId: "i1", firstAt: T("09:00", "01"), lastAt: T("18:20", from.slice(8)), timePrecision: "minute", messageCount: messages,
+  people: [cmPerson("p1")], topics: [cmTopic("t1")], openCommitments: 1, userEdited: false, level, periodFrom: from, periodTo: to, days,
+  sourceUrl: "https://mail.example/thread/1", compactedFrom: null, compactedAt: null, ...extra });
+const commNotes = [
+  note("n1", "day", "Перенос выпуска 2.4", "2026-10-14", "2026-10-14", 1, 8),
+  note("n2", "week", "Неделя 10–16 октября", "2026-10-10", "2026-10-16", 7, 42, { compactedFrom: 5, compactedAt: T("03:10", "17") }),
+  note("n3", "month", "Октябрь 2026", "2026-10-01", "2026-10-31", 31, 180, { compactedFrom: 4, compactedAt: T("03:10", "18") }),
+  note("n4", "thread", "Смета по релизу", "2026-10-03", "2026-10-19", 9, 64, { compactedFrom: 2, compactedAt: T("03:10", "19") }),
+];
+const commNote = (id) => {
+  const n = commNotes.find((x) => x.id === id) ?? commNotes[1];
+  const msgs = Array.from({ length: Math.min(n.messageCount, 6) }, (_, k) => ({ id: `m${k}`, author: k % 2 ? "ada@example.com" : "Иван Соколов",
+    sentAt: T("10:0" + (k % 10), "12"), title: "Re: " + n.title, url: "https://mail.example/m" + k, key: k < 2 }));
+  return { ...n, summary: "Решили перенести выпуск на неделю и вернуться к смете после согласования.", appended: [], messages: msgs, commitments };
+};
+
+// FTR.NAB.MEM-0001 R25, R26 (design §3.7): the month of the memory of communications — cards, charts, blocks, users.
+// The numbers are invented; the day of the month drives them so two builds show the same picture.
+const usageDay = (i) => ({ day: `2026-10-${String(i).padStart(2, "0")}`, costCollect: Math.round((8 + (i % 5) * 3) * 10) / 10,
+  costCompact: Math.round((2 + (i % 3) * 4) * 10) / 10, messages: 120 + ((i * 37) % 260), created: 3 + ((i * 7) % 11),
+  levels: { day: 2 + ((i * 5) % 13), week: i % 4, month: i % 3 === 0 ? 1 : 0, thread: i % 5 === 0 ? 1 : 0 } });
+const commUsageDays = Array.from({ length: 30 }, (_, k) => usageDay(k + 1));
+const usageRow = (email, notes, levels, runs, costCollect, costCompact, extra = {}) => ({ userId: email, email, notes, levels, runs,
+  lastCollect: { at: T("09:00", "20"), outcome: "ok" }, costUsd: costCollect + costCompact, costCollect, costCompact, limitUsedPct: 0,
+  lastCompactAt: T("03:10", "18"), compactBroken: false, openCommitments: 2, ...extra });
+const commUsage = {
+  month: "2026-10", monthlyLimitUsd: 6, enabledUsers: 12, activeUsers: 7, notes: 4312, costUsd: 18.4,
+  cost: { collect: 14.1, compact: 4.3 },
+  compaction: { charsIn: 980000, charsOut: 233333, ratio: 4.2, ok: 1204, failed: 3, lastNightAt: T("03:10", "20"), brokenUsers: 1 },
+  levels: { day: 3500, week: 500, month: 240, thread: 72 },
+  commitments: { open: 17, closedInMonth: 42, overdue: 5 },
+  collect: { outcomes: { ok: 210, busy: 12, rate_limited: 4, source_access: 1, timeout: 0, error: 2 },
+    messagesBySource: [{ itemId: "i1", source: "mail", title: "ada@example.com", messages: 3420 },
+      { itemId: "i2", source: "vkteams", title: "VK Teams", messages: 890 }] },
+  items: [usageRow("ada@example.com", 2104, { day: 1700, week: 260, month: 120, thread: 24 }, 168, 3.42, 1.1, { limitUsedPct: 75, openCommitments: 6 }),
+    usageRow("alan@example.com", 980, { day: 800, week: 120, month: 50, thread: 10 }, 92, 1.9, 0.6, { limitUsedPct: 42 }),
+    usageRow("grace@example.com", 640, { day: 520, week: 80, month: 32, thread: 8 }, 61, 1.2, 0.4, { limitUsedPct: 27, openCommitments: 1 }),
+    usageRow("linus@example.com", 588, { day: 480, week: 40, month: 38, thread: 30 }, 55, 0.9, 0.3,
+      { limitUsedPct: 20, lastCompactAt: null, compactBroken: true, openCommitments: 0 })],
+};
 
 function api(url, theme, comm, collectModel) {
   const p = url.pathname;
@@ -241,13 +285,16 @@ function api(url, theme, comm, collectModel) {
   if (comm && p === "/api/v1/comm/people") return commTags("person");
   if (comm && p === "/api/v1/comm/topics") return commTags("topic");
   if (comm && p === "/api/v1/comm/graph") return commGraph;
+  if (comm && p === "/api/v1/comm/notes") return { items: commNotes, nextCursor: null };
+  if (comm && /^\/api\/v1\/comm\/notes\/[^/]+$/.test(p)) return commNote(p.split("/").pop());
   if (comm && p === "/api/v1/commitments") return { items: url.searchParams.get("state") === "closed" ? [] : commitments };
   // FTR.NAB.CMN-0003 R29 (design §3.10, decision 26): the model of the collection is behind LiteLLM, its thinking is off
-  if (p === "/admin/api/v1/settings/comm") return { enabled: true, retentionDays: 180, model: { connectionId: "mc1", model: "deepseek-v4.1-flash" },
+  if (p === "/admin/api/v1/settings/comm") return { enabled: true, retentionMonths: 6, retentionDays: 180, model: { connectionId: "mc1", model: "deepseek-v4.1-flash" }, compactModel: null,
     embeddings: null, monthlyLimitUsd: 6, runTimeoutMinutes: 30, batchThreads: null, defaults: { runTimeoutMinutes: 20, batchThreads: 8 },
     thinkingOff: "chat-template", vectorsAvailable: true, semantic: false };
   if (p === "/admin/api/v1/comm/sources") return { items: [], adapters: ["gmail", "mail"] };
-  if (p === "/admin/api/v1/comm/usage") return { enabledUsers: 12, notes: 4312, costUsd: 18.4, monthlyLimitUsd: 6, items: [] };
+  if (p === "/admin/api/v1/comm/usage") return commUsage;
+  if (p === "/admin/api/v1/comm/usage/daily") return { days: commUsageDays };
   if (p === "/admin/api/v1/clients") return { items: clients };
   if (p === "/admin/api/v1/model-connections") return { items: collectModel === "deepseek" ? modelConnections.map((c) => ({ ...c, type: "deepseek" })) : modelConnections,
     types: connectionTypes };

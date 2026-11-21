@@ -9,7 +9,7 @@ import { errorText } from "../../lib/errors";
 import { intlLocale } from "../../lib/i18n";
 import { dateTime } from "../../lib/format";
 import { Icon, Modal, Select, Switch, useToast } from "@green-on-grey/ui-kit";
-import { sourceTitle } from "./tags";
+import { noteWhen, sourceTitle } from "./tags";
 import { digestChannels } from "./digest";
 
 const INTERVALS = ["15m", "1h", "4h", "1d"] as const;
@@ -20,7 +20,7 @@ type Patch = { enabled?: boolean; settings?: Partial<CollectSettings & DigestSet
 /** The Memory tasks tab (R13, R14, R24, design §3.1): three prepared tasks as
  * cards with a switch and settings, and deleting everything collected. */
 export function MemoryTasksTab({ state }: { state: CommState }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const qc = useQueryClient();
   const toast = useToast();
   const tasks = useQuery({ queryKey: keys.memoryTasks, queryFn: () => api.get<{ items: MemoryTask[] }>("/api/v1/memory-tasks") });
@@ -100,7 +100,9 @@ export function MemoryTasksTab({ state }: { state: CommState }) {
 
       <div className="collected">
         <div className="grow"><b>{t("comm.tasks.collected")}</b>
-          <div className="small t2">{t("comm.tasks.collectedText", { notes: state.counts.notes, commitments: state.counts.openCommitments, days: state.retentionDays })}</div></div>
+          <div className="small t2">{t("comm.tasks.collectedText", { notes: state.counts.notes, commitments: state.counts.openCommitments, months: state.retentionMonths })}</div>
+          {/* FTR.NAB.MEM-0001 R17: when the compaction of the user last worked */}
+          <div className="small t2">{state.compact.lastAt ? t("comm.tasks.lastCompact", { date: noteWhen(state.compact.lastAt, "day", intlLocale(i18n.language)) }) : t("comm.tasks.noCompact")}</div></div>
         <button className="btn danger sm" disabled={state.counts.notes === 0 && !state.consentAt} onClick={() => setDeleting(true)}><Icon name="trash" size={15} />{t("comm.tasks.deleteAll")}</button>
       </div>
 

@@ -1045,7 +1045,7 @@
       "lead": "Users switch the collection of their mail and messengers on themselves, after their consent.",
       "enabled": "Allow the memory of communications",
       "retention": "Retention of notes",
-      "retentionHint": "Counted from the last message. A note with an open commitment is kept until the commitment is closed.",
+      "retentionHint": "The monthly records and the mail threads. Daily and weekly records are kept until the compaction.",
       "model": "Model of the collection",
       "notChosen": "Not chosen",
       "modelMissing": "Without a model the collection does not run.",
@@ -1082,7 +1082,68 @@
       "thinkingChatTemplate": "chat_template_kwargs — Qwen behind vLLM or LiteLLM",
       "thinkingReasoningEffort": "reasoning_effort = none — OpenAI-compatible",
       "thinkingHint": "Every request of the collector to the model gets a parameter that switches thinking off: the collection is faster and cheaper. In the chat the model works as before.",
-      "thinkingAlways": "Thinking of this model is always switched off for the collection."
+      "thinkingAlways": "Thinking of this model is always switched off for the collection.",
+      "months": "mo.",
+      "compactModel": "Model of the compaction",
+      "compactModelHint": "Empty — the model of the collection.",
+      "use": {
+        "month": "Month",
+        "users": "Users",
+        "activeUsers": "{count} active",
+        "records": "Records",
+        "levelsShort": "D {day} · W {week} · M {month} · T {thread}",
+        "compaction": "Compaction",
+        "ratio": "×{ratio}",
+        "ratioHint": "{in} → {out} characters",
+        "costTitle": "Cost",
+        "costSplit": "Collection {collect} · compaction {compact}",
+        "broken": "Compaction broken",
+        "brokenFilter": "Show only these users",
+        "charts": {
+          "cost": "Cost, $",
+          "volume": "Messages and records",
+          "levels": "Records by level"
+        },
+        "series": {
+          "collect": "Collection",
+          "compact": "Compaction",
+          "messages": "Messages",
+          "created": "Records created"
+        },
+        "collectBlock": "Collection",
+        "outcomes": {
+          "ok": "Done",
+          "busy": "Busy",
+          "rate_limited": "Rate limited",
+          "source_access": "No access",
+          "timeout": "Timeout",
+          "error": "Error"
+        },
+        "bySource": "Messages read by source",
+        "compactBlock": "Compaction",
+        "lastNight": "Last night: {date}",
+        "okCount": "Succeeded: {count}",
+        "failedCount": "Failed: {count}",
+        "commitmentsBlock": "Commitments",
+        "commitmentsOpen": "Open: {count}",
+        "commitmentsClosed": "Closed this month: {count}",
+        "commitmentsOverdue": "Overdue: {count}",
+        "cols": {
+          "user": "User",
+          "notes": "Records",
+          "runs": "Runs",
+          "lastCollect": "Last collection",
+          "costCollect": "Cost of collection",
+          "costCompact": "Cost of compaction",
+          "limit": "Limit",
+          "lastCompact": "Last compaction",
+          "openCommitments": "Open"
+        },
+        "noData": "No data for this month",
+        "chip": "Only {email}",
+        "chipClear": "Show everyone",
+        "shares": "{count} · {pct} %"
+      }
     },
     "groups": {
       "title": "Groups",
@@ -1385,7 +1446,8 @@
       "source": "Source",
       "summary": "Summary",
       "open": "Open",
-      "openTitle": "Open commitments"
+      "openTitle": "Open commitments",
+      "volume": "Volume"
     },
     "invite": {
       "title": "Your work correspondence will appear here",
@@ -1403,12 +1465,14 @@
     "graph": {
       "aria": "The graph of people and topics",
       "node": "{count, plural, one {{label}, # note} other {{label}, # notes}}",
-      "shown": "{shown} of {total} nodes",
+      "shown": "Shown: {nodes} of {totalNodes} nodes, {edges} of {totalEdges} links",
       "few": "Too few links yet",
       "linked": "Linked with",
       "panel": "Notes of the selection",
       "showAll": "{count, plural, one {Show # in the table} other {Show all # in the table}}",
-      "minLinks": "{count, plural, one {Show from # link} other {Show from # links}}"
+      "minLinks": "{count, plural, one {Show from # link} other {Show from # links}}",
+      "notShown": "The node is not shown: too few links",
+      "nodeDays": "{label}, {count, plural, one {# day} other {# days}} of communication"
     },
     "note": {
       "aria": "Note",
@@ -1423,7 +1487,12 @@
       "open": "Open",
       "more": "{count, plural, one {# more} other {# more}}",
       "deleteTitle": "Delete the note?",
-      "deleteText": "The note and its commitments are deleted. This thread will not be collected again."
+      "deleteText": "The note and its commitments are deleted. This thread will not be collected again.",
+      "compacted": "{count, plural, one {Merged from # record} other {Merged from # records}} · {date}",
+      "openThread": "Open the thread",
+      "openChat": "Open the chat",
+      "allMessages": "All messages ({count})",
+      "openSource": "Open in the source"
     },
     "cm": {
       "mine": "I owe",
@@ -1558,7 +1627,7 @@
         "failed": "Paused after failures. See the reason in the Tasks section."
       },
       "collected": "Collected",
-      "collectedText": "Notes: {notes}, open commitments: {commitments} · kept for {days} days",
+      "collectedText": "Notes: {notes}, open commitments: {commitments} · kept for {months} months",
       "deleteAll": "Delete everything collected",
       "deleteAllTitle": "Delete everything collected?",
       "deleteAllText": "Notes ({notes}), commitments ({commitments}), people and topics are deleted and the memory tasks are switched off. The facts of the memory stay.",
@@ -1569,8 +1638,18 @@
         "included": "Collected though muted",
         "none": "No muted groups found",
         "error": "The list of groups could not be read: connect VK WorkSpace again"
-      }
-    }
+      },
+      "lastCompact": "Last compaction: {date}",
+      "noCompact": "No compaction yet"
+    },
+    "level": {
+      "day": "Day",
+      "week": "Week",
+      "month": "Month",
+      "thread": "Thread"
+    },
+    "days": "{count, plural, one {# day} other {# days}}",
+    "filterPersonTopic": "Person or topic"
   },
   "models": {
     "cap": {

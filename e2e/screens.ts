@@ -50,6 +50,8 @@ export const SCREENS: Screen[] = [
   { name: "memory-add", path: "/memory", act: async (page) => { await page.locator(".btn.primary.sm").first().click(); } },
   // FTR.NAB.CMN-0003 design §3.1: the digest of a week names a channel the user has lost
   { name: "memory-tasks", path: "/memory?tab=tasks", comm: true }, // FTR.NAB.CMN-0003 qa TASK-21
+  // FTR.NAB.MEM-0001 design §3.1: the table with the level of a record, its period and its volume
+  { name: "memory-comm", path: "/memory?tab=comm", comm: true },
   // FTR.NAB.CMN-0003 R19: the graph of people and topics, at rest and with a pinned person
   { name: "memory-graph", path: "/memory?tab=comm&view=graph", comm: true },
   { name: "memory-graph-pinned", path: "/memory?tab=comm&view=graph", comm: true, act: async (page) => {

@@ -1045,7 +1045,7 @@
       "lead": "用户在同意后自行开启邮件和即时通讯的收集。",
       "enabled": "允许沟通记忆",
       "retention": "笔记保留期限",
-      "retentionHint": "从最后一条消息起计算。含未完成约定的笔记会保留到约定关闭。",
+      "retentionHint": "按月记录与邮件会话。日和周的记录保留到压缩为止。",
       "model": "收集所用模型",
       "notChosen": "未选择",
       "modelMissing": "未选择模型时不会进行收集。",
@@ -1082,7 +1082,68 @@
       "thinkingChatTemplate": "chat_template_kwargs — 通过 vLLM 或 LiteLLM 的 Qwen",
       "thinkingReasoningEffort": "reasoning_effort = none — 兼容 OpenAI",
       "thinkingHint": "收集器发给模型的每个请求都会带上关闭思考的参数：收集更快、更便宜。在聊天中模型照常工作。",
-      "thinkingAlways": "收集时此模型的思考始终关闭。"
+      "thinkingAlways": "收集时此模型的思考始终关闭。",
+      "months": "个月",
+      "compactModel": "压缩模型",
+      "compactModelHint": "留空则与采集模型相同。",
+      "use": {
+        "month": "月份",
+        "users": "用户",
+        "activeUsers": "{count} 位活跃",
+        "records": "记录",
+        "levelsShort": "日 {day} · 周 {week} · 月 {month} · 会 {thread}",
+        "compaction": "压缩",
+        "ratio": "×{ratio}",
+        "ratioHint": "{in} → {out} 字符",
+        "costTitle": "费用",
+        "costSplit": "采集 {collect} · 压缩 {compact}",
+        "broken": "压缩失败",
+        "brokenFilter": "只显示这些用户",
+        "charts": {
+          "cost": "费用，$",
+          "volume": "消息与记录",
+          "levels": "按级别的记录"
+        },
+        "series": {
+          "collect": "采集",
+          "compact": "压缩",
+          "messages": "消息",
+          "created": "创建的记录"
+        },
+        "collectBlock": "采集",
+        "outcomes": {
+          "ok": "完成",
+          "busy": "忙",
+          "rate_limited": "受限",
+          "source_access": "无访问",
+          "timeout": "超时",
+          "error": "错误"
+        },
+        "bySource": "各来源读取的消息",
+        "compactBlock": "压缩",
+        "lastNight": "最近一夜：{date}",
+        "okCount": "成功：{count}",
+        "failedCount": "失败：{count}",
+        "commitmentsBlock": "约定",
+        "commitmentsOpen": "未完成：{count}",
+        "commitmentsClosed": "本月完成：{count}",
+        "commitmentsOverdue": "逾期：{count}",
+        "cols": {
+          "user": "用户",
+          "notes": "记录",
+          "runs": "运行",
+          "lastCollect": "上次采集",
+          "costCollect": "采集费用",
+          "costCompact": "压缩费用",
+          "limit": "限额",
+          "lastCompact": "上次压缩",
+          "openCommitments": "未完成"
+        },
+        "noData": "本月没有数据",
+        "chip": "仅 {email}",
+        "chipClear": "显示全部",
+        "shares": "{count} · {pct}%"
+      }
     },
     "groups": {
       "title": "群组",
@@ -1385,7 +1446,8 @@
       "source": "来源",
       "summary": "摘要",
       "open": "未完成",
-      "openTitle": "未完成的约定"
+      "openTitle": "未完成的约定",
+      "volume": "体量"
     },
     "invite": {
       "title": "您的工作往来将显示在这里",
@@ -1403,12 +1465,14 @@
     "graph": {
       "aria": "人员与主题关系图",
       "node": "{count, plural, other {{label}，# 条笔记}}",
-      "shown": "显示 {shown}/{total} 个节点",
+      "shown": "显示 {nodes}/{totalNodes} 个节点，{edges}/{totalEdges} 条连接",
       "few": "关联还太少",
       "linked": "关联",
       "panel": "所选项的笔记",
       "showAll": "{count, plural, other {在表格中显示全部 # 条}}",
-      "minLinks": "{count, plural, other {显示至少 # 个关联}}"
+      "minLinks": "{count, plural, other {显示至少 # 个关联}}",
+      "notShown": "未显示该节点：连接太少",
+      "nodeDays": "{label}，交流 {count} 天"
     },
     "note": {
       "aria": "笔记",
@@ -1423,7 +1487,12 @@
       "open": "打开",
       "more": "{count, plural, other {另外 # 条}}",
       "deleteTitle": "删除笔记？",
-      "deleteText": "笔记及其约定将被删除。此会话不会再被收集。"
+      "deleteText": "笔记及其约定将被删除。此会话不会再被收集。",
+      "compacted": "由 {count} 条记录压缩 · {date}",
+      "openThread": "打开会话",
+      "openChat": "打开聊天",
+      "allMessages": "所有消息（{count}）",
+      "openSource": "在来源中打开"
     },
     "cm": {
       "mine": "我需完成",
@@ -1558,7 +1627,7 @@
         "failed": "多次失败后已暂停。原因见“任务”。"
       },
       "collected": "已收集",
-      "collectedText": "笔记：{notes}，未完成约定：{commitments} · 保留 {days} 天",
+      "collectedText": "记录：{notes}，未完成约定：{commitments} · 保存 {months} 个月",
       "deleteAll": "删除已收集的内容",
       "deleteAllTitle": "删除全部已收集的内容？",
       "deleteAllText": "将删除笔记（{notes}）、约定（{commitments}）、人员和主题，并关闭记忆任务。记忆中的事实会保留。",
@@ -1569,8 +1638,18 @@
         "included": "虽已静音仍收集",
         "none": "未找到已静音的群组",
         "error": "无法读取群组列表：请重新连接 VK WorkSpace"
-      }
-    }
+      },
+      "lastCompact": "上次压缩：{date}",
+      "noCompact": "尚未压缩"
+    },
+    "level": {
+      "day": "日",
+      "week": "周",
+      "month": "月",
+      "thread": "会话"
+    },
+    "days": "{count} 天",
+    "filterPersonTopic": "人物或主题"
   },
   "models": {
     "cap": {
