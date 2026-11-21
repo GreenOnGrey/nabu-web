@@ -873,7 +873,12 @@
       "result": "结果",
       "via": "通过 {client}",
       "empty": "没有记录",
-      "system": "系统"
+      "system": "系统",
+      "args": "参数",
+      "error": "错误",
+      "copy": "复制",
+      "copied": "已复制",
+      "copyFailed": "复制失败"
     },
     "channels": {
       "title": "渠道",

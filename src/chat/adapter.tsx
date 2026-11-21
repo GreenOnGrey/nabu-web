@@ -119,6 +119,13 @@ function chatAttachments(m: Message): ChatAttachment[] {
 
 const attachmentPath = (id: string) => `/api/v1/attachments/${id}`;
 
+/** FTR.NAB.CHAT-0004 R13: an answer the server may still be writing. An answer older
+ * than the timeout of a turn belongs to a turn that died: the site must not wait for
+ * it forever, even when the server has not closed it yet. `after` is a moment in ms. */
+export function liveAnswer(m: Pick<Message, "role" | "status" | "createdAt">, after: number): boolean {
+  return m.role === "assistant" && (m.status === "streaming" || m.status === "pending") && Date.parse(m.createdAt) > after;
+}
+
 /** Loads a file of a message for the preview with the session of the user (FTR.NAB.CHAT-0001 R34). */
 export const loadAttachment = (a: ChatAttachment) => api.blob(attachmentPath(a.id));
 
@@ -256,6 +263,15 @@ export function useConversation(conv: Conversation, modelWindow = 0): Pick<ChatP
   const toast = useToast();
   const [overrides, setOverrides] = useState<Record<string, Message>>({});
   const [busy, setBusy] = useState(false);
+  // FTR.NAB.CHAT-0004 R13: the age after which an answer is not live — the same
+  // threshold as the server (GET /config → turnStaleSeconds). The clock moves, so
+  // an answer that dies while the page is open stops being live too.
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(t);
+  }, []);
+  const liveAfter = now - (config.turnStaleSeconds || 1860) * 1000;
   const fail = (e: unknown, text?: string) => toast({ kind: "error", title: errorText(t, e), text });
 
   // UI-04: opening a mail topic resets its unread counter.
@@ -302,7 +318,7 @@ export function useConversation(conv: Conversation, modelWindow = 0): Pick<ChatP
     return [...byId.values()].toSorted((a, b) => a.createdAt.localeCompare(b.createdAt) || (a.role === "user" ? -1 : 1));
   }, [history.data, overrides, conv.id, cancelled]);
 
-  const streaming = raw.some((m) => m.role === "assistant" && (m.status === "streaming" || m.status === "pending"));
+  const streaming = raw.some((m) => liveAnswer(m, liveAfter));
   const [wasStreaming, setWasStreaming] = useState(streaming);
   if (wasStreaming !== streaming) {
     setWasStreaming(streaming);
@@ -324,7 +340,7 @@ export function useConversation(conv: Conversation, modelWindow = 0): Pick<ChatP
     if (m?.conversationId && m.conversationId !== conv.id) return false;
     if (m && !m.truncated) return false;
     // the live copy of the answer goes once the history has the saved one
-    const live = (x: Message) => (m?.id ? x.id === m.id : x.role === "assistant" && (x.status === "streaming" || x.status === "pending"));
+    const live = (x: Message) => (m?.id ? x.id === m.id : liveAnswer(x, liveAfter));
     void qc.refetchQueries({ queryKey: keys.messages(conv.id) }).then(() =>
       setOverrides((o) => Object.fromEntries(Object.entries(o).filter(([, x]) => !live(x)))));
     return true;
@@ -378,7 +394,16 @@ export function useConversation(conv: Conversation, modelWindow = 0): Pick<ChatP
   });
 
   const lng = i18n.language;
-  const messages = useMemo(() => raw.map((m) => ({ ...toChatMessage(t, m, wait, lng), retryQueued: retrying.has(m.id) || undefined })), [raw, wait, t, lng, retrying]);
+  const messages = useMemo(() => raw.map((m) => {
+    // R13: the answer of a turn that died is a failure with Retry, not one being written forever
+    const stale = (m.status === "streaming" || m.status === "pending") && !liveAnswer(m, liveAfter);
+    const view = toChatMessage(t, stale ? { ...m, status: "failed" } : m, wait, lng);
+    return {
+      ...view,
+      error: stale ? { text: llmErrorText(t, "agent_crashed"), transient: true } : view.error,
+      retryQueued: retrying.has(m.id) || undefined,
+    };
+  }), [raw, wait, t, lng, retrying, liveAfter]);
 
   const context = useContextFill(conv, modelWindow);
   const commands = useCommands(conv);
@@ -439,7 +464,7 @@ export function useConversation(conv: Conversation, modelWindow = 0): Pick<ChatP
       try {
         await api.post(`/api/v1/messages/${messageId}/retry`);
         const old = raw.find((x) => x.id === messageId);
-        const behind = raw.some((x) => (x.role === "assistant" && (x.status === "streaming" || x.status === "pending")) || x.queued);
+        const behind = raw.some((x) => liveAnswer(x, liveAfter) || x.queued);
         if (old && behind) setRetrying((r) => new Set(r).add(old.id));
       } catch (e) {
         fail(e);
