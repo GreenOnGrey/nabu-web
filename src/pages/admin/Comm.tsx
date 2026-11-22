@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { api } from "../../api/client";
-import type { CommAdminSettings, ModelConnection } from "../../api/types";
+import type { CommAdminSettings, ConnectionType, ModelConnection } from "../../api/types";
 import { errorText } from "../../lib/errors";
 import { Switch, useToast } from "@green-on-grey/ui-kit";
 import { CommUsage } from "./CommUsage";
@@ -64,6 +64,11 @@ function CommSettings() {
     save.mutate({ [field]: v ? { connectionId, model } : null });
   };
   const retention = Number(months ?? s.retentionMonths), l = Number((limit ?? String(s.monthlyLimitUsd)).replace(",", "."));
+  // the model whose thinking the setting governs is the collection's (design §3.10); the setting governs the
+  // compaction too
+  const modelChoice = s.model;
+  const conn = conns.data?.items.find((c) => c.id === modelChoice?.connectionId);
+  const def = conn?.models.find((m) => m.id === modelChoice?.model);
   return (
     <>
       <div className="svc" style={{ maxWidth: 640 }}>
@@ -118,8 +123,8 @@ function CommSettings() {
         <CollectLimit id="comm-threads" label={t("admin.comm.batchThreads")} hint={t("admin.comm.batchThreadsHint")}
           value={s.batchThreads} fallback={s.defaults.batchThreads} max={100} draft={threads} setDraft={setThreads}
           busy={save.isPending} onSave={(v) => save.mutate({ batchThreads: v })} />
-        {(!s.model || conns.data) && (
-          <ThinkingOff value={s.thinkingOff} type={conns.data?.items.find((c) => c.id === s.model?.connectionId)?.type} busy={save.isPending}
+        {modelChoice && conn && (
+          <ThinkingOff value={s.thinkingOff} type={conn.type} reasoning={def ? def.reasoning : true} busy={save.isPending}
             onSave={(v) => save.mutate({ thinkingOff: v })} />
         )}
       </div>
@@ -175,29 +180,53 @@ function CollectLimit({ id, label, unit, hint, value, fallback, max, draft, setD
   );
 }
 
-/** The explicit thinking off of the model of the collection (FTR.NAB.CMN-0003 R29, design §3.10, decision 26): a
- * switch and the way. DeepSeek, Z.AI and GigaChat switch it off by their own parameter, so they get a hint. */
-function ThinkingOff({ value, type, busy, onSave }: {
-  value: CommAdminSettings["thinkingOff"]; type?: string; busy: boolean; onSave: (v: CommAdminSettings["thinkingOff"]) => void;
-}) {
+/** A switch the model cannot move: the public GigaChat API does not manage the thinking, and a model without
+ * reasoning has nothing to switch off (FTR.NAB.CMN-0003 design §3.10). */
+function ThinkingDisabled({ hint }: { hint: string }) {
   const { t } = useTranslation();
-  if (type && type !== "openai_compatible") {
-    return <div className="field"><div className="hint">{t("admin.comm.thinkingAlways")}</div></div>;
-  }
   return (
     <div className="field">
-      <Switch on={value !== null} disabled={busy} onChange={(on) => onSave(on ? "chat-template" : null)} label={t("admin.comm.thinkingOff")} />
-      {value !== null && (
+      <Switch on={false} disabled onChange={() => {}} label={t("admin.comm.thinkingOff")} />
+      <div className="hint">{hint}</div>
+    </div>
+  );
+}
+
+/** The setting of the thinking of the models of the memory (FTR.NAB.CMN-0003 R29, design §3.10, decision 26;
+ * FTR.NAB.MEM-0001 R14): it governs the collection and the compaction. DeepSeek and Z.AI switch the thinking off
+ * by their own parameter; an OpenAI-compatible connection chooses the way; the public GigaChat API does not let
+ * Nabu manage it, so the switch is not interactive there (tech, decision 58). */
+function ThinkingOff({ value, type, reasoning, busy, onSave }: {
+  value: CommAdminSettings["thinkingOff"]; type: ConnectionType; reasoning: boolean; busy: boolean;
+  onSave: (v: CommAdminSettings["thinkingOff"]) => void;
+}) {
+  const { t } = useTranslation();
+  if (type === "gigachat") {
+    return <ThinkingDisabled hint={t("admin.comm.thinkingGigachat")} />;
+  }
+  if (!reasoning) {
+    return <ThinkingDisabled hint={t("admin.comm.thinkingNoReasoning")} />;
+  }
+  const own = type === "deepseek" || type === "zai";
+  const way = value === "chat-template" || value === "reasoning-effort" ? value : null;
+  // null is the default of the type: off for DeepSeek and Z.AI, allowed for the others
+  const on = way !== null || (own && (value === null || value === "provider"));
+  const toggle = (next: boolean) => onSave(next ? (own ? "provider" : way ?? "chat-template") : "allow");
+  return (
+    <div className="field">
+      <Switch on={on} disabled={busy} onChange={toggle} label={t("admin.comm.thinkingOff")} />
+      {on && !own && (
         <>
           <label htmlFor="comm-thinking" style={{ marginTop: 8 }}>{t("admin.comm.thinkingWay")}</label>
-          <select id="comm-thinking" className="inp" value={value} disabled={busy}
+          <select id="comm-thinking" className="inp" value={way ?? "chat-template"} disabled={busy}
             onChange={(e) => onSave(e.target.value as NonNullable<CommAdminSettings["thinkingOff"]>)}>
             <option value="chat-template">{t("admin.comm.thinkingChatTemplate")}</option>
             <option value="reasoning-effort">{t("admin.comm.thinkingReasoningEffort")}</option>
           </select>
-          <div className="hint">{t("admin.comm.thinkingHint")}</div>
         </>
       )}
+      {on && own && <div className="hint">{t("admin.comm.thinkingProvider")}</div>}
+      <div className="hint">{on ? t("admin.comm.thinkingHint") : t("admin.comm.thinkingAllowHint")}</div>
     </div>
   );
 }
