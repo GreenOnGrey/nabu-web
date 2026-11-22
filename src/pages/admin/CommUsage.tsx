@@ -101,45 +101,44 @@ export function CommUsage() {
           )}
           {days.length === 0 && !daily.isLoading && <div className="muted small" style={{ margin: "12px 0" }}>{t("admin.comm.use.noData")}</div>}
 
-          <h4 style={{ margin: "18px 0 6px" }}>{t("admin.comm.use.collectBlock")}</h4>
-          <div className="row" style={{ gap: 24, flexWrap: "wrap" }}>
-            <table className="t" style={{ maxWidth: 340 }}>
-              <tbody>
-                {OUTCOMES.filter((k) => (u.collect.outcomes[k] ?? 0) > 0).map((k) => {
-                  const total = OUTCOMES.reduce((s, kk) => s + (u.collect.outcomes[kk] ?? 0), 0);
-                  return (
-                    <tr key={k}><td>{t(`admin.comm.use.outcomes.${k}`)}</td>
-                      <td className="small">{t("admin.comm.use.shares", { count: u.collect.outcomes[k], pct: total ? Math.round((u.collect.outcomes[k] / total) * 100) : 0 })}</td></tr>
-                  );
-                })}
-              </tbody>
-            </table>
-            <div style={{ minWidth: 260 }}>
-              <div className="lab">{t("admin.comm.use.bySource")}</div>
+          <div className="nb-use-cards">
+            <div className="nb-use-card">
+              <div className="nb-use-h">{t("admin.comm.use.collectBlock")}</div>
+              {OUTCOMES.filter((k) => (u.collect.outcomes[k] ?? 0) > 0).map((k) => {
+                const total = OUTCOMES.reduce((s, kk) => s + (u.collect.outcomes[kk] ?? 0), 0);
+                return (
+                  <div className="nb-use-row" key={k}>
+                    <span>{t(`admin.comm.use.outcomes.${k}`)}</span>
+                    <b>{t("admin.comm.use.shares", { count: u.collect.outcomes[k], pct: total ? Math.round((u.collect.outcomes[k] / total) * 100) : 0 })}</b>
+                  </div>
+                );
+              })}
+              <div className="nb-use-lab">{t("admin.comm.use.bySource")}</div>
               {u.collect.messagesBySource.map((s) => (
-                <div className="srcl" key={s.itemId + s.source}>
-                  <Icon name="mail" size={13} /><span>{s.title}</span><b>{n(s.messages)}</b>
+                <div className="nb-use-row" key={s.itemId + s.source}>
+                  <span><Icon name="mail" size={13} />{s.title}</span>
+                  <b>{n(s.messages)}</b>
                 </div>
               ))}
-              {u.collect.messagesBySource.length === 0 && <div className="small muted">—</div>}
+              {u.collect.messagesBySource.length === 0 && <div className="nb-use-row"><span>—</span></div>}
+            </div>
+            <div className="nb-use-card">
+              <div className="nb-use-h">{t("admin.comm.use.compactBlock")}</div>
+              {u.compaction.lastNightAt && (
+                <div className="nb-use-row"><span>{t("admin.comm.use.chips.lastNight")}</span><b>{date(u.compaction.lastNightAt)}</b></div>
+              )}
+              <div className="nb-use-row"><span>{t("admin.comm.use.chips.ok")}</span><b>{n(u.compaction.ok)}</b></div>
+              <div className="nb-use-row"><span>{t("admin.comm.use.chips.failed")}</span><b className={u.compaction.failed > 0 ? "err-text" : undefined}>{n(u.compaction.failed)}</b></div>
+            </div>
+            <div className="nb-use-card">
+              <div className="nb-use-h">{t("admin.comm.use.commitmentsBlock")}</div>
+              <div className="nb-use-row"><span>{t("admin.comm.use.chips.open")}</span><b>{n(u.commitments.open)}</b></div>
+              <div className="nb-use-row"><span>{t("admin.comm.use.chips.closed")}</span><b>{n(u.commitments.closedInMonth)}</b></div>
+              <div className="nb-use-row"><span>{t("admin.comm.use.chips.overdue")}</span><b className={u.commitments.overdue > 0 ? "due" : undefined}>{n(u.commitments.overdue)}</b></div>
             </div>
           </div>
 
-          <h4 style={{ margin: "18px 0 6px" }}>{t("admin.comm.use.compactBlock")}</h4>
-          <div className="row" style={{ gap: 24, flexWrap: "wrap" }}>
-            {u.compaction.lastNightAt && <span className="small">{t("admin.comm.use.lastNight", { date: date(u.compaction.lastNightAt) })}</span>}
-            <span className="small">{t("admin.comm.use.okCount", { count: n(u.compaction.ok) })}</span>
-            <span className="small">{t("admin.comm.use.failedCount", { count: n(u.compaction.failed) })}</span>
-          </div>
-
-          <h4 style={{ margin: "18px 0 6px" }}>{t("admin.comm.use.commitmentsBlock")}</h4>
-          <div className="row" style={{ gap: 24, flexWrap: "wrap" }}>
-            <span className="small">{t("admin.comm.use.commitmentsOpen", { count: n(u.commitments.open) })}</span>
-            <span className="small">{t("admin.comm.use.commitmentsClosed", { count: n(u.commitments.closedInMonth) })}</span>
-            <span className="small">{t("admin.comm.use.commitmentsOverdue", { count: n(u.commitments.overdue) })}</span>
-          </div>
-
-          <div style={{ overflowX: "auto", marginTop: 12 }}>
+          <div className="nb-use-users">
             <table className="t">
               <thead><tr>
                 <th>{t("admin.comm.use.cols.user")}</th><th>{t("admin.comm.use.cols.notes")}</th><th>{t("admin.comm.use.cols.runs")}</th>
@@ -164,7 +163,6 @@ export function CommUsage() {
               </tbody>
             </table>
           </div>
-          <div className="hintbox" style={{ marginTop: 12 }}><Icon name="lock" /><span>{t("admin.comm.noContent")}</span></div>
         </>
       )}
     </>
