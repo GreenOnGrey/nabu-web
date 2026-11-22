@@ -412,9 +412,10 @@ export interface CommAdminSettings {
   runTimeoutMinutes: number | null;
   batchThreads: number | null;
   defaults: { runTimeoutMinutes: number; batchThreads: number };
-  /** how a run of the collector switches the thinking of an OpenAI-compatible model off; null — no parameter
-   * (FTR.NAB.CMN-0003 tech, decision 58) */
-  thinkingOff: "chat-template" | "reasoning-effort" | null;
+  /** how the collection and the compaction switch the thinking off: the provider's own parameter, a way of an
+   * OpenAI-compatible connection, or "allow" — no parameter, the default of the provider; null — the default of
+   * the connection type (FTR.NAB.CMN-0003 tech, decision 58; FTR.NAB.MEM-0001 tech, decision 23) */
+  thinkingOff: "provider" | "chat-template" | "reasoning-effort" | "allow" | null;
   /** the database has the vector extension; the chosen model of embeddings resolves */
   vectorsAvailable: boolean;
   semantic: boolean;
