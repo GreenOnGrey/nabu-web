@@ -60,31 +60,37 @@ export function ProfileMenu({ onClose }: { onClose: () => void }) {
       <div className="sec">
         <div className="line">
           <span>{t("profile.language")}</span>
-          <span className="mini-seg">
-            {LANGUAGES.map((l) => (
-              <button key={l} className={me.language === l ? "on" : ""} lang={l} title={LANGUAGE_NAMES[l]} aria-label={LANGUAGE_NAMES[l]}
-                aria-pressed={me.language === l} onClick={() => setLanguage(l)}>
-                {LANGUAGE_SHORT[l]}
-              </button>
-            ))}
+          <span className="ctlrow">
+            <span className="mini-seg">
+              {LANGUAGES.map((l) => (
+                <button key={l} className={me.language === l ? "on" : ""} lang={l} title={LANGUAGE_NAMES[l]} aria-label={LANGUAGE_NAMES[l]}
+                  aria-pressed={me.language === l} onClick={() => setLanguage(l)}>
+                  {LANGUAGE_SHORT[l]}
+                </button>
+              ))}
+            </span>
           </span>
         </div>
         <div className="line" style={{ marginTop: 12 }}>
           <span>{t("profile.theme")}</span>
-          <span className="mini-seg">
-            {(["light", "dark"] as const).map((th) => (
-              <button key={th} className={me.theme === th ? "on" : ""} aria-pressed={me.theme === th} onClick={() => patch.mutate({ theme: th })}>
-                {t(`profile.themes.${th}`)}
-              </button>
-            ))}
+          <span className="ctlrow">
+            <span className="mini-seg">
+              {(["light", "dark"] as const).map((th) => (
+                <button key={th} className={me.theme === th ? "on" : ""} aria-pressed={me.theme === th} onClick={() => patch.mutate({ theme: th })}>
+                  {t(`profile.themes.${th}`)}
+                </button>
+              ))}
+            </span>
           </span>
         </div>
         <div className="line" style={{ marginTop: 12 }}>
           <span>{t("profile.timezone")}</span>
-          <select className="inp" style={{ width: 180, padding: "4px 8px" }} value={me.timezone} aria-label={t("profile.timezone")}
-            onChange={(e) => patch.mutate({ timezone: e.target.value })}>
-            {zones.map((z) => <option key={z} value={z}>{z}</option>)}
-          </select>
+          <span className="ctlrow">
+            <select className="inp" style={{ width: 180 }} value={me.timezone} aria-label={t("profile.timezone")}
+              onChange={(e) => patch.mutate({ timezone: e.target.value })}>
+              {zones.map((z) => <option key={z} value={z}>{z}</option>)}
+            </select>
+          </span>
         </div>
       </div>
       <div className="sec">

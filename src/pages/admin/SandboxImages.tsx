@@ -59,7 +59,7 @@ function Requests() {
   return (
     <div className={open ? "nb-sbx-split" : undefined}>
       <div>
-        <div className="nb-sbx-toolbar">
+        <div className="ctlrow nb-sbx-toolbar">
           <div className="mini-seg" role="group" aria-label={t("admin.sandbox-images.period")}>
             {(["7d", "30d", "90d"] as const).map((p) => (
               <button key={p} className={period === p ? "on" : ""} aria-pressed={period === p} onClick={() => setPeriod(p)}>{t(`admin.sandbox-images.periods.${p}`)}</button>
