@@ -72,7 +72,7 @@ export function UsersAdmin() {
           <button className="btn primary sm" onClick={() => setInviting(true)}><Icon name="plus" size={15} />{t("admin.users.invite")}</button>
         </span>
       </div>
-      <div className="row" style={{ gap: 12, margin: "14px 0" }}>
+      <div className="ctlrow" style={{ margin: "14px 0" }}>
         <div className="search" style={{ maxWidth: 420, flex: 1 }}>
           <Icon name="search" />
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("admin.users.search")} aria-label={t("admin.users.search")} />

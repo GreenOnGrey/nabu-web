@@ -75,7 +75,7 @@ export function CommTab({ state, filter, setFilter, view, setView, noteId, setNo
   return (
     <>
       <CollectBanner state={state} />
-      <div className="ctlrow">
+      <div className="ctlrow" style={{ marginBottom: 12 }}>
         <div className="search">
           <Icon name="search" />
           <input value={filter.q} onChange={(e) => setFilter({ q: e.target.value })} placeholder={t("comm.search")} aria-label={t("comm.search")} />

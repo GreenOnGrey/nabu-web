@@ -159,7 +159,7 @@ export function CommitmentsTab({ people, topics, onTag }: { people: CommTag[]; t
   const chatPath = (id: string) => (id === mainId ? "/" : `/chat/${id}`);
   return (
     <>
-      <div className="ctlrow">
+      <div className="ctlrow" style={{ marginBottom: 12 }}>
         <div className="mini-seg">
           {(["", "mine", "theirs"] as const).map((d) => (
             <button key={d || "all"} className={direction === d ? "on" : ""} aria-pressed={direction === d} onClick={() => setDirection(d)}>{t(`comm.cm.filter.${d || "all"}`)}</button>
