@@ -383,3 +383,15 @@ table.comm-t td:nth-child(1),table.comm-t td:nth-child(2){display:inline-block;w
 .nb-mrow-wrap{display:flex;align-items:flex-start;gap:6px}
 .nb-mrow-wrap>.mrow{flex:1}
 .nb-ext{margin-top:8px}
+
+/* The blocks of the usage of the memory (FTR.NAB.MEM-0001 design §3.7): three cards of label-and-value rows
+   instead of headings with wide tables — the numbers read in a column and the screen stops looking crowded. */
+.nb-use-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin:18px 0 14px}
+.nb-use-card{border:1px solid var(--border);border-radius:var(--r-m);background:var(--surface);padding:12px 14px;min-width:0}
+.nb-use-h{font-weight:600;font-size:14px;margin-bottom:6px}
+.nb-use-lab{font-size:12px;color:var(--muted);margin:10px 0 2px}
+.nb-use-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:5px 0;font-size:13px;border-bottom:1px solid var(--border)}
+.nb-use-row:last-child{border-bottom:0}
+.nb-use-row>span{display:flex;align-items:center;gap:6px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-2)}
+.nb-use-row>b{white-space:nowrap;font-weight:600}
+.nb-use-users{overflow-x:auto;margin-top:6px}
