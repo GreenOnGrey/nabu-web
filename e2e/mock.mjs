@@ -215,6 +215,8 @@ const members = [{ id: "u1", email: "ada@example.com", name: "Ада Лавле�
 
 // FTR.NAB.CMN-0003 R19: the memory of communications on, and the graph of its people and topics.
 const commOn = { ...commState, allowed: true, available: true, consentAt: T("09:00", "01"), compact: { lastAt: T("03:10", "16") }, collect: { ...commState.collect, status: "active" }, counts: { notes: 42, openCommitments: 3 } };
+// FTR.NAB.ADM-0001 R8: the source of the collection with its muted groups (mock-muted-groups: one returned or none)
+const vkSource = { itemId: "vk-1", source: "vkteams", title: "VK Teams", connected: true, enabled: true };
 const tag = (id, kind, label, notes, links) => ({ id, kind, label, notes, links, days: notes });
 const commGraph = {
   nodes: [tag("p1", "person", "Анна Петрова", 14, 4), tag("p2", "person", "Иван Соколов", 9, 3), tag("p3", "person", "Мария Ли", 3, 1),
@@ -282,8 +284,10 @@ const commUsage = {
       { limitUsedPct: 20, lastCompactAt: null, compactBroken: true, openCommitments: 0 })],
 };
 
-function api(url, theme, comm, collectModel) {
+function api(url, theme, comm, collectModel, mutedGroups) {
   const p = url.pathname;
+  // FTR.NAB.ADM-0001 R8: the collection reads VK Teams — with a group returned to it or with nothing returned
+  const vkOn = mutedGroups === "one" || mutedGroups === "none";
   if (p === "/api/v1/me") return me(theme);
   if (p === "/api/v1/config") return config;
   if (p === "/api/v1/agent") return agent;
@@ -298,13 +302,20 @@ function api(url, theme, comm, collectModel) {
   if (p === "/api/v1/space/files") return { items: files, nextCursor: null };
   if (p === "/api/v1/catalog") return { items: catalog };
   if (p === "/api/v1/channels") return { items: me().channels };
-  if (p === "/api/v1/comm/state") return comm ? commOn : commState;
+  if (p === "/api/v1/comm/state") return comm ? { ...commOn, sources: vkOn ? [vkSource] : [] } : commState;
   if (comm && p === "/api/v1/comm/people") return commTags("person");
   if (comm && p === "/api/v1/comm/topics") return commTags("topic");
   if (comm && p === "/api/v1/comm/graph") return commGraph;
   if (comm && p === "/api/v1/comm/notes") return { items: commNotes, nextCursor: null };
   if (comm && /^\/api\/v1\/comm\/notes\/[^/]+$/.test(p)) return commNote(p.split("/").pop());
-  if (comm && p === "/api/v1/commitments") return { items: url.searchParams.get("state") === "closed" ? [] : commitments };
+  if (comm && p === "/api/v1/commitments") {
+    const person = url.searchParams.get("person");
+    const topic = url.searchParams.get("topic");
+    const items = url.searchParams.get("state") === "closed" ? [] : commitments
+      .filter((c) => !person || c.person?.id === person)
+      .filter((c) => !topic || c.topics.some((x) => x.id === topic));
+    return { items };
+  }
   // FTR.NAB.CMN-0003 R29 (design §3.10, decision 26): the model of the collection is behind LiteLLM, its thinking is off
   if (p === "/admin/api/v1/settings/comm") return { enabled: true, retentionMonths: 6, retentionDays: 180, model: { connectionId: "mc1", model: "deepseek-v4.1-flash" }, compactModel: null,
     embeddings: null, monthlyLimitUsd: 6, runTimeoutMinutes: 30, batchThreads: null, defaults: { runTimeoutMinutes: 20, batchThreads: 8 },
@@ -335,10 +346,14 @@ function api(url, theme, comm, collectModel) {
   if (p === "/admin/api/v1/users") return { items: url.searchParams.get("status") === "archived" ? [] : users };
   if (/^\/admin\/api\/v1\/users\/[^/]+$/.test(p)) return userCardFor(p.split("/").at(-1));
   if (/^\/admin\/api\/v1\/users\/[^/]+\/access$/.test(p)) return userAccess;
+  if (/^\/api\/v1\/comm\/sources\/[^/]+\/muted-groups$/.test(p)) return { items: [
+    { chatSn: "muted-long", name: "Marketing&PR news Citydrive <> Support|CX|Content — очень длинное название заглушённой группы" },
+    { chatSn: "muted-alerts", name: "Тестовый чатик с алертами" },
+  ] };
   // FTR.NAB.CMN-0003 R14: the prepared tasks; the day digest names a channel the user no longer has
   if (p === "/api/v1/memory-tasks") return { items: [
     { kind: "collect", enabled: false, taskId: null, status: "off", pauseKind: null, nextRunAt: null, lastRun: null,
-      settings: { sources: [], interval: "1h", roundTheClock: false, exclusions: { senders: [], folders: [], chats: [] }, time: "09:00", channel: "web" } },
+      settings: { sources: vkOn ? [{ itemId: "vk-1", source: "vkteams" }] : [], interval: "1h", roundTheClock: false, exclusions: { senders: [], folders: [], chats: [] }, includeMuted: mutedGroups === "one" ? ["muted-long"] : [], time: "09:00", channel: "web" } },
     { kind: "digest_day", enabled: true, taskId: "t-day", status: "active", pauseKind: null, nextRunAt: T("09:00", "18"), lastRun: null,
       settings: { sources: [], interval: "1h", roundTheClock: false, exclusions: { senders: [], folders: [], chats: [] }, time: "09:00", days: [1, 2, 3, 4, 5], channel: "telegram" } },
     { kind: "digest_week", enabled: true, taskId: "t-week", status: "active", pauseKind: null, nextRunAt: T("09:00", "23"), lastRun: null,
@@ -385,7 +400,7 @@ http.createServer((req, res) => {
     }
     if (url.pathname === "/api/v1/me" && cookie("mock-auth") === "0") { res.writeHead(401, { "content-type": "application/json" }); return res.end('{"error":{"code":"unauthenticated","message":"sign in"}}'); }
     res.writeHead(200, { "content-type": "application/json" });
-    return res.end(JSON.stringify(api(url, cookie("mock-theme"), cookie("mock-comm") === "1", cookie("mock-collect-model"))));
+    return res.end(JSON.stringify(api(url, cookie("mock-theme"), cookie("mock-comm") === "1", cookie("mock-collect-model"), cookie("mock-muted-groups") ?? "")));
   }
   let file = path.join(DIST, decodeURIComponent(url.pathname));
   if (!file.startsWith(DIST) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) file = path.join(DIST, "index.html");

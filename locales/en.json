@@ -1652,7 +1652,6 @@
       "deleteAllText": "Notes ({notes}), commitments ({commitments}), people and topics are deleted and the memory tasks are switched off. The facts of the memory stay.",
       "muted": {
         "title": "Muted groups are not collected",
-        "add": "Return a group",
         "search": "Name of a muted group",
         "included": "Collected though muted",
         "none": "No muted groups found",

@@ -1652,7 +1652,6 @@
       "deleteAllText": "将删除笔记（{notes}）、约定（{commitments}）、人员和主题，并关闭记忆任务。记忆中的事实会保留。",
       "muted": {
         "title": "已静音的群组不收集",
-        "add": "恢复群组",
         "search": "已静音群组的名称",
         "included": "虽已静音仍收集",
         "none": "未找到已静音的群组",

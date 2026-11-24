@@ -1652,7 +1652,6 @@
       "deleteAllText": "Notizen ({notes}), Zusagen ({commitments}), Personen und Themen werden gelöscht und die Gedächtnisaufgaben ausgeschaltet. Die Fakten bleiben.",
       "muted": {
         "title": "Stummgeschaltete Gruppen werden nicht gesammelt",
-        "add": "Gruppe zurückholen",
         "search": "Name einer stummgeschalteten Gruppe",
         "included": "Gesammelt, obwohl stummgeschaltet",
         "none": "Keine stummgeschalteten Gruppen gefunden",

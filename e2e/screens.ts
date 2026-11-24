@@ -12,6 +12,9 @@ export interface Screen {
   comm?: boolean;
   /** The type of the connection of the model of the collection (mock-collect-model); LiteLLM by default. */
   collectModel?: "deepseek";
+  /** The muted groups of the collection (mock-muted-groups): "one" — a group is returned to the collection,
+   * "none" — the source is connected and nothing is returned. */
+  mutedGroups?: "one" | "none";
   /** What to do after the page has settled, before the shot. */
   act?: (page: Page) => Promise<void>;
 }
@@ -47,9 +50,25 @@ export const SCREENS: Screen[] = [
   // FTR.NAB.CMN-0005 design §4: in the administration the burger holds its sections
   { name: "admin-sections", path: "/admin/audit", only: "phone", act: click("Администрирование") },
   { name: "memory", path: "/memory" },
-  { name: "memory-add", path: "/memory", act: async (page) => { await page.locator(".btn.primary.sm").first().click(); } },
+  { name: "memory-add", path: "/memory", act: async (page) => { await page.getByRole("button", { name: "Добавить запись" }).click(); } },
   // FTR.NAB.CMN-0003 design §3.1: the digest of a week names a channel the user has lost
   { name: "memory-tasks", path: "/memory?tab=tasks", comm: true }, // FTR.NAB.CMN-0003 qa TASK-21
+  // FTR.NAB.ADM-0001 design §3.2: the search of the muted groups stands in place; a long name is cut, not laid out
+  { name: "memory-tasks-muted", path: "/memory?tab=tasks", comm: true, mutedGroups: "one", act: async (page) => {
+    const search = page.getByRole("textbox", { name: "Название заглушённой группы" });
+    if (!(await search.isVisible())) throw new Error("the search of the muted groups is not in place");
+    await search.fill("Тест");
+    await page.getByRole("button", { name: /Тестовый чатик/ }).waitFor();
+    // a long name is cut inside the card, not laid out over the neighbours
+    if (!(await page.locator(".tcard").first().evaluate((el) => el.scrollWidth <= el.clientWidth))) throw new Error("the muted groups overflow the card");
+  } },
+  // design §3.2: nothing is returned yet — the way to return a group is still seen
+  { name: "memory-tasks-muted-empty", path: "/memory?tab=tasks", comm: true, mutedGroups: "none", act: async (page) => {
+    const search = page.getByRole("textbox", { name: "Название заглушённой группы" });
+    if (!(await search.isVisible())) throw new Error("the search of the muted groups waited for a click");
+    const remove = await page.locator(".tcard").first().getByRole("button", { name: "Убрать", exact: true }).count();
+    if (remove > 0) throw new Error("a returned group is in place");
+  } },
   // FTR.NAB.MEM-0001 design §3.1: the table with the level of a record, its period and its volume
   { name: "memory-comm", path: "/memory?tab=comm", comm: true },
   // FTR.NAB.CMN-0003 R19: the graph of people and topics, at rest and with a pinned person
@@ -60,6 +79,17 @@ export const SCREENS: Screen[] = [
   } },
   // FTR.NAB.CMN-0003 qa UI-12: a commitment from the chat with the link to its conversation
   { name: "memory-commitments", path: "/memory?tab=commitments", comm: true },
+  // FTR.NAB.CMN-0003 design §3.6: one field of the person or the topic, as on the communications; a pick of one kind
+  { name: "memory-commitments-filter", path: "/memory?tab=commitments", comm: true, act: async (page) => {
+    const field = page.getByRole("combobox", { name: "Человек или тема" });
+    await field.click();
+    await field.fill("Бюджет");
+    await page.getByRole("option", { name: /Бюджет/ }).click();
+    await field.fill("Анна");
+    await page.getByRole("option", { name: /Анна Петрова/ }).click();
+    const chips = await page.locator(".cm-filter .tg").count();
+    if (chips !== 1) throw new Error(`the field keeps ${chips} filters beside the person`);
+  } },
   { name: "tasks", path: "/tasks" },
   { name: "space", path: "/space" },
   // FTR.NAB.CHAT-0001 R34: a file of the space opens in the preview

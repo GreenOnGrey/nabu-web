@@ -1652,7 +1652,6 @@
       "deleteAllText": "Se eliminan las notas ({notes}), los compromisos ({commitments}), las personas y los temas, y se desactivan las tareas de memoria. Los hechos se conservan.",
       "muted": {
         "title": "Los grupos silenciados no se recopilan",
-        "add": "Devolver un grupo",
         "search": "Nombre de un grupo silenciado",
         "included": "Se recopilan aunque estén silenciados",
         "none": "No se encontraron grupos silenciados",
