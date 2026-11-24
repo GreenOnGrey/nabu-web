@@ -60,6 +60,8 @@ export interface AvailableModel {
   name: string;
   connection: string;
   caps: ModelCaps;
+  /** FTR.NAB.CHAT-0001 R16: what a million tokens cost, US dollars; absent when Nabu does not know the price. */
+  price?: { input: number; output: number; cacheRead: number; cacheWrite: number };
 }
 
 /** The fill of the context window of a conversation (FTR.NAB.CHAT-0001 R3). */

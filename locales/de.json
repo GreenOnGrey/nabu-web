@@ -457,15 +457,19 @@
         "reasoning": "Reasoning",
         "contextWindow": "Kontextfenster",
         "maxTokens": "Längste Antwort",
-        "cost": "Preis ein/aus pro 1 Mio.",
-        "cost_input": "Preis der Eingabe",
-        "cost_output": "Preis der Ausgabe"
+        "cost": "Preis pro 1 Mio., USD: Ein / Aus / Cache-Lesen / Cache-Schreiben",
+        "cost_input": "Preis der Eingabe pro 1 Mio.",
+        "cost_output": "Preis der Ausgabe pro 1 Mio.",
+        "cost_cacheRead": "Preis des Cache-Lesens pro 1 Mio.",
+        "cost_cacheWrite": "Preis des Cache-Schreibens pro 1 Mio."
       },
       "availableByGroups": "Die wählbaren Modelle werden Gruppen gewährt.",
       "latency": "{ms, number} ms",
       "resetField": "Zurücksetzen",
       "unfold": "Fähigkeiten von {model}",
-      "fold": "Fähigkeiten von {model} ausblenden"
+      "fold": "Fähigkeiten von {model} ausblenden",
+      "limitsHint": "Kontextfenster und längste Antwort kommen vom Anbieter (LiteLLM), dann aus dem Verzeichnis; sagt keiner etwas, bleiben 128 000 und 16 000. Preise in US-Dollar pro eine Million Token; das Lesen des Caches ist dabei, das Schreiben steht nur hier.",
+      "priceLegend": "Preis pro 1 Mio., USD: Eingabe / Ausgabe / Cache-Lesen"
     },
     "catalog": {
       "title": "Katalog",
@@ -1683,6 +1687,7 @@
       "manual": "manuell",
       "default": "Standard"
     },
-    "unconfirmed": "nicht bestätigt"
+    "unconfirmed": "nicht bestätigt",
+    "windowSource": "Das Fenster kommt von: {source}"
   }
 }

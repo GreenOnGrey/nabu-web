@@ -457,15 +457,19 @@
         "reasoning": "Razonamiento",
         "contextWindow": "Ventana de contexto",
         "maxTokens": "Respuesta máxima",
-        "cost": "Precio entrada / salida por 1 M",
-        "cost_input": "Precio de entrada",
-        "cost_output": "Precio de salida"
+        "cost": "Precio por 1 M, USD: entrada / salida / lectura / escritura de caché",
+        "cost_input": "Precio de la entrada por 1 M",
+        "cost_output": "Precio de la salida por 1 M",
+        "cost_cacheRead": "Precio de la lectura de caché por 1 M",
+        "cost_cacheWrite": "Precio de la escritura de caché por 1 M"
       },
       "availableByGroups": "Los modelos que pueden elegir los usuarios se conceden a grupos.",
       "latency": "{ms, number} ms",
       "resetField": "Restablecer",
       "unfold": "Capacidades de {model}",
-      "fold": "Ocultar las capacidades de {model}"
+      "fold": "Ocultar las capacidades de {model}",
+      "limitsHint": "La ventana y la respuesta más larga vienen del proveedor (LiteLLM) y luego del directorio; si ninguno las indica, quedan 128 000 y 16 000. Los precios son en dólares por millón de tokens: la lectura de caché se incluye, la escritura solo se muestra aquí.",
+      "priceLegend": "Precio por 1 M, USD: entrada / salida / lectura de caché"
     },
     "catalog": {
       "title": "Catálogo",
@@ -1683,6 +1687,7 @@
       "manual": "manual",
       "default": "predeterminado"
     },
-    "unconfirmed": "no confirmado"
+    "unconfirmed": "no confirmado",
+    "windowSource": "La ventana viene de: {source}"
   }
 }
