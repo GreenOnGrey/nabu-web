@@ -80,9 +80,24 @@ const sandboxProfiles = { customImages: true, prefixes: ["registry.company.local
     prof("oracle-client", "custom", { imageRef: "registry.company.local/nabu/oracle-client:1.2", state: "error", error: "sandbox_probe_no_bash", nodesReady: 0, nodesTotal: 0 }),
   ] };
 
-const model = { connectionId: "c1", model: "sonnet", name: "sonnet-5", connection: "Anthropic", caps: { image: true, tools: true, reasoning: true, contextWindow: 200000 } };
-const flash = { connectionId: "c2", model: "deepseek-v4.1-flash", name: "DeepSeek V4.1 Flash", connection: "DeepSeek", caps: { image: true, tools: true, reasoning: false, contextWindow: 128000 } };
-const agent = { name: "Набу", tone: "business", model, defaultModel: model, chosen: false, availableModels: [model, flash], context: { tokens: 42000, window: 200000 } };
+const model = { connectionId: "c1", model: "sonnet", name: "sonnet-5", connection: "Anthropic", caps: { image: true, tools: true, reasoning: true, contextWindow: 200000 },
+  price: { input: 3, output: 15, cacheRead: 0.3, cacheWrite: 3.75 } };
+const flash = { connectionId: "c2", model: "deepseek-v4.1-flash", name: "DeepSeek V4.1 Flash", connection: "DeepSeek", caps: { image: true, tools: true, reasoning: false, contextWindow: 128000 },
+  price: { input: 0.14, output: 0.28, cacheRead: 0.014, cacheWrite: 0 } };
+// FTR.NAB.CHAT-0001 R16: many models — the list scrolls and the menu keeps its place on the screen
+// FTR.NAB.CHAT-0001 R16: a model whose price Nabu does not know (GigaChat is billed by packages) has no price
+const extra = [["giga", "GigaChat 2 Max", "GigaChat", 131072, false], ["giga", "GigaChat 2 Lite", "GigaChat", 131072, false],
+  ["zai", "GLM-4.6", "Z.AI", 200000, true, { input: 0.6, output: 2.2, cacheRead: 0.11, cacheWrite: 0 }],
+  ["zai", "GLM-4.5-Air", "Z.AI", 128000, false, { input: 0.2, output: 1.1, cacheRead: 0.02, cacheWrite: 0 }],
+  ["ds", "DeepSeek V4.1 Pro", "DeepSeek", 1000000, false, { input: 1.74, output: 3.48, cacheRead: 0.145, cacheWrite: 0 }],
+  ["oa", "gpt-5.1", "OpenAI", 400000, false, { input: 1.25, output: 10, cacheRead: 0.125, cacheWrite: 0 }],
+  ["oa", "gpt-5.1-mini", "OpenAI", 400000, false, { input: 0.25, output: 2, cacheRead: 0.025, cacheWrite: 0 }],
+  ["oa", "o4-mini", "OpenAI", 200000, false, { input: 1.1, output: 4.4, cacheRead: 0.275, cacheWrite: 0 }],
+  ["oa", "gemini-3-pro", "Google", 1000000, false, { input: 2, output: 12, cacheRead: 0.2, cacheWrite: 0 }]]
+  .map(([c, name, connection, window, image, price]) => ({
+    connectionId: c, model: name, name, connection, caps: { image, tools: true, reasoning: false, contextWindow: window },
+    ...(price ? { price } : {}) }));
+const agent = { name: "Набу", tone: "business", model, defaultModel: model, chosen: false, availableModels: [model, flash, ...extra], context: { tokens: 42000, window: 200000 } };
 const conv = (id, kind, title, extra = {}) => ({ id, kind, title, lastMessageAt: T("14:12"), archivedAt: null, createdAt: T("09:00", "01"), source: "chat", unreadCount: 0, writesRequireConfirmation: false, ...extra });
 const conversations = [conv("main", "main", null), conv("t1", "topic", "Релиз 1.4", { lastMessageAt: T("10:00") }),
   conv("t2", "topic", "Счёт от поставщика", { source: "email", unreadCount: 2, writesRequireConfirmation: true, lastMessageAt: T("08:30") })];

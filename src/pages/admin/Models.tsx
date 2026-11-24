@@ -62,6 +62,8 @@ export function ModelsAdmin() {
         <button className="btn primary sm" onClick={() => setAdding(true)}><Icon name="plus" size={15} />{t("admin.models.add")}</button>
       </div>
       <p className="t2">{t("admin.models.lead")}</p>
+      {/* R7: where the limits and the prices come from — a provider, the directory, or Nabu's own default */}
+      <div className="hint" style={{ marginBottom: 12 }}>{t("admin.models.limitsHint")}</div>
       {conns.data?.items.map((c) => (
         <div className="svc" key={c.id}>
           <div className="h">
@@ -107,11 +109,15 @@ export function ModelsAdmin() {
   );
 }
 
-/** The price of a model: the input and the output for 1M tokens (FTR.NAB.CHAT-0001
- * design §3.4). A provider gives floats with a long tail (159.67999999999998):
- * Intl rounds them and keeps the table within the dialog. */
+/** The price of a model: the input, the output and the read cache for 1M tokens
+ * (FTR.NAB.CHAT-0001 design §3.4). A provider gives floats with a long tail
+ * (159.67999999999998): Intl rounds them and keeps the table within the dialog.
+ * The price of the written cache stays in the unfolded row — it is the cost of
+ * a request that writes the cache, and it is rare. */
 const priceOf = (m: ModelDef, lng: string) =>
-  m.cost && (m.cost.input || m.cost.output) ? `${price(m.cost.input, lng)} / ${price(m.cost.output, lng)}` : "—";
+  m.cost && (m.cost.input || m.cost.output || m.cost.cacheRead)
+    ? `${price(m.cost.input, lng)} / ${price(m.cost.output, lng)} / ${price(m.cost.cacheRead, lng)}`
+    : "—";
 
 /** The same price in a number field: four decimals, not the tail of the provider. */
 const round4 = (v: number) => Math.round(v * 1e4) / 1e4;
@@ -130,7 +136,7 @@ function ModelRows({ conn, check, onSwitchOff }: { conn: ModelConnection; check?
             <tr key={m.id}>
               <td className="mt-model"><b>{m.name || m.id}</b><div className="mono small muted mt-id">{m.id}{m.aliases?.length ? ` · ${m.aliases.join(", ")}` : ""}</div></td>
               <td><ModelCaps m={m} /></td>
-              <td className="small muted">{priceOf(m, lng)}</td>
+              <td className="small muted" title={t("admin.models.priceLegend")}>{priceOf(m, lng)}</td>
               <td className="small">
                 {r && (r.ok ? <span className="ok-t"><Icon name="check" size={13} /> {r.embeddings ? t("admin.models.embeddingsModel") : t("admin.models.latency", { ms: r.latencyMs ?? 0 })}</span>
                   : <span className="err-t"><Icon name="alert" size={13} /> {llmErrorText(t, r.errorClass ?? "bad_request")}</span>)}
@@ -194,7 +200,7 @@ function ModelTable({ models, picked, edits, onToggle, onEdit }: {
                   <td className="mt-tick"><input type="checkbox" checked={picked.has(m.id)} disabled={disabled} onChange={() => onToggle(m.id)} aria-label={m.id} /></td>
                   {/* the name, the id and the capabilities in one cell: the price and the unfolding stand beside */}
                   <td className="mt-model"><b>{m.name || m.id}</b><div className="mono small muted mt-id" title={m.id}>{m.id}</div><ModelCaps m={m} /></td>
-                  <td className="small muted mt-price">{priceOf(m, lng)}</td>
+                  <td className="small muted mt-price" title={t("admin.models.priceLegend")}>{priceOf(m, lng)}</td>
                   <td className="mt-fold"><button className="textbtn" aria-expanded={open === m.id} aria-label={t(open === m.id ? "admin.models.fold" : "admin.models.unfold", { model: m.name || m.id })}
                     onClick={() => setOpen(open === m.id ? null : m.id)}>{open === m.id ? "▴" : "▾"}</button></td>
                 </tr>
@@ -226,8 +232,9 @@ function ModelTable({ models, picked, edits, onToggle, onEdit }: {
                         <div>
                           <div className="small muted cap-lab">{t("admin.models.cap.cost")}</div>
                           <div className="caps-cost">
-                            {(["input", "output"] as const).map((k) => (
+                            {(["input", "output", "cacheRead", "cacheWrite"] as const).map((k) => (
                               <input key={k} className="inp cap-num" type="number" min={0} step="0.001" aria-label={t(`admin.models.cap.cost_${k}`)}
+                                title={t(`admin.models.cap.cost_${k}`)}
                                 value={round4((e.cost ?? m.cost)?.[k] ?? 0)}
                                 onChange={(ev) => onEdit(m.id, { ...e, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, ...(e.cost ?? m.cost), [k]: Number(ev.target.value) } })} />
                             ))}
@@ -243,6 +250,7 @@ function ModelTable({ models, picked, edits, onToggle, onEdit }: {
           })}
         </tbody>
       </table>
+      {models.length > 0 && <div className="hint" style={{ marginTop: 8 }}>{t("admin.models.limitsHint")}</div>}
     </>
   );
 }

@@ -304,7 +304,7 @@ function MCPOAuthBlock({ item, onManual, onChanged }: { item: AdminCatalogItem |
               <button type="button" className="btn ghost sm" onClick={() => setConfirm(false)}>{t("common.cancel")}</button>
             </div>
           ) : (
-            <button type="button" className="btn ghost sm" onClick={() => setConfirm(true)}>{t("admin.catalog.mcpOAuth.reregister")}</button>
+            <button type="button" className="linkish underlink" onClick={() => setConfirm(true)}>{t("admin.catalog.mcpOAuth.reregister")}</button>
           )}
         </>
       ) : (

@@ -26,6 +26,9 @@ table.tasks-t td.task-cell{white-space:normal;min-width:240px}
 .quota{height:6px;border-radius:3px;background:var(--surface-2);overflow:hidden;width:220px}
 .quota i{display:block;height:100%;background:var(--violet)}
 .secret-once{font-family:var(--mono);font-size:13px;padding:10px 12px;border-radius:var(--r-m);background:var(--amber-soft);color:var(--amber);word-break:break-all}
+/* FTR.NAB.ADM-0001 design §3.1: «Перерегистрировать клиента» — ссылка, а не кнопка:
+   вторичная кнопка терялась рядом с блоком клиента, и администратор её не находил. */
+.underlink{text-decoration:underline;text-underline-offset:2px}
 @media (max-width:860px){
 .memrow{grid-template-columns:1fr auto}
 .memrow .when{display:none}
@@ -248,7 +251,7 @@ table.comm-t td:nth-child(1),table.comm-t td:nth-child(2){display:inline-block;w
 }
 .cap-sw{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
 .cap-lab{min-height:2.6em;display:flex;align-items:flex-end;margin-bottom:6px}
-.caps-cost{display:flex;gap:4px;min-width:0}
+.caps-cost{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;min-width:0}
 /* a number field shrinks with its column instead of its own width of an input */
 .cap-num{min-width:0;flex:1 1 0}
 .model-new{display:flex;flex-direction:column;gap:4px;margin:4px 0}

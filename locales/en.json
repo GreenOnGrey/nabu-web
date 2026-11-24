@@ -457,15 +457,19 @@
         "reasoning": "Reasoning",
         "contextWindow": "Context window",
         "maxTokens": "Longest answer",
-        "cost": "Price in / out per 1M",
-        "cost_input": "Price of input",
-        "cost_output": "Price of output"
+        "cost": "Price per 1M, USD: in / out / cache read / cache write",
+        "cost_input": "Price of input, per 1M",
+        "cost_output": "Price of output, per 1M",
+        "cost_cacheRead": "Price of the read cache, per 1M",
+        "cost_cacheWrite": "Price of the written cache, per 1M"
       },
       "availableByGroups": "The models users may choose are granted to groups.",
       "latency": "{ms, number} ms",
       "resetField": "Reset",
       "unfold": "Capabilities of {model}",
-      "fold": "Hide the capabilities of {model}"
+      "fold": "Hide the capabilities of {model}",
+      "limitsHint": "The window and the longest answer come from the provider (LiteLLM), then from the directory; when neither says, Nabu keeps 128 000 and 16 000. Prices are in US dollars per million tokens; the cache of the read input is included, the written cache is shown here only.",
+      "priceLegend": "Price per 1M, USD: input / output / read cache"
     },
     "catalog": {
       "title": "Catalog",
@@ -1683,6 +1687,7 @@
       "manual": "manual",
       "default": "default"
     },
-    "unconfirmed": "not confirmed"
+    "unconfirmed": "not confirmed",
+    "windowSource": "The window comes from: {source}"
   }
 }

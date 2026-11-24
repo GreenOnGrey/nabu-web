@@ -13,7 +13,8 @@ export function ModelCaps({ m }: { m: ModelDef }) {
         {m.reasoning && <span className="mcap"><Icon name="brain" size={11} />{t("models.cap.reasoning")}</span>}
         {m.tools === false && <span className="mcap err">{t("models.cap.noTools")}</span>}
       </>}
-      {m.contextWindow > 0 && <span className="mcap">{tokens(m.contextWindow, i18n.language)}</span>}
+      {m.contextWindow > 0 && <span className="mcap" title={m.sources?.contextWindow
+        ? t("models.windowSource", { source: t(`models.src.${m.sources.contextWindow}`) }) : undefined}>{tokens(m.contextWindow, i18n.language)}</span>}
       {m.gone && <span className="mcap warn">{t("admin.models.gone")}</span>}
     </span>
   );

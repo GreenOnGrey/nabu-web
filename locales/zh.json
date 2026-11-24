@@ -457,15 +457,19 @@
         "reasoning": "推理",
         "contextWindow": "上下文窗口",
         "maxTokens": "最长回答",
-        "cost": "每百万输入/输出价格",
-        "cost_input": "输入价格",
-        "cost_output": "输出价格"
+        "cost": "每百万价格（USD）：输入 / 输出 / 缓存读取 / 缓存写入",
+        "cost_input": "每百万输入的价格",
+        "cost_output": "每百万输出的价格",
+        "cost_cacheRead": "每百万缓存读取的价格",
+        "cost_cacheWrite": "每百万缓存写入的价格"
       },
       "availableByGroups": "用户可选的模型授予群组。",
       "latency": "{ms, number} 毫秒",
       "resetField": "重置",
       "unfold": "{model} 的能力",
-      "fold": "隐藏 {model} 的能力"
+      "fold": "隐藏 {model} 的能力",
+      "limitsHint": "上下文窗口和最长回答取自服务商（LiteLLM），其次取自已知目录；都没有时保留 128 000 和 16 000。价格以美元/百万 token 计：包含缓存读取，缓存写入只在这里显示。",
+      "priceLegend": "每百万价格（USD）：输入 / 输出 / 缓存读取"
     },
     "catalog": {
       "title": "目录",
@@ -1683,6 +1687,7 @@
       "manual": "手动",
       "default": "默认"
     },
-    "unconfirmed": "未确认"
+    "unconfirmed": "未确认",
+    "windowSource": "上下文窗口来源：{source}"
   }
 }
