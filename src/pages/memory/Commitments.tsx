@@ -9,6 +9,7 @@ import { errorText } from "../../lib/errors";
 import { intlLocale } from "../../lib/i18n";
 import { Empty, Icon, useToast } from "@green-on-grey/ui-kit";
 import { TagChip, dueText } from "./tags";
+import { TagPicker } from "./TagPicker";
 
 type Bucket = "overdue" | "today" | "week" | "later" | "undated" | "closed";
 const BUCKETS: Bucket[] = ["overdue", "today", "week", "later", "undated", "closed"];
@@ -141,17 +142,17 @@ export function CommitmentRow({ c, onTag, layout = "full", chatPath = (id) => `/
 }
 
 /** The Commitments tab (design §3.6): by due day, with the direction and the
- * state as segments. */
-export function CommitmentsTab({ people, topics, onTag }: { people: CommTag[]; topics: CommTag[]; onTag: (tag: CommTag) => void }) {
+ * state as segments and one field of the person or the topic — the field of the
+ * Communications tab (design §3.4): a choice of one kind replaces the other. */
+export function CommitmentsTab({ onTag }: { onTag: (tag: CommTag) => void }) {
   const { t } = useTranslation();
   const [direction, setDirection] = useState<"" | "mine" | "theirs">("");
   const [state, setState] = useState<"open" | "closed">("open");
-  const [person, setPerson] = useState("");
-  const [topic, setTopic] = useState("");
+  // the picked filter keeps its own label: the list of the field is the last eight of the source, not the whole set
+  const [filter, setFilter] = useState<Pick<CommTag, "id" | "kind" | "label"> | null>(null);
   const query = new URLSearchParams({ state });
   if (direction) query.set("direction", direction);
-  if (person) query.set("person", person);
-  if (topic) query.set("topic", topic);
+  if (filter) query.set(filter.kind === "person" ? "person" : "topic", filter.id);
   const list = useCommitments(query.toString());
   const items = list.data ?? [];
   const convs = useQuery({ queryKey: keys.conversations(false), queryFn: () => api.get<{ items: Conversation[] }>("/api/v1/conversations?archived=false") });
@@ -170,15 +171,14 @@ export function CommitmentsTab({ people, topics, onTag }: { people: CommTag[]; t
             <button key={s} className={state === s ? "on" : ""} aria-pressed={state === s} onClick={() => setState(s)}>{t(`comm.cm.filter.${s}`)}</button>
           ))}
         </div>
-        <select className="sel" value={person} onChange={(e) => setPerson(e.target.value)} aria-label={t("comm.person")}>
-          <option value="">{t("comm.person")}</option>
-          {people.map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}
-        </select>
-        <select className="sel" value={topic} onChange={(e) => setTopic(e.target.value)} aria-label={t("comm.topic")}>
-          <option value="">{t("comm.topic")}</option>
-          {topics.map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}
-        </select>
+        <TagPicker onPick={setFilter} />
       </div>
+      {filter && (
+        <div className="tgs cm-filter">
+          <TagChip tag={filter} removeLabel={t("comm.removeFilter")} onRemove={() => setFilter(null)} />
+          {list.data && <span className="small muted">{t("chat.commitments.count", { count: items.length })}</span>}
+        </div>
+      )}
       {list.error && <div className="err-text">{errorText(t, list.error)}</div>}
       {list.data && items.length === 0 && <Empty icon="check" title={t(state === "open" ? "comm.cm.empty" : "comm.cm.emptyClosed")} />}
       <CommitmentGroups items={items} row={(c) => <CommitmentRow key={c.id} c={c} onTag={onTag} chatPath={chatPath} />} />

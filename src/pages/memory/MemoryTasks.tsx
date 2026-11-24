@@ -175,9 +175,10 @@ function CollectSettingsForm({ state, value, disabled, onChange }: {
           ))}
         </span></div>
       <div className="kvrow"><span className="muted">{t("comm.tasks.interval")}</span>
-        <select className="sel" value={value.interval} disabled={disabled} onChange={(e) => onChange({ interval: e.target.value as CollectSettings["interval"] })} aria-label={t("comm.tasks.interval")}>
+        {/* the row of the kit keeps one height of the select with the fields of the card (R27) */}
+        <div className="ctlrow lg"><select className="sel" value={value.interval} disabled={disabled} onChange={(e) => onChange({ interval: e.target.value as CollectSettings["interval"] })} aria-label={t("comm.tasks.interval")}>
           {INTERVALS.map((i) => <option key={i} value={i}>{t(`comm.tasks.intervals.${i}`)}</option>)}
-        </select></div>
+        </select></div></div>
       <div className="kvrow"><span className="muted">{t("comm.tasks.hours")}</span>
         <Switch on={value.roundTheClock} disabled={disabled} onChange={(on) => onChange({ roundTheClock: on })} label={t("comm.tasks.roundTheClock")} /></div>
       <Exclusions value={value.exclusions} disabled={disabled} onChange={(exclusions) => onChange({ exclusions })} />
@@ -190,11 +191,18 @@ function CollectSettingsForm({ state, value, disabled, onChange }: {
   );
 }
 
+/** The name of a returned or a found muted group: cut inside its chip, the whole name in the title (design §3.2). */
+function MutedGroupName({ name }: { name: string }) {
+  return <span className="muted-group-name" title={name}>{name}</span>;
+}
+
 /** The muted groups of VK Teams returned to the collection (FTR.NAB.ADM-0001
- * R8, design §3.2): muted groups are skipped unless the user returns them. */
+ * R8, design §3.2): muted groups are skipped unless the user returns them. The
+ * field of the search stands in place from the start: with nothing returned yet
+ * it is the only thing the row shows, so the way to return a group is seen
+ * without opening anything. */
 function MutedGroups({ itemId, value, disabled, onChange }: { itemId: string; value: string[]; disabled: boolean; onChange: (v: string[]) => void }) {
   const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
   const [q, setQ] = useState("");
   const [names, setNames] = useState<Record<string, string>>({});
@@ -206,38 +214,42 @@ function MutedGroups({ itemId, value, disabled, onChange }: { itemId: string; va
   const found = useQuery({
     queryKey: ["comm", "muted-groups", itemId, q],
     queryFn: () => api.get<{ items: { chatSn: string; name: string }[] }>(`/api/v1/comm/sources/${itemId}/muted-groups?q=${encodeURIComponent(q)}`),
-    enabled: open || value.length > 0, // the names of the returned groups come from the same list
+    enabled: q !== "" || value.length > 0, // the names of the returned groups come from the same list
     placeholderData: (prev) => prev,
     staleTime: 60_000,
   });
   const nameOf = (sn: string) => names[sn] ?? found.data?.items.find((g) => g.chatSn === sn)?.name ?? sn;
+  const rest = (found.data?.items ?? []).filter((g) => !value.includes(g.chatSn));
   return (
-    <div className="kvrow top"><span className="muted">{t("comm.tasks.muted.title")}</span>
-      <span className="stack">
-        {value.length > 0 && <span className="small muted">{t("comm.tasks.muted.included")}</span>}
-        <span className="chips">
-          {value.map((sn) => (
-            <span className="chip" key={sn}>{nameOf(sn)}
-              <button type="button" className="tg-x" disabled={disabled} aria-label={t("common.remove")} onClick={() => onChange(value.filter((x) => x !== sn))}><Icon name="x" size={11} /></button>
-            </span>
-          ))}
-        </span>
-        {open ? (
+    <div className="kvrow top muted-groups"><span className="muted">{t("comm.tasks.muted.title")}</span>
+      <span className="stack muted-groups-box">
+        {value.length > 0 && (
           <>
-            <input className="inp" value={text} maxLength={100} onChange={(e) => setText(e.target.value)} placeholder={t("comm.tasks.muted.search")} aria-label={t("comm.tasks.muted.search")} />
-            {found.isError ? <span className="small err-t">{t("comm.tasks.muted.error")} <Link to="/connections">{t("nav.connections")}</Link></span>
-              : found.isLoading ? <span className="small muted">…</span>
-              : (found.data?.items ?? []).filter((g) => !value.includes(g.chatSn)).length === 0 ? <span className="small muted">{t("comm.tasks.muted.none")}</span>
-              : <span className="chips">
-                  {(found.data?.items ?? []).filter((g) => !value.includes(g.chatSn)).map((g) => (
-                    <button type="button" key={g.chatSn} className="chip" disabled={disabled}
-                      onClick={() => { setNames({ ...names, [g.chatSn]: g.name }); onChange([...value, g.chatSn]); }}><Icon name="plus" size={11} />{g.name}</button>
-                  ))}
-                </span>}
+            <span className="small muted">{t("comm.tasks.muted.included")}</span>
+            <span className="chips">
+              {value.map((sn) => (
+                <span className="chip muted-group-chip" key={sn}><MutedGroupName name={nameOf(sn)} />
+                  <button type="button" className="tg-x" disabled={disabled} aria-label={t("common.remove")} onClick={() => onChange(value.filter((x) => x !== sn))}><Icon name="x" size={11} /></button>
+                </span>
+              ))}
+            </span>
           </>
-        ) : (
-          <button type="button" className="btn ghost sm" disabled={disabled} onClick={() => setOpen(true)}>{t("comm.tasks.muted.add")}</button>
         )}
+        {/* the row of the kit: the search takes the height of the fields of the card (FTR.NAB.CMN-0005 R27) */}
+        <div className="ctlrow lg">
+          <input className="inp muted-groups-search" value={text} maxLength={100} onChange={(e) => setText(e.target.value)}
+            placeholder={t("comm.tasks.muted.search")} aria-label={t("comm.tasks.muted.search")} />
+        </div>
+        {/* nothing under an empty field: the card keeps its height and the source is not called */}
+        {q !== "" && (found.isError ? <span className="small err-t">{t("comm.tasks.muted.error")} <Link to="/connections">{t("nav.connections")}</Link></span>
+          : found.isFetching ? <span className="small muted">…</span>
+          : rest.length === 0 ? <span className="small muted">{t("comm.tasks.muted.none")}</span>
+          : <span className="chips muted-groups-list">
+              {rest.map((g) => (
+                <button type="button" key={g.chatSn} className="chip muted-group-chip" disabled={disabled}
+                  onClick={() => { setNames({ ...names, [g.chatSn]: g.name }); onChange([...value, g.chatSn]); setText(""); setQ(""); }}><Icon name="plus" size={11} /><MutedGroupName name={g.name} /></button>
+              ))}
+            </span>)}
       </span></div>
   );
 }
@@ -258,12 +270,12 @@ function Exclusions({ value, disabled, onChange }: { value: CollectSettings["exc
             </span>
           ))}
         </span>
-        <form className="row" style={{ gap: 6 }} onSubmit={(e) => { e.preventDefault(); const v = text.trim(); if (v && !value[kind].includes(v)) onChange({ ...value, [kind]: [...value[kind], v] }); setText(""); }}>
+        <form className="ctlrow lg" onSubmit={(e) => { e.preventDefault(); const v = text.trim(); if (v && !value[kind].includes(v)) onChange({ ...value, [kind]: [...value[kind], v] }); setText(""); }}>
           <select className="sel" value={kind} onChange={(e) => setKind(e.target.value as typeof kind)} aria-label={t("comm.tasks.exclusionKind")}>
             {(["senders", "folders", "chats"] as const).map((k) => <option key={k} value={k}>{t(`comm.tasks.exclusionKinds.${k}`)}</option>)}
           </select>
-          <input className="inp" style={{ flex: 1, minWidth: 0 }} value={text} maxLength={200} onChange={(e) => setText(e.target.value)} placeholder={t(`comm.tasks.exclusionHint.${kind}`)} aria-label={t("comm.tasks.exclusions")} />
-          <button className="btn sm" disabled={disabled || !text.trim()} aria-label={t("comm.tasks.addExclusion")}><Icon name="plus" size={14} /></button>
+          <input className="inp" style={{ flex: "1 1 140px", minWidth: 0 }} value={text} maxLength={200} onChange={(e) => setText(e.target.value)} placeholder={t(`comm.tasks.exclusionHint.${kind}`)} aria-label={t("comm.tasks.exclusions")} />
+          <button className="btn" disabled={disabled || !text.trim()} aria-label={t("comm.tasks.addExclusion")}><Icon name="plus" size={14} /></button>
         </form>
         <span className="small muted">{t("comm.tasks.neverCollected")}</span>
       </span></div>

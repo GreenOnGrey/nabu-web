@@ -73,7 +73,7 @@ export function MemoryPage() {
             view={sp.get("view") === "graph" ? "graph" : "table"} setView={(v) => patch({ view: v === "graph" ? "graph" : null })}
             noteId={sp.get("note")} setNote={(id) => patch({ note: id })} />
         : invite)}
-      {tab === "commitments" && (s.consentAt ? <CommitmentsTab people={people.data?.items ?? []} topics={topics.data?.items ?? []} onTag={openTag} /> : invite)}
+      {tab === "commitments" && (s.consentAt ? <CommitmentsTab onTag={openTag} /> : invite)}
       {tab === "tasks" && <MemoryTasksTab state={s} />}
     </div>
   );
