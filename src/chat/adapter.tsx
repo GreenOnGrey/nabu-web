@@ -126,6 +126,29 @@ export function liveAnswer(m: Pick<Message, "role" | "status" | "createdAt">, af
   return m.role === "assistant" && (m.status === "streaming" || m.status === "pending") && Date.parse(m.createdAt) > after;
 }
 
+/** FTR.NAB.CHAT-0004 R13: an answer older than the timeout of a turn is suspect,
+ * not dead: the site re-reads the conversation before calling it so. `rechecked`
+ * holds what the site already knows about each re-read. */
+export type Recheck = "asked" | "resynced";
+
+/** An answer the server may still be writing. */
+function unfinished(m: Pick<Message, "role" | "status">): boolean {
+  return m.role === "assistant" && (m.status === "streaming" || m.status === "pending");
+}
+
+/** FTR.NAB.CHAT-0004 R13: the answer is older than the threshold and the server
+ * was not asked about it yet — the site re-reads the conversation once. */
+export function needsResync(m: Pick<Message, "id" | "role" | "status" | "createdAt">, after: number, rechecked: ReadonlyMap<string, Recheck>): boolean {
+  return unfinished(m) && !liveAnswer(m, after) && !rechecked.has(m.id);
+}
+
+/** FTR.NAB.CHAT-0004 R13: the error of a turn that died is shown only after the
+ * server was asked and still reports the answer as writing; a finished answer is
+ * shown finished, even when the event with its end was lost. */
+export function deadAnswer(m: Pick<Message, "id" | "role" | "status" | "createdAt">, after: number, rechecked: ReadonlyMap<string, Recheck>): boolean {
+  return unfinished(m) && !liveAnswer(m, after) && rechecked.get(m.id) === "resynced";
+}
+
 /** Loads a file of a message for the preview with the session of the user (FTR.NAB.CHAT-0001 R34). */
 export const loadAttachment = (a: ChatAttachment) => api.blob(attachmentPath(a.id));
 
@@ -393,17 +416,33 @@ export function useConversation(conv: Conversation, modelWindow = 0): Pick<ChatP
     qc.invalidateQueries({ queryKey: ["conversations"] });
   });
 
+  // FTR.NAB.CHAT-0004 R13: an answer older than the threshold of the turn is not
+  // called dead by the local copy. The site re-reads the conversation once and
+  // shows the error only when the server still reports the answer as writing:
+  // the stream is a refresh signal, not the source of truth.
+  const [rechecked, setRechecked] = useState<ReadonlyMap<string, Recheck>>(() => new Map());
+  useEffect(() => {
+    const ids = raw.filter((m) => needsResync(m, liveAfter, rechecked)).map((m) => m.id);
+    if (ids.length === 0) return;
+    setRechecked((s) => new Map([...s, ...ids.map((id) => [id, "asked"] as const)]));
+    void qc.refetchQueries({ queryKey: keys.messages(conv.id) }).then(() => {
+      // the saved messages are the truth now: the live copy of a re-read answer
+      // must not shadow them (the delta handler kept it streaming)
+      if (qc.getQueryState(keys.messages(conv.id))?.status !== "error") {
+        setOverrides((o) => Object.fromEntries(Object.entries(o).filter(([id]) => !ids.includes(id))));
+      }
+      // a failed re-read leaves the local copy in charge, as before the change
+      setRechecked((s) => new Map([...s, ...ids.map((id) => [id, "resynced"] as const)]));
+    });
+  }, [raw, liveAfter, rechecked, qc, conv.id]);
+
   const lng = i18n.language;
   const messages = useMemo(() => raw.map((m) => {
     // R13: the answer of a turn that died is a failure with Retry, not one being written forever
-    const stale = (m.status === "streaming" || m.status === "pending") && !liveAnswer(m, liveAfter);
-    const view = toChatMessage(t, stale ? { ...m, status: "failed" } : m, wait, lng);
-    return {
-      ...view,
-      error: stale ? { text: llmErrorText(t, "agent_crashed"), transient: true } : view.error,
-      retryQueued: retrying.has(m.id) || undefined,
-    };
-  }), [raw, wait, t, lng, retrying, liveAfter]);
+    const dead = deadAnswer(m, liveAfter, rechecked);
+    const view = toChatMessage(t, dead ? { ...m, status: "failed", errorClass: "agent_crashed" } : m, wait, lng);
+    return { ...view, retryQueued: retrying.has(m.id) || undefined };
+  }), [raw, wait, t, lng, retrying, liveAfter, rechecked]);
 
   const context = useContextFill(conv, modelWindow);
   const commands = useCommands(conv);

@@ -3,7 +3,7 @@ import type { Message } from "../api/types";
 import { errorText } from "../lib/errors";
 import { ApiError } from "../api/client";
 import { createI18n } from "../lib/i18n";
-import { liveAnswer, toChatMessage } from "./adapter";
+import { liveAnswer, deadAnswer, needsResync, toChatMessage, type Recheck } from "./adapter";
 
 const t = createI18n("ru").t;
 const msg = (m: Partial<Message>): Message => ({
@@ -30,6 +30,35 @@ describe("FTR.NAB.CHAT-0004 in the web", () => {
     expect(liveAnswer(msg({ role: "assistant", status: "streaming", createdAt: "2026-10-27T14:10:00Z" }), after)).toBe(false);
     expect(liveAnswer(msg({ role: "assistant", status: "streaming", createdAt: "2026-10-27T14:40:00Z" }), after)).toBe(true);
     expect(liveAnswer(msg({ role: "assistant", status: "done", createdAt: "2026-10-27T14:40:00Z" }), after)).toBe(false);
+  });
+
+  it("STP-20: an answer older than the threshold is re-read; a finished one is no error", () => {
+    const after = Date.parse("2026-10-27T14:35:00Z");
+    const m = msg({ role: "assistant", status: "streaming", createdAt: "2026-10-27T14:00:00Z" });
+    // before the re-read the local copy does not call the answer dead
+    expect(needsResync(m, after, new Map())).toBe(true);
+    expect(deadAnswer(m, after, new Map())).toBe(false);
+    // the re-read is asked once; until the answer comes the error is not shown
+    const asked = new Map<string, Recheck>([["m1", "asked"]]);
+    expect(needsResync(m, after, asked)).toBe(false);
+    expect(deadAnswer(m, after, asked)).toBe(false);
+    // the answer came back finished: shown finished, no error
+    const done = { ...m, status: "done" as const, text: "Готово" };
+    expect(deadAnswer(done, after, new Map([["m1", "resynced"]]))).toBe(false);
+    const view = toChatMessage(t, done, null);
+    expect(view.text).toBe("Готово");
+    expect(view.error).toBeUndefined();
+  });
+
+  it("STP-21: the server still reports the answer as writing — the error shows", () => {
+    const after = Date.parse("2026-10-27T14:35:00Z");
+    const m = msg({ role: "assistant", status: "streaming", createdAt: "2026-10-27T14:00:00Z", text: "Половина" });
+    expect(deadAnswer(m, after, new Map([["m1", "resynced"]]))).toBe(true);
+    // the adapter shows the answer as failed with the error of the class
+    const view = toChatMessage(t, { ...m, status: "failed", errorClass: "agent_crashed" }, null);
+    expect(view.error?.text).toBe("Агент неожиданно остановился. Повторите.");
+    expect(view.error?.transient).toBe(true);
+    expect(view.text).toBe("Половина");
   });
 
   it("QUE-12: the errors of the queue are worded", () => {
